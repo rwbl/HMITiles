@@ -124,13 +124,13 @@ Planned additions include:
 
 ## Disclaimer
 
-This project is inspired by ISA-101 Human-Machine Interface principles. 
+This project is inspired by ISA-101 Human-Machine Interface principles.
 
-It is not intended as a certified or safety-rated system. 
+It is not intended as a certified or safety-rated system.
 
-ISA-101 is a standard and trademark of the International Society of Automation. 
+ISA-101 is a standard and trademark of the International Society of Automation.
 
-This project is not affiliated with, endorsed by, or certified by ISA. 
+This project is not affiliated with, endorsed by, or certified by ISA.
 
 ## License
 
