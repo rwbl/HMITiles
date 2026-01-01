@@ -5,7 +5,7 @@
 
 ## Overview
 
-HMITiles is an open-source HMI (Human Machine Interface) tile library written in **B4X**, following widely accepted industrial HMI principles.
+HMITiles is an open-source HMI (Human Machine Interface) tile library written in [B4X](http://www.b4x.com), following widely accepted industrial HMI principles.
 
 It provides reusable, professional-grade HMI tiles for:
 - Industrial dashboards
