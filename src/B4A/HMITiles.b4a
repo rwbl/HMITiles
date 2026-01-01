@@ -1,0 +1,140 @@
+﻿Build1=Default,com.rwbl.hmitiles
+File1=alarm-light.png
+File10=hmitilelist.bal
+File11=hmitilereadout.bal
+File12=hmitilergb.bal
+File13=hmitileselect.bal
+File14=hmitileselectlist.bal
+File15=hmitilesensor.bal
+File16=hmitileshape.bal
+File17=hmitilesppv.bal
+File18=hmitiletrend.bal
+File19=MainPage.bal
+File2=hmitilebutton.bal
+File3=hmitileclock.bal
+File4=hmitileeventviewer.bal
+File5=hmitilegauge.bal
+File6=hmitileimage.bal
+File7=hmitileimageicon.bal
+File8=hmitilelabel.bal
+File9=hmitilelevel.bal
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
+FileGroup12=Default Group
+FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=Default Group
+FileGroup19=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+Library1=b4xpages
+Library2=byteconverter
+Library3=core
+Library4=xui views
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~
+Module1=|relative|..\B4XMainPage
+Module10=|relative|..\Mods\HMITileLabel
+Module11=|relative|..\Mods\HMITileLevel
+Module12=|relative|..\Mods\HMITileList
+Module13=|relative|..\Mods\HMITileReadout
+Module14=|relative|..\Mods\HMITileRGB
+Module15=|relative|..\Mods\HMITileSeekBar
+Module16=|relative|..\Mods\HMITileSelect
+Module17=|relative|..\Mods\HMITileSelectList
+Module18=|relative|..\Mods\HMITileSensor
+Module19=|relative|..\Mods\HMITileShape
+Module2=|relative|..\Mods\HMITileButton
+Module20=|relative|..\Mods\HMITileSPPV
+Module21=|relative|..\Mods\HMITileTrend
+Module22=|relative|..\Mods\HMITileUtils
+Module23=Starter
+Module3=|relative|..\Mods\HMITileClock
+Module4=|relative|..\Mods\HMITileDigitalClock
+Module5=|relative|..\Mods\HMITileEventViewer
+Module6=|relative|..\Mods\HMITileGauge
+Module7=|relative|..\Mods\HMITileGridHelper
+Module8=|relative|..\Mods\HMITileImage
+Module9=|relative|..\Mods\HMITileImageIcon
+NumberOfFiles=19
+NumberOfLibraries=4
+NumberOfModules=23
+Version=13.4
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: HMITiles
+	#VersionCode: 1
+	#VersionName: Casper
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+	#BridgeLogger: True
+#End Region
+
+Sub Process_Globals
+	Public ActionBarHomeClicked As Boolean
+End Sub
+
+Sub Globals
+
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Dim pm As B4XPagesManager
+	pm.Initialize(Activity)
+End Sub
+
+'Template version: B4A-1.01
+#Region Delegates
+
+Sub Activity_ActionBarHomeClick
+	ActionBarHomeClicked = True
+	B4XPages.Delegate.Activity_ActionBarHomeClick
+	ActionBarHomeClicked = False
+End Sub
+
+Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Return B4XPages.Delegate.Activity_KeyPress(KeyCode)
+End Sub
+
+Sub Activity_Resume
+	B4XPages.Delegate.Activity_Resume
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+	B4XPages.Delegate.Activity_Pause
+End Sub
+
+Sub Activity_PermissionResult (Permission As String, Result As Boolean)
+	B4XPages.Delegate.Activity_PermissionResult(Permission, Result)
+End Sub
+
+Sub Create_Menu (Menu As Object)
+	B4XPages.Delegate.Create_Menu(Menu)
+End Sub
+
+#if Java
+public boolean _onCreateOptionsMenu(android.view.Menu menu) {
+	 processBA.raiseEvent(null, "create_menu", menu);
+	 return true;
+	
+}
+#End If
+#End Region
+
+'Program code should go into B4XMainPage and other pages.

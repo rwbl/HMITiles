@@ -1,0 +1,111 @@
+﻿AppType=JavaFX
+Build1=Default,com.rwblinn.hmitiles
+File1=hmitilebutton.bjl
+File10=hmitilereadout.bjl
+File11=hmitilergb.bjl
+File12=hmitileselect.bjl
+File13=hmitileselectlist.bjl
+File14=hmitilesensor.bjl
+File15=hmitileshape.bjl
+File16=hmitilesppv.bjl
+File17=hmitiletrend.bjl
+File18=mainpage.bjl
+File2=hmitileclock.bjl
+File3=hmitileeventviewer.bjl
+File4=hmitilegauge.bjl
+File5=hmitileimage.bjl
+File6=hmitileimageicon.bjl
+File7=hmitilelabel.bjl
+File8=hmitilelevel.bjl
+File9=hmitilelist.bjl
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
+FileGroup12=Default Group
+FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=New Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+Library1=b4xpages
+Library2=byteconverter
+Library3=jcore
+Library4=jfx
+Library5=xui views
+Library6=javaobject
+Module1=|relative|..\B4XMainPage
+Module10=|relative|..\Mods\HMITileLabel
+Module11=|relative|..\Mods\HMITileLevel
+Module12=|relative|..\Mods\HMITileList
+Module13=|relative|..\Mods\HMITileReadout
+Module14=|relative|..\Mods\HMITileRGB
+Module15=|relative|..\Mods\HMITileSeekBar
+Module16=|relative|..\Mods\HMITileSelect
+Module17=|relative|..\Mods\HMITileSelectList
+Module18=|relative|..\Mods\HMITileSensor
+Module19=|relative|..\Mods\HMITileShape
+Module2=|relative|..\Mods\HMITileButton
+Module20=|relative|..\Mods\HMITileSPPV
+Module21=|relative|..\Mods\HMITileTrend
+Module22=|relative|..\Mods\HMITileUtils
+Module3=|relative|..\Mods\HMITileClock
+Module4=|relative|..\Mods\HMITileDigitalClock
+Module5=|relative|..\Mods\HMITileEventViewer
+Module6=|relative|..\Mods\HMITileGauge
+Module7=|relative|..\Mods\HMITileGridHelper
+Module8=|relative|..\Mods\HMITileImage
+Module9=|relative|..\Mods\HMITileImageIcon
+NumberOfFiles=18
+NumberOfLibraries=6
+NumberOfModules=22
+Version=10.3
+@EndOfDesignText@
+#Region Project Attributes 
+	#MainFormWidth: 1050
+	#MainFormHeight: 800 
+#End Region
+
+Sub Process_Globals
+	Private fx As JFX
+	Private MainForm As Form
+End Sub
+
+Sub AppStart (Form1 As Form, Args() As String)
+	MainForm = Form1
+	MainForm.Show
+	Dim PagesManager As B4XPagesManager
+	PagesManager.Initialize(MainForm)
+End Sub
+
+'Template version: B4J-1.0
+#Region Delegates
+Sub MainForm_FocusChanged (HasFocus As Boolean)
+	B4XPages.Delegate.MainForm_FocusChanged(HasFocus)
+End Sub
+
+Sub MainForm_Resize (Width As Double, Height As Double)
+	B4XPages.Delegate.MainForm_Resize(Width, Height)
+End Sub
+
+Sub MainForm_Closed
+	B4XPages.Delegate.MainForm_Closed
+End Sub
+
+Sub MainForm_CloseRequest (EventData As Event)
+	B4XPages.Delegate.MainForm_CloseRequest(EventData)
+End Sub
+
+Public Sub MainForm_IconifiedChanged (Iconified As Boolean)
+	B4XPages.Delegate.MainForm_IconifiedChanged(Iconified)
+End Sub
+#End Region
