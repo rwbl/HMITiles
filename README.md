@@ -1,11 +1,11 @@
 # HMITiles
-**ISA-101–Inspired Open-Source HMI Tile Library for Industrial Dashboards**
+**An ISA-101–Inspired Open-Source HMI Tile Library for Industrial Dashboards**
 
 ---
 
 ## Overview
 
-HMITiles is an open-source HMI (Human Machine Interface) tile library written in **B4X**, following widely accepted industrial HMI design principles.
+HMITiles is an open-source HMI (Human Machine Interface) tile library written in **B4X**, following widely accepted industrial HMI principles.
 
 It provides reusable, professional-grade HMI tiles for:
 - Industrial dashboards
@@ -18,7 +18,7 @@ The focus of this library is **clarity, consistency, and disciplined HMI design*
 
 ## Design Goals
 
-- Based on widely accepted industrial HMI design principles
+- Based on widely accepted industrial HMI principles
 - Alarm-first color discipline
 - Clear and consistent state handling
 - Touch-friendly layouts
@@ -55,9 +55,9 @@ All tiles share a **unified styling and state model**.
 
 ## Screenshots
 
-Example overview screen showing multiple tiles in a single dashboard.
-
-*(Screenshots will be added here)*
+![Overview Dashboard](screenshots/overview.png "Overview Dashboard")
+![Water Tank Simulator](screenshots/water_tank_simulator.png "Water Tank Simulator")
+![ESP32 BLE LED](screenshots/esp32_ble_led.png "ESP32 BLE LED")
 
 ---
 

@@ -1,21 +1,62 @@
-# CHANGELOG HMITiles.b4xlib
+# Changelog
+
+All notable changes to **HMITiles** are documented in this file.
+
+The project follows semantic versioning where possible.
 
 ---
 
-## v1.4.0 (Build 20251231)
-- NEW: HMITiles - SeekBar (replaces Slider), Select, SelectList, Shapes (HLine,VLine,Corners).
-- NEW: B4A Example Apps - Overview, ESP32BLELED (control ESP32 LED via BLE, ESP32 firmare B4R).
-- UPD: Customviews - All HMITiles reworked, tested with B4A - exception: HMITileRGB (B4J only).
-- UPD: B4J Examples - Overview, Water Tank Simulator, ArduinoLED.
-- DEL: Internal customviews - HMISeekbar, HMIPlusMinusNumeric. 
+## [1.4.0] – 2025-12-31
 
-## v1.3.0 (Build 202512DD)
-- NEW: HMITiles - Trend, SPPV, Gauge.
-- NEW: Internal customviews - HMISeekbar, HMIPlusMinusNumeric.
-- NEW: Example Water Tank Simulator, ArduinoLED.
-- UPD: HMITiles various minor updates.
-- UPD: HMITileUtils - Color scheme revised to neutral blue-green scale.
-- UPD: Example Overview
+### Added
+- New HMI tiles:
+  - SeekBar (replacing Slider)
+  - Select
+  - SelectList
+  - Shape tiles (HLine, VLine, Corners)
+- New B4A example applications:
+  - Overview
+  - ESP32BLELED (control ESP32 LED via BLE, ESP32 firmware in B4R)
 
-## v1.0.0 (Build 20251217)
-- NEW: Initial release (published B4J forum https://www.b4x.com/android/forum/threads/hmitiles.169774/).
+### Changed
+- All HMITiles custom views reworked and tested with **B4A**
+  - Exception: `HMITileRGB` remains **B4J-only**
+- Updated B4J example applications:
+  - Overview
+  - WaterTankSimulator
+  - ArduinoLED
+
+### Removed
+- Internal custom views:
+  - `HMISeekbar`
+  - `HMIPlusMinusNumeric`
+
+---
+
+## [1.3.0] – 2025-12-XX
+
+### Added
+- New HMI tiles:
+  - Trend
+  - SPPV
+  - Gauge
+- Internal custom views:
+  - `HMISeekbar`
+  - `HMIPlusMinusNumeric`
+- Example applications:
+  - WaterTankSimulator
+  - ArduinoLED
+
+### Changed
+- Various minor updates across HMITiles
+- Revised `HMITileUtils` color scheme to a neutral blue–green scale
+- Updated Overview example
+
+---
+
+## [1.0.0] – 2025-12-17
+
+### Added
+- Initial public release of HMITiles
+- Published on the B4J forum:  
+  https://www.b4x.com/android/forum/threads/hmitiles.169774/
