@@ -12,7 +12,7 @@ It provides reusable, professional-grade HMI tiles for:
 - SCADA (Supervisory Control and Data Acquisition) front-ends
 - Machine and process HMIs
 
-The focus of this library is **clarity, consistency, and disciplined HMI design** — not visual effects or UI decoration.
+The focus of this library is **clarity, consistency, and disciplined HMI design** - not visual effects or UI decoration.
 
 ---
 
@@ -122,18 +122,8 @@ Planned additions include:
 - HMITileMenuButton
 - FarmKit32 example to control the Keyestudio Smart Farm Kit KS0567, similar in concept to HomeKit32
 
-## Disclaimer
-
-This project is inspired by ISA-101 Human-Machine Interface principles.
-
-It is not intended as a certified or safety-rated system.
-
-ISA-101 is a standard and trademark of the International Society of Automation.
-
-This project is not affiliated with, endorsed by, or certified by ISA.
-
 ## License
 
-MIT License
+- **HMITiles** – MIT License © 2025-2026 Robert W. W. Linn
 See LICENSE for details.
 
