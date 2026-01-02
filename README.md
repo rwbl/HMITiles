@@ -1,5 +1,5 @@
 # HMITiles
-**An ISA-101–Inspired Open-Source HMI Tile Library for Industrial Dashboards**
+**An Open-Source HMI Tile Library for Industrial Dashboards**
 
 ---
 
@@ -55,9 +55,9 @@ All tiles share a **unified styling and state model**.
 
 ## Screenshots
 
-![Overview Dashboard](screenshots/overview.png "Overview Dashboard")
-![Water Tank Simulator](screenshots/water_tank_simulator.png "Water Tank Simulator")
-![ESP32 BLE LED](screenshots/esp32_ble_led.png "ESP32 BLE LED")
+![Overview Dashboard](images/overview_dashboard.png "Overview Dashboard")
+![Water Tank Simulator](images/water_tank_simulator.png "Water Tank Simulator")
+![ESP32 BLE LED](images/esp32_ble_led.png "ESP32 BLE LED")
 
 ---
 

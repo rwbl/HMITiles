@@ -9,7 +9,7 @@ The project follows semantic versioning where possible.
 ## [1.4.0] – 2025-12-31
 
 ### Added
-- New HMI tiles:
+- HMI tiles:
   - SeekBar (replacing Slider)
   - Select
   - SelectList
@@ -19,12 +19,12 @@ The project follows semantic versioning where possible.
   - ESP32BLELED (control ESP32 LED via BLE, ESP32 firmware in B4R)
 
 ### Changed
-- All HMITiles custom views reworked and tested with **B4A**
+- HMITiles custom views reworked and tested with **B4A**
   - Exception: `HMITileRGB` remains **B4J-only**
 - Updated B4J example applications:
   - Overview
-  - WaterTankSimulator
-  - ArduinoLED
+  - Water Tank Simulator
+  - Arduino LED
 
 ### Removed
 - Internal custom views:
@@ -33,10 +33,10 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.3.0] – 2025-12-XX
+## [1.3.0] – 2025-12-26
 
 ### Added
-- New HMI tiles:
+- HMI Tiles:
   - Trend
   - SPPV
   - Gauge
@@ -44,8 +44,8 @@ The project follows semantic versioning where possible.
   - `HMISeekbar`
   - `HMIPlusMinusNumeric`
 - Example applications:
-  - WaterTankSimulator
-  - ArduinoLED
+  - Water Tank Simulator
+  - Arduino LED
 
 ### Changed
 - Various minor updates across HMITiles
@@ -58,5 +58,4 @@ The project follows semantic versioning where possible.
 
 ### Added
 - Initial public release of HMITiles
-- Published on the B4J forum:  
-  https://www.b4x.com/android/forum/threads/hmitiles.169774/
+- Published on the [B4J forum](https://www.b4x.com/android/forum/threads/hmitiles.169774/)
