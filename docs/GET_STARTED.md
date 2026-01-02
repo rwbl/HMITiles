@@ -22,11 +22,11 @@ This guide shows how to create your first HMITiles project using a simple HMITil
 
 ## Step 2 - Create a New B4J Project
 
-1. Create a new folder named `HMIButtons`.
+1. Create a new folder named `HMITileButtons`.
 2. Start the B4J IDE.
 3. Select menu File > New > B4XPages.
-4. Choose the `HMIButtons`folder
-5. Set project name `HMIButtons`.
+4. Choose the `HMITileButtons`folder
+5. Set project name `HMITileButtons`.
 6. Select the class `B4XMainPage`.
 
 ## Step 3 – Enable the HMITiles Library
@@ -128,6 +128,8 @@ Compile and Run the project.
 [TileButtonOnOff] state=false
 ```
 
+![Get Started HMITileButtons](images/get_started_hmitilebuttons.png "Get Started HMITileButtons")
+
 ## Full B4J B4XMainPage Code (Reference)
 ```
 Sub Class_Globals
@@ -176,5 +178,4 @@ End Sub
 - Explore other HMITiles (Readouts, Sensors, SeekBars, Trends)
 - Review API.md for supported public interfaces
 - Check example projects for real-world usage
-
 

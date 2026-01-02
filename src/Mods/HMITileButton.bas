@@ -130,13 +130,15 @@ End Sub
 ' ================================================================
 
 #Region API
-Public Sub setTitleText(value As String)
+' Get or set the title of the button.
+Public Sub setTitle(value As String)
 	LabelTitle.Text = value
 End Sub
-Public Sub getTitleText As String
+Public Sub getTitle As String
 	Return LabelTitle.Text
 End Sub
 
+' Get or set the state text of the button.
 Public Sub setStateText(value As String)
 	LabelState.Text = value
 End Sub
