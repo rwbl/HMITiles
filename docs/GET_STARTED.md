@@ -128,7 +128,7 @@ Compile and Run the project.
 [TileButtonOnOff] state=false
 ```
 
-![Get Started HMITileButtons](images/get_started_hmitilebuttons.png "Get Started HMITileButtons")
+![Get Started HMITileButtons](../images/get_started_hmitilebuttons.png "Get Started HMITileButtons")
 
 ## Full B4J B4XMainPage Code (Reference)
 ```
