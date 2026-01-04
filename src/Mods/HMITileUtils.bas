@@ -8,8 +8,8 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileUtils.bas
 ' Brief:		Common constants and helper subs used by the customview HMITiles.
-' Date:			2025-12-31
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-04
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Central styling module for HMITiles library.
 '     			- Base colors (neutral blue-green scale)
 '     			- Alarm colors (amber/red)

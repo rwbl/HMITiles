@@ -6,6 +6,20 @@ The project follows semantic versioning where possible.
 
 ---
 
+## [1.4.3] – 2026-01-DD
+
+### Added
+- New B4J example applications:
+	Get Started HMITileButton, HMITileLabel.
+
+### Changed
+- HMITiles custom views public API aligned.
+- Updated all examples
+
+### Removed
+
+---
+
 ## [1.4.0] – 2025-12-31
 
 ### Added

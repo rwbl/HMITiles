@@ -8,8 +8,8 @@ Version=9.85
 ' File:			HMITiles
 ' Brief:		Example app for the HMITiles B4X library.
 ' Description:	Show selective HMITils on a Android Tablet 800x1200px.
-' Date:			2025-12-31
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-04
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' DependsOn:	XUI Views, ByteConverter
 ' ================================================================
 
@@ -18,8 +18,8 @@ Version=9.85
 #End Region
 
 Sub Class_Globals
-	Private VERSION As String	= "HMITiles Example Overview v20251231"
-	Private ABOUT As String 	= $"HMITiles (c) 2025 Robert W.B. Linn - MIT"$
+	Private VERSION As String	= "HMITiles Example Overview v20260104"
+	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
 	Private xui As XUI
@@ -149,7 +149,12 @@ Private Sub TileButtonToggle_Click
 End Sub
 
 Private Sub TileButtonAlarm_Click
-	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
+	If TileButtonAlarm.State Then
+		TileButtonAlarm.SetNormal("Cleared")
+	Else
+		TileButtonAlarm.SetAlarm("ALARM")
+	End If
+	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
 End Sub
 
 ' ================================================================

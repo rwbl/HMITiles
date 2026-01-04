@@ -8,17 +8,19 @@ Version=9.85
 ' File:			HMITiles
 ' Brief:		Development program for the HMITiles B4X library.
 ' Description:	This library provides a coherent tile system, HMITiles.
-' Date:			2026-01-01
+' Date:			2026-01-04
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' DependsOn:	XUI Views, ByteConverter, JavaObject
 ' ================================================================
 
 #Region Shared Files
+' Ref: www.b4x.com/android/forum/threads/b4x-codebundle-–-export-projects-as-a-single-json-for-ai-analysis.169835/
+#Macro: Title, Code bundle, ide://run?File=%ADDITIONAL%\CodeBundle.jar&Args=%PROJECT_NAME%&vmargs=-DCompactJson%3DFalse
 #CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
 #End Region
 
-Sub Class_Globals
-	Private VERSION As String	= "HMITiles v20260101 - Development"
+Private Sub Class_Globals
+	Private VERSION As String	= "HMITiles v20260104 - Development"
 	Private ABOUT As String 	= $"${VERSION} (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -148,7 +150,12 @@ Private Sub TileButtonToggle_Click
 End Sub
 
 Private Sub TileButtonAlarm_Click
-	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
+	If TileButtonAlarm.State Then
+		TileButtonAlarm.SetNormal("Cleared")
+	Else
+		TileButtonAlarm.SetAlarm("ALARM")
+	End If
+	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
 End Sub
 
 ' ================================================================

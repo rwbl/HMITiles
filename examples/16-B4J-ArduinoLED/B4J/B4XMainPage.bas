@@ -8,8 +8,8 @@ Version=9.85
 ' ================================================================
 ' File:			ArduinoLED
 ' Brief:		Control the state of an LED connected to an Arduino UNO via the serial line.
-' Date:			2025-12-31
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-04
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	The application connects to the Arduino UNO via the serial line (COM).
 '				The state of the Arduino onboard LED (pin 0x0D) is set via byte:
 '				0x00 (OFF), 0x01 (ON), 0x02 (Blink)
@@ -25,8 +25,8 @@ Sub Class_Globals
 	' ================================================================
 	' APPLICATION METADATA
 	' ================================================================
-	Private VERSION As String	= "HMITiles Example ArduinoLED v20251231"
-	Private ABOUT As String 	= $"HMITiles (c) 2025 Robert W.B. Linn - MIT"$
+	Private VERSION As String	= "HMITiles Example ArduinoLED v20260104"
+	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 
 	' ================================================================
 	' LED COMMANDS & STATES

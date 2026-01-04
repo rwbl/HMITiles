@@ -8,17 +8,19 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileClock.bas
 ' Brief:    	CustomView HMITile showing an analog clock drawn on a B4XCanvas.
-' Date:			2025-12-17
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-04
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Hints:    	HMITile cannot be resized after form loaded.
 ' ================================================================
 #End Region
 
-#Event: Click(EventData As MouseEvent)
-
+' Designer Properties
 #DesignerProperty: Key: ShowSeconds, DisplayName: Show Seconds, FieldType: Boolean, DefaultValue: False
 
-Sub Class_Globals
+' Events
+#Event: Click(EventData As MouseEvent)
+
+Private Sub Class_Globals
 	Dim COLOR_HOUR_HAND As Int 		= 0xFFFFFFFF
 	Dim COLOR_MINUTES_HAND As Int 	= 0xFFFFFFFF
 	Dim COLOR_SECONDS_HAND As Int	= 0xFFFF0000
@@ -27,9 +29,9 @@ Sub Class_Globals
 	Private mCallBack As Object
 
 	Public mBase As B4XView
-	Private xui As XUI
 	Public Tag As Object
 
+	Private xui As XUI
 	Private PaneClock As B4XView
 	Private CanvasClock As B4XCanvas
 
@@ -41,12 +43,12 @@ Sub Class_Globals
 	Private mLastSec As Int = -1
 End Sub
 
-Public Sub Initialize (Callback As Object, EventName As String)
+Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 	mCallBack = Callback
 	mEventName = EventName
 End Sub
 
-Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	Tag = mBase.Tag
 	mBase.Tag = Me
@@ -69,26 +71,10 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mClockTimer.Enabled = True
 End Sub
 
-Private Sub ClockTimer_Tick
-    Dim now As Long = DateTime.Now
-    Dim sec As Int = DateTime.GetSecond(now)
-    If sec = mLastSec Then Return    ' avoid double redraw
-    mLastSec = sec
-	UpdateTime(DateTime.Now)
-End Sub
-
-' ApplyStyle
-' Apply style Normal.
-Private Sub ApplyStyle
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
-End Sub
-
 Private Sub Base_Resize (Width As Double, Height As Double)
 	If Not(PaneClock.IsInitialized) Then Return
 	
-	PaneClock.SetLayoutAnimated(0, _ 
+	PaneClock.SetLayoutAnimated(0, _
 								HMITileUtils.BORDER_WIDTH, _
 								HMITileUtils.BORDER_WIDTH, _
         						Width - HMITileUtils.BORDER_WIDTH * 2, _ 
@@ -97,9 +83,22 @@ Private Sub Base_Resize (Width As Double, Height As Double)
 	UpdateTime(DateTime.Now)
 End Sub
 
-' =========================
-' Public clock interface
-' =========================
+#Region ClockTimer
+Private Sub ClockTimer_Tick
+    Dim now As Long = DateTime.Now
+    Dim sec As Int = DateTime.GetSecond(now)
+    If sec = mLastSec Then Return    ' avoid double redraw
+    mLastSec = sec
+	UpdateTime(DateTime.Now)
+End Sub
+#End Region
+
+' ================================================================
+' PUBLIC API
+' ================================================================
+
+#Region API
+' Get or set show seconds option.
 Public Sub setShowSeconds(b As Boolean)
 	mShowSeconds = b
 	UpdateTime(DateTime.Now)
@@ -108,6 +107,7 @@ Public Sub getShowSeconds As Boolean
 	Return mShowSeconds
 End Sub
 
+' Get or set the clock enabled/disabled
 Public Sub setEnabled(enabled As Boolean)
 	mBase.Enabled = enabled
 	HMITileUtils.SetAlpha(mBase.enabled)
@@ -116,14 +116,20 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
+' Start the clock.
 Public Sub StartClock
 	mClockTimer.Enabled = True
 End Sub
+
+' Stop the clock.
 Public Sub StopClock
 	mClockTimer.Enabled = False
 End Sub
 
-Public Sub UpdateTime(T As Long)
+' Update the time.
+' Parameters:
+'	newtime Long - Clock time in ticks.
+Public Sub UpdateTime(newtime As Long)
 	' If CanvasClock.IsInitialized = False Then Return
 
 	CanvasClock.ClearRect(CanvasClock.TargetRect)
@@ -133,15 +139,29 @@ Public Sub UpdateTime(T As Long)
 	Dim r As Float = Min(cx, cy) * 0.80
 
 	DrawClockFace(cx, cy, r)
-	DrawHands(cx, cy, r, T)
+	DrawHands(cx, cy, r, newtime)
 
 	CanvasClock.Invalidate
 End Sub
+#End Region
+
+' ================================================================
+' Tile STYLING
+' ================================================================
+#Region HMITile Styling
+' ApplyStyle
+' Apply style Normal.
+Private Sub ApplyStyle
+	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	' Border styling - All non-buttons clean, borderless tile with border-radius.
+	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+End Sub
+#End Region
 
 ' =========================
 ' Drawing methods
 ' =========================
-
+#Region DrawingMethods
 Private Sub DrawClockFace(cx As Float, cy As Float, r As Float)
 	' Outter circle
 	CanvasClock.DrawCircle(cx, cy, r, HMITileUtils.COLOR_TEXT_SECONDARY, False, 3dip)
@@ -189,20 +209,21 @@ Private Sub DrawHand(cx As Float, cy As Float, length As Float, angleDeg As Doub
 	Dim y2  As Double = cy + Sin(rad) * length
 	CanvasClock.DrawLine(cx, cy, x2, y2, color, stroke)
 End Sub
+#End Region
 
+' ================================================================
+' EVENTS
+' ================================================================
+#Region Events
 #if B4J
 Private Sub PaneClock_MouseClicked (EventData As MouseEvent)
 	PaneClock_Click
 End Sub
 #End If
 
-' ================================================================
-' B4X - use click only
-' ================================================================
-
 Private Sub PaneClock_Click
 	If SubExists(mCallBack, mEventName & "_Click") Then
 		CallSub(mCallBack, mEventName & "_Click")
 	End If
 End Sub
-
+#End Region

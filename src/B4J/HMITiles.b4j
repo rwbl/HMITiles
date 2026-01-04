@@ -70,6 +70,11 @@ NumberOfLibraries=6
 NumberOfModules=22
 Version=10.3
 @EndOfDesignText@
+' ================================================================
+' File:			HMITiles
+' Brief:		Development program for the HMITiles B4X library.
+'				See B4XMainPage.
+' ================================================================
 #Region Project Attributes 
 	#MainFormWidth: 1050
 	#MainFormHeight: 800 

@@ -8,7 +8,7 @@ Version=9.85
 ' File:			HMITileButton
 ' Brief:		Example B4J program for the HMITiles B4X library.
 ' Description:	Show usage of the HMITileButton.
-' Date:			2025-01-02
+' Date:			2026-01-04
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' ================================================================
 
@@ -20,11 +20,17 @@ Sub Class_Globals
 	' Button ON OFF or TOGGLE FontAwesome Icons
 	Private BUTTON_FA_ICON_ON As String = Chr(0xF205)
 	Private BUTTON_FA_ICON_OFF As String = Chr(0xF204)
-	
+
+	' Button Alarm state text
+	Private BUTTON_STATETEXT_CLEARED As String = "Cleared"
+	Private BUTTON_STATETEXT_ALARM As String = "ALARM"
+
+	' UI	
 	Private xui As XUI
 	Private Root As B4XView
 	Private TileButtonOnOff As HMITileButton
 	Private TileButtonToggle As HMITileButton
+	Private TileButtonAlarm As HMITileButton
 End Sub
 
 Public Sub Initialize
@@ -50,6 +56,9 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	TileButtonToggle.SetStateFontFontAwesome
 	TileButtonToggle.State = False
 	TileButtonToggle.StateText = BUTTON_FA_ICON_OFF
+
+	' Button Alarm
+	TileButtonAlarm.SetAlarm(BUTTON_STATETEXT_ALARM)
 End Sub
 
 ' ===================================================
@@ -76,7 +85,7 @@ End Sub
 
 ' Button Click Event
 ' Button with fontawesome looks like a toggle switch.
-' Important to set state
+' Important to set state.
 Private Sub TileButtonToggle_Click
 	' Reverse the button state
 	TileButtonToggle.SetState(TileButtonToggle.State)
@@ -93,4 +102,16 @@ Private Sub TileButtonToggle_Click
 	' Log to the B4J IDE
 	Log($"[TileButtonToggle] state=${TileButtonToggle.State}"$)
 	' [TileButtonToggle] state=true
+End Sub
+
+Private Sub TileButtonAlarm_Click
+	' Check state
+	If TileButtonAlarm.State Then
+		' If alarm then set cleared
+		TileButtonAlarm.SetNormal(BUTTON_STATETEXT_CLEARED)
+	Else
+		' If cleared then set alarm
+		TileButtonAlarm.SetAlarm(BUTTON_STATETEXT_ALARM)
+	End If
+	Log($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$)
 End Sub

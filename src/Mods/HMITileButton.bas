@@ -9,8 +9,8 @@ Version=10.3
 ' File:     	HMITileButton.bas
 ' Brief:    	CustomView HMITile that behaves like a button (clickable).
 '           	Supports Normal, Warning, Error, Dimmed styles.
-' Date:			2025-12-31
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-04
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+------------------+
 '				|      Title       |   <- h=25%
@@ -25,43 +25,56 @@ Version=10.3
 '						Text set from designer property Text (Label)
 ' Modes:		This HMITileButton is a single CustomView with multiple behaviors:
 '				Normal Button - Set text As normal Label
-'					HMITileButton1.Text = "Start"
+'					TileButton1.Text = "Start"
 '				Toggle Button - Using FA toggle icons
-'					HMITileButton1.Text = IIf(newState, Chr(0xF205), Chr(0xF204))
+'					TileButton1.Text = IIf(newState, Chr(0xF205), Chr(0xF204))
 '				Switch - Use "ON / OFF"
-'					HMITileButton1.Text = IIf(newState, "ON", "OFF")
+'					TileButton1.Text = IIf(newState, "ON", "OFF")
 '				Light Bulb Control
-'					HMITileButton1.Text = IIf(newState, Chr(0xF0EB), Chr(0xF111))
+'					TileButton1.Text = IIf(newState, Chr(0xF0EB), Chr(0xF111))
 '				Lock/Unlock
-'					HMITileButton1.Text = IIf(locked, Chr(0xF023), Chr(0xF09C)) 
+'					TileButton1.Text = IIf(locked, Chr(0xF023), Chr(0xF09C)) 
 '				Open/Close
-'					HMITileButton1.Text = IIf(isOpen, Chr(0xF2C2), Chr(0xF2C1))
+'					TileButton1.Text = IIf(isOpen, Chr(0xF2C2), Chr(0xF2C1))
 '
 ' Examples:
-' Toggle Button with FontAwesome font
-'	Private HMITileButtonToggle As HMITileButton
-'		' Set LabelState font, state False And click To set the initial icon off
-'		HMITileButtonToggle.SetStateFontFontAwesome
-'		HMITileButtonToggle.State = False
-'		HMITileButtonToggle_Click
+'				Toggle Button with FontAwesome font
+'					Private ITileButtonToggle As HMITileButton
+'						' Set LabelState font, state False And click To set the initial icon off
+'						TileButtonToggle.SetStateFontFontAwesome
+'						TileButtonToggle.State = False
+'						TileButtonToggle_Click
 '
-'	' Button Click Event
-'	' Button with fontawesome looks like a toggle switch.
-'	' Important to set state
-'	Private Sub HMITileButtonToggle_Click
-'		HMITileButtonToggle.SetState(HMITileButtonToggle.State)
-'		HMITileButtonToggle.StateText = IIf(HMITileButtonToggle.State, Chr(0xF205), Chr(0xF204)) ' FA toggle-on / toggle-off
-'		HMITileEventViewer1.Insert($"[HMITileButtonToggle] state=${HMITileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
-'	End Sub
+'					' Button Click Event
+'					' Button with fontawesome looks like a toggle switch.
+'					' Important to set state
+'					Private Sub HMITileButtonToggle_Click
+'						TileButtonToggle.SetState(HMITileButtonToggle.State)
+'						TileButtonToggle.StateText = IIf(HMITileButtonToggle.State, Chr(0xF205), Chr(0xF204)) ' FA toggle-on / toggle-off
+'						TileEventViewer1.Insert($"[HMITileButtonToggle] state=${HMITileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
+'					End Sub
 '
-' Callback: UI follows actual device state
-' 	' Button with text change
-' 	Private Sub HMITileButton1_Click
-' 		Dim state As Boolean = Not(DevYellowLed.Get)
-'		DevYellowLed.Set(state)
-'		HMITileButton1.Text = IIf(state, "ON", "OFF")
-'		HMITileButton1.SetStateColor(state)
-' 	End Sub
+'				Callback: UI follows actual device state
+'					Private TileButton1 As HMITileButton
+'					' Button with text change
+'					Private Sub TileButton1_Click
+'						Dim state As Boolean = Not(DevYellowLed.Get)
+'						DevYellowLed.Set(state)
+'						TileButton1.Text = IIf(state, "ON", "OFF")
+'						TileButton1.SetStateColor(state)
+'					End Sub		
+'
+'				Alarm Button with state Normal ("Cleared") and Alarm ("ALARM")
+'					Private TileButtonAlarm As HMITileButton
+'					Private Sub TileButtonAlarm_Click
+'						If TileButtonAlarm.State Then
+'							TileButtonAlarm.SetNormal("Cleared")
+'						Else
+'							TileButtonAlarm.SetAlarm("ALARM")
+'						End If
+'						TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
+'					End Sub
+'
 ' ================================================================
 #End Region
 
@@ -73,7 +86,7 @@ Version=10.3
 ' Events
 #Event: Click
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Base
 	Public mBase As B4XView
 	Private mLbl As B4XView			'ignore
@@ -94,12 +107,12 @@ Sub Class_Globals
 	Private mState As Boolean = False
 End Sub
 
-Public Sub Initialize (Callback As Object, EventName As String)
+Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 	mEventName = EventName
 	mCallBack = Callback
 End Sub
 
-Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mLbl = Lbl
 	Tag = mBase.Tag
@@ -155,18 +168,22 @@ Public Sub getState As Boolean
 	Return mState
 End Sub
 
+' Set the font of the label state to fontawesome.
 Public Sub SetStateFontFontAwesome
 	LabelState.Font = xui.CreateFontAwesome(HMITileUtils.TEXT_SIZE_ICON)
 End Sub
 
+' Set the font of the label state to default.
 Public Sub SetStateFontDefault
 	LabelState.Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_STATE)
 End Sub
 
+' Set the color of the label state to fontawesome.
 Public Sub SetStateColor(success As Boolean)
 	HMITileUtils.ApplyStyleStateOnOff(mBase, LabelState, success)
 End Sub
 
+' Get or set the tile enabled/disabled..
 Public Sub setEnabled(enabled As Boolean)
 	mBase.Enabled = enabled
 	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
@@ -175,21 +192,28 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub SetInfo(text As String)
+' Set the typestyle to normal.
+Public Sub SetNormal(text As String)
 	setStateText(text)
 	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
 End Sub
 
+' Set the typestyle to warning.
 Public Sub SetWarning(text As String)
 	setStateText(text)
 	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
 End Sub
 
+' Set the typestyle to alarm.
 Public Sub SetAlarm(text As String)
 	setStateText(text)
 	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
 End Sub
 
+' Applies one of the tile styles.
+' tilestate - Use STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
+' Parameters:
+'	value String 
 Public Sub setTypeStyle(value As String)
 	mTypeStyle = value
 	ApplyStyle(mTypeStyle)
@@ -200,7 +224,7 @@ End Sub
 #End Region
 
 ' ================================================================
-' HMITile STYLING
+' Tile STYLING
 ' ================================================================
 #Region HMITile Styling
 ' ApplyStyle
@@ -243,42 +267,10 @@ End Sub
 ' EVENTS
 ' ================================================================
 #Region Events
-' B4J - Mouse Events (Button Behavior)
 #if B4J
 Private Sub LabelState_MouseClicked(EventData As MouseEvent)
 	LabelState_Click
 End Sub
-
-'' Next subs are nice-to-haves and NOT USED
-'Private Sub LabelState_MouseEntered (EventData As MouseEvent)
-'	If mBase.Enabled Then mBase.Alpha = 0.85
-'End Sub
-'
-'Private Sub LabelState_MousePressed (EventData As MouseEvent)
-'	mIsPressed = True
-'	mBase.Alpha = 0.7   ' visual feedback
-'End Sub
-'
-'Private Sub LabelState_MouseReleased (EventData As MouseEvent)
-'	mIsPressed = False
-'	mBase.Alpha = 1.0
-'End Sub
-'
-'Private Sub LabelTitle_MouseEntered (EventData As MouseEvent)
-'	LabelState_MouseEntered(EventData)
-'End Sub
-'
-'Private Sub LabelTitle_MouseClicked (EventData As MouseEvent)
-'	LabelState_MouseClicked(EventData)
-'End Sub
-'
-'Private Sub LabelTitle_MousePressed (EventData As MouseEvent)
-'	LabelState_MousePressed(EventData)
-'End Sub
-'
-'Private Sub LabelTitle_MouseReleased (EventData As MouseEvent)
-'	LabelState_MouseReleased(EventData)
-'End Sub
 #End If
 
 ' B4X - use click only

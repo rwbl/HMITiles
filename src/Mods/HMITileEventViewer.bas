@@ -9,8 +9,8 @@ Version=10.3
 ' File:     HMITileEventViewer.bas
 ' Brief:    HMITile with a title, customlistview and trash icon (clear all event messages).
 '			The customlistview contains an event list with each line being an event (Or "event message")
-' Date:		2025-12-23
-' Author:	Robert W.B. Linn (c) 2025 MIT
+' Date:		2026-01-04
+' Author:	Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '			+------------------+
 '			|      Label       |   
@@ -39,7 +39,7 @@ Version=10.3
 ' Events
 #Event: ItemClick (Index As Int, Value As Object)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	#if B4J
 	Private fx As JFX
 	#end if
@@ -72,13 +72,13 @@ Sub Class_Globals
 	Private Events As List
 End Sub
 
-Public Sub Initialize (Callback As Object, EventName As String)
+Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 	mEventName = EventName
 	mCallBack = Callback
 	Events.Initialize
 End Sub
 
-Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mLbl = Lbl
 	Tag = mBase.Tag
@@ -148,7 +148,11 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 	ClvEvents.Base_Resize (ClvEvents.GetBase.Width, ClvEvents.GetBase.Height)
 End Sub
 
-#Region Properties
+' ================================================================
+' PUBLIC API
+' ================================================================
+
+#Region API
 ' Title
 ' Get/Set HMITile title.
 ' Parameters:

@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			WaterTankSimulator
 ' Brief:		A simple interactive water tank PID simulator demonstrating selective HMITiles.
-' Date:			2026-01-01
+' Date:			2026-01-04
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	WaterTankSimulator is a lightweight B4J demo application that simulates a controlled water tank process with input flow, tank level, and output flow.
 '				It showcases the practical use of HMITiles (SP/PV tiles, mini trends, and readouts).
@@ -44,7 +44,7 @@ Sub Class_Globals
 	' ================================================================
 	' APPLICATION METADATA
 	' ================================================================
-	Private VERSION As String	= "HMITiles Example Water Tank Simulator v20260101"
+	Private VERSION As String	= "HMITiles Example Water Tank Simulator v20260104"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2016 Robert W.B. Linn - MIT"$
 
 	' ================================================================
@@ -189,7 +189,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' ================================================================
 	' SIMULATOR CONTROL BUTTON
 	' ================================================================
-	TileButtonOnOff.TitleText = "Simulator"
+	TileButtonOnOff.Title = "Simulator"
 	TileButtonOnOff.State = True
 	TileButtonOnOff_Click	' Apply initial state
 
