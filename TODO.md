@@ -2,6 +2,11 @@
 
 ---
 
+### ShortList
+- All classes upadet private/public subs, align docs.
+
+---
+
 ### NEW: Tiles
 | Tile Type                        | Alarm Allowed?  | Reason                               | State | Notes                    |
 | -------------------------------- | --------------- | ------------------------------------ | ----- | ------------------------ |
@@ -26,7 +31,7 @@
 #### Status
 In progress.
 
-### NEW FarmKit32
+### NEW: FarmKit32
 Control the FarmKit32. 
 Similar to HomeKit32 but then using the Keyestudio Smart Farm Kit [KS0567](docs.keyestudio.com/projects/KS0567/en/latest/wiki/index.html)
 #### Status
