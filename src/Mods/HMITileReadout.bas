@@ -136,18 +136,15 @@ Public Sub getState As Boolean
 	Return mState
 End Sub
 
-Public Sub SetInfo(text As String)
-	setState(text)
+Public Sub SetStyleNormal
 	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
 End Sub
 
-Public Sub SetWarning(text As String)
-	setState(text)
+Public Sub SetStyleWarning
 	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
 End Sub
 
-Public Sub SetAlarm(text As String)
-	setState(text)
+Public Sub SetStyleAlarm
 	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
 End Sub
 
@@ -175,19 +172,27 @@ Public Sub ApplyStyle(tilestate As String)
 	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
 	Select state
 		Case HMITileUtils.STATE_NORMAL
+			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
+			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
 		Case HMITileUtils.STATE_WARNING
+			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
+			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
 		Case HMITileUtils.STATE_ALARM
+			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
+			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
 		Case HMITileUtils.STATE_DISABLED
+			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
+			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select
 	' Border styling - All non-buttons clean, borderless tile with border-radius.

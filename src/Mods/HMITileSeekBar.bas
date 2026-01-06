@@ -17,25 +17,25 @@ Version=10.3
 
 ' Designer Properties
 
-#DesignerProperty: Key: Title, 			DisplayName: Title, FieldType: String, DefaultValue: Title
-#DesignerProperty: Key: Value, 			DisplayName: Value, FieldType: Int, DefaultValue: 50
-#DesignerProperty: Key: Min, 			DisplayName: Minimum, FieldType: Int, DefaultValue: 0
-#DesignerProperty: Key: Max, 			DisplayName: Maximum, FieldType: Int, DefaultValue: 100
-#DesignerProperty: Key: Interval, 		DisplayName: Interval, FieldType: Int, DefaultValue: 1, Description: Interval stepping.
-#DesignerProperty: Key: Unit, 			DisplayName: Unit, FieldType: String, DefaultValue: Unit
-#DesignerProperty: Key: ColorBar, 		DisplayName: Color Bar, FieldType: Color, DefaultValue: 0xFFD0D0D0, Description: Track left/back.
-#DesignerProperty: Key: ColorBarFill, 	DisplayName: Color Bar Fill, FieldType: Color, DefaultValue: 0xFFA8A8A8, Description: Track right/front.
-#DesignerProperty: Key: ActiveBarWidth, DisplayName: Active Bar Width, FieldType: Int, DefaultValue: 6
-#DesignerProperty: Key: InActiveBarWidth, DisplayName: Inactive Bar Width, FieldType: Int, DefaultValue: 3
-#DesignerProperty: Key: ThumbRadius, DisplayName: Thumb Radius, FieldType: Int, DefaultValue: 8, Description: Thumb radius size if not pressed.
+#DesignerProperty: Key: Title, 				DisplayName: Title, FieldType: String, DefaultValue: Title
+#DesignerProperty: Key: Value, 				DisplayName: Value, FieldType: Int, DefaultValue: 50
+#DesignerProperty: Key: Min, 				DisplayName: Minimum, FieldType: Int, DefaultValue: 0
+#DesignerProperty: Key: Max, 				DisplayName: Maximum, FieldType: Int, DefaultValue: 100
+#DesignerProperty: Key: Interval, 			DisplayName: Interval, FieldType: Int, DefaultValue: 1, Description: Interval stepping.
+#DesignerProperty: Key: Unit, 				DisplayName: Unit, FieldType: String, DefaultValue: Unit
+#DesignerProperty: Key: ColorBar, 			DisplayName: Color Bar, FieldType: Color, DefaultValue: 0xFFD0D0D0, Description: Track left/back.
+#DesignerProperty: Key: ColorBarFill, 		DisplayName: Color Bar Fill, FieldType: Color, DefaultValue: 0xFFA8A8A8, Description: Track right/front.
+#DesignerProperty: Key: ActiveBarWidth, 	DisplayName: Active Bar Width, FieldType: Int, DefaultValue: 6
+#DesignerProperty: Key: InActiveBarWidth, 	DisplayName: Inactive Bar Width, FieldType: Int, DefaultValue: 3
+#DesignerProperty: Key: ThumbRadius, 		DisplayName: Thumb Radius, FieldType: Int, DefaultValue: 8, Description: Thumb radius size if not pressed.
 #DesignerProperty: Key: ThumbRadiusPressed, DisplayName: Thumb Radius Pressed, FieldType: Int, DefaultValue: 18, Description: Thumb radius size if pressed. This size is also used to set the bar left & right margin. If ticks not fit then increase.
-#DesignerProperty: Key: ThumbColor, DisplayName: Thumb Color, FieldType: Color, DefaultValue: 0x58006AFF
-#DesignerProperty: Key: ShowThumb, DisplayName: Show Thumb, FieldType: Boolean, DefaultValue: True
-#DesignerProperty: Key: ShowTicks, DisplayName: Show Ticks, FieldType: Boolean, DefaultValue: False, Description: Tick marks with labels.
-#DesignerProperty: Key: TickCount, DisplayName: Tick Count, FieldType: Int, DefaultValue: 5, Description: Default 5 - Min, 25%, 50%, 75%, Max.
-#DesignerProperty: Key: TickValueColor, DisplayName: Tick Value Color, FieldType: Color, DefaultValue: 0xFF1E1E1E
-#DesignerProperty: Key: Vertical, DisplayName: Vertical, FieldType: Boolean, DefaultValue: False, Description: Orientation vertical.
-#DesignerProperty: Key: TouchStateChanged, DisplayName: Use TouchState, FieldType: Boolean, DefaultValue: False, Description: Use touchstate released to trigger event instead every value change.
+#DesignerProperty: Key: ThumbColor, 		DisplayName: Thumb Color, FieldType: Color, DefaultValue: 0x58006AFF
+#DesignerProperty: Key: ShowThumb, 			DisplayName: Show Thumb, FieldType: Boolean, DefaultValue: True
+#DesignerProperty: Key: ShowTicks, 			DisplayName: Show Ticks, FieldType: Boolean, DefaultValue: False, Description: Tick marks with labels.
+#DesignerProperty: Key: TickCount, 			DisplayName: Tick Count, FieldType: Int, DefaultValue: 5, Description: Default 5 - Min, 25%, 50%, 75%, Max.
+#DesignerProperty: Key: TickValueColor, 	DisplayName: Tick Value Color, FieldType: Color, DefaultValue: 0xFF1E1E1E
+#DesignerProperty: Key: Vertical, 			DisplayName: Vertical, FieldType: Boolean, DefaultValue: False, Description: Orientation vertical.
+#DesignerProperty: Key: TouchStateChanged,	DisplayName: Use TouchState, FieldType: Boolean, DefaultValue: False, Description: Use touchstate released to trigger event instead every value change.
 
 ' Events
 #Event: ValueChanged (Value As Int)
@@ -169,7 +169,7 @@ End Sub
 Public Sub Base_Resize(Width As Double, Height As Double)
 
 	If Not(LabelTitle.IsInitialized) Then
-		Log($"[HMITileSeekBar.HorizontalBaseResize] Seekbar not ready."$)
+		Log($"[HMITileSeekBar.BaseResize] Seekbar not ready."$)
 		Return
 	End If
 	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING

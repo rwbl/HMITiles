@@ -9,7 +9,7 @@ Version=10.3
 ' File: 		HMITileLabel.bas
 ' Brief:		CustomView HMITile with a single label centered.
 '				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2025-12-28
+' Date:			2026-01-05
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Style:		- High-contrast foreground
 '				- Alarm = red background + white text
@@ -22,7 +22,7 @@ Version=10.3
 '				| Warning  | amber      | black     | high contrast       |
 '				| Alarm    | red        | white     | very high contrast  |
 '				| Disabled | gray       | soft gray | subtle but readable |
-'				Layout 120dip x 120dip
+'				Layout Default 120px x 120px
 ' Layout:
 '				+-----+
 '				|+---+|
@@ -118,7 +118,21 @@ Public Sub getState As Boolean
 	Return mState
 End Sub
 
-Public Sub SetInfo(text As String)
+' Set the font of the label to fontawesome.
+Public Sub SetFontAwesome(large As Boolean)
+	If large Then
+		LabelText.Font = xui.CreateFontAwesome(HMITileUtils.TEXT_SIZE_ICON_LARGE)
+	Else
+		LabelText.Font = xui.CreateFontAwesome(HMITileUtils.TEXT_SIZE_ICON)
+	End If
+End Sub
+
+' Set the font of the label to default.
+Public Sub SetFontDefault
+	LabelText.Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_STATE)
+End Sub
+
+Public Sub SetNormal(text As String)
 	setText(text)
 	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
 End Sub
