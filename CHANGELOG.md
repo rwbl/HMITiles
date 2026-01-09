@@ -6,15 +6,28 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.4.3] – 2026-01-DD
+## [1.5.0] – 2026-01-09
 
 ### Added
-- New B4J example applications:
-	Get Started HMITileButton, HMITileLabel.
+- HMITileUtils
+	- API 
+- HMITileLabel
+	- API SetFontAwesome large or default size, SetFontNormal
+- HMITileEventViewer
+	- API RowHeight to override defaults for compact/normal mode
+- HMITileSeekBar
+	- API ShowValue to hide the value
+- B4A example applications
+	- B4A library BleCentral.b4lib based examples:
+		- BleScanner, GVH5075Scanner, RuuviTagScanner
+		- Bricks BuWizz2, Lego HUB No.4
+- B4J example applications
+	- Get Started HMITileButton, HMITileLabel
 
 ### Changed
-- HMITiles custom views public API aligned.
+- HMITiles custom views public API aligned
 - Updated all examples
+- Minor updates
 
 ### Removed
 
