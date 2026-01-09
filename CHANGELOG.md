@@ -29,8 +29,6 @@ The project follows semantic versioning where possible.
 - Updated all examples
 - Minor updates
 
-### Removed
-
 ---
 
 ## [1.4.0] – 2025-12-31
