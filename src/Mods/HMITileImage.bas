@@ -78,7 +78,7 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 
 	'											 d  l    t                    w              h
 	LabelTitle.SetLayoutAnimated				(0, pad, pad,                 Width, Height * 0.25)
-	B4XImageViewHMITile.mBase.SetLayoutAnimated	(0, pad, Height * 0.25 + pad, Width, Height * 0.70)
+	B4XImageViewHMITile.mBase.SetLayoutAnimated	(0, pad, Height * 0.25 + pad, Width - (pad * 2), Height * 0.70)
 
 	' Load image if available
 	If mImageName <> "" Then
@@ -90,10 +90,11 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 		#End If
 		If File.Exists(folder, mImageName) Then
 			Try
+				' Load image and resize with keeping aspect ratio
 				B4XImageViewHMITile.Bitmap = xui.LoadBitmapResize(folder, mImageName, _
 													              B4XImageViewHMITile.mBase.Width, _
             													  B4XImageViewHMITile.mBase.Height, _
-													              True)   ' keep aspect ratio
+													              True)
 			Catch
 				Log($"[HMITileImage.LoadImage][E] Unable to load image '${mImageName}': ${LastException}"$)
 			End Try

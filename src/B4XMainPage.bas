@@ -8,7 +8,7 @@ Version=9.85
 ' File:			HMITiles
 ' Brief:		Development program for the HMITiles B4X library.
 ' Description:	This library provides a coherent tile system, HMITiles.
-' Date:			2026-01-04
+' Date:			See Class_Globals VERSION
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' DependsOn:	XUI Views, ByteConverter, JavaObject
 ' ================================================================
@@ -20,8 +20,8 @@ Version=9.85
 #End Region
 
 Private Sub Class_Globals
-	Private VERSION As String	= "HMITiles v20260104 - Development"
-	Private ABOUT As String 	= $"${VERSION} (c) 2025-2026 Robert W.B. Linn - MIT"$
+	Private VERSION As String	= "HMITiles Development v20260417"
+	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
 	Private xui As XUI
@@ -29,12 +29,16 @@ Private Sub Class_Globals
 	Private LabelAbout As B4XView
 	
 	' UI HMITiles
+	Private TileLabelFontAwesome As HMITileLabel
+	Private TileNavButtonPage2 As HMITileNavButton
 	Private TileButtonOnOff As HMITileButton
 	Private TileButtonToggle As HMITileButton
 	Private TileEventViewer As HMITileEventViewer
 	Private TileButtonAlarm As HMITileButton
 	Private TileLevel As HMITileLevel
+	Private TileSeekBar As HMITileSeekBar
 	Private TileSeekBarIndicator As HMITileSeekBar
+	Private TileSeekBarIndicator2 As HMITileSeekBar
 	Private TileList As HMITileList
 	Private TileReadOut As HMITileReadout
 	Private TileSPPV1 As HMITileSPPV
@@ -44,8 +48,14 @@ Private Sub Class_Globals
 	Private TileTrend As HMITileTrend
 	Private TileGauge As HMITileGauge
 	Private TileDigitalClock As HMITileDigitalClock
-	Private TileSeekBar As HMITileSeekBar
 	Private TileSensor As HMITileSensor
+	Private TileButtonFA As HMITileButton
+	Private TileButtonFA2 As HMITileButton
+	Private TileStatusIndicators As HMITileStatusIndicators
+	
+	' Pages
+	Private Page2 As B4XPage2
+	Private TileTimer As HMITileTimer
 End Sub
 
 Public Sub Initialize
@@ -57,6 +67,12 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("mainpage")
 
+	' Add pages
+	' Sub-Pages
+	Page2.Initialize
+	' Page ID, Page Object (defined in class_globals)
+	B4XPages.AddPage("Page2", Page2)
+
 	' UI  additional settings
 	Root.Color = HMITileUtils.COLOR_BACKGROUND_SCREEN
 	#if B4A
@@ -66,26 +82,41 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	B4XPages.SetTitle(Me, $"${VERSION} (B4J)"$)
 	B4XPages.GetNativeParent(Me).Resizable = False
 	#End If
+	#if LINUX
+	B4XPages.SetTitle(Me, $"${VERSION} (LINUX)"$)
+	B4XPages.GetNativeParent(Me).Resizable = False
+	#End If
 	LabelAbout.Text = ABOUT
 
 	' Ensure to set sleep prior calling customviews
 	Sleep(1)
 
+	' Label Fontawesome
+	TileLabelFontAwesome.SetFontAwesome(True)
+	TileLabelFontAwesome.Text = Chr(0xF256)
+	
 	' Digital Clock
 	TileDigitalClock.ShowSeconds = True
 	
 	' Eventviewer
 	TileEventViewer.CompactMode = False
+	TileEventViewer.TimeStamp = False
 	TileEventViewer.Insert(VERSION, HMITileUtils.EVENT_LEVEL_INFO)
 
 	' OnOff Button
-	TileButtonOnOff.State = False
+	TileButtonOnOff.State = True
 	TileButtonOnOff_Click
 	
 	' Toggle Button
 	TileButtonToggle.SetStateFontFontAwesome
-	TileButtonToggle.State = False
+	TileButtonToggle.State = True
 	TileButtonToggle_Click
+
+	' Button FA
+	TileButtonFA.SetStateFontFontAwesome
+	TileButtonFA.StateText = Chr(0xF061)
+	TileButtonFA2.SetStateFontFontAwesome
+	TileButtonFA2.StateText = Chr(0xF021)
 
 	' Readout
 	TileReadOut.Value = 67
@@ -93,7 +124,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' LevelIndicator
 	TileLevel.Value = 25
 
-	' SliderIndicator	
+	' SeekBars 
 	TileSeekBarIndicator.Vertical = True
 	TileSeekBarIndicator.Value = 25
 	TileSeekBarIndicator.ShowTicks = False
@@ -114,15 +145,29 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	TileSPPV1.EditMode = True
 
 	' Trend
-	' Sleep(1)
 	TileTrendAddData
 
 	' SelectList
 	TileSelectList.CompactMode = True
 	TileSelectListAddAll
-
+	TileSelectList.SelectedItemIndex = 1
+	TileSelectList.SelectedItem = "Item 3"
 	TileSelect.AddAll(Array As String("ON", "OFF", "BLINK"))
 	TileSelect.Selected = "ON"
+	
+	' StatusIndicators
+	' Total 9 status indicators - 
+	TileStatusIndicators.SetData(1, 1, "P1", "Pump 1 Feed C-1101", TileStatusIndicators.STATE_FALSE, True)
+	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.STATE_DISABLED, True)
+	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.STATE_TRUE, True)
+	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.STATE_FALSE, True)
+End Sub
+
+' ================================================================
+' NAVBUTTONS
+' ================================================================
+Private Sub TileNavButtonPage2_Click
+	B4XPages.ShowPageAndRemovePreviousPages("page2")
 End Sub
 
 ' ================================================================
@@ -130,16 +175,18 @@ End Sub
 ' ================================================================
 
 Private Sub TileButtonOnOff_Click
-	TileButtonOnOff.SetState(TileButtonOnOff.State)
+	'TileButtonOnOff.SetState(TileButtonOnOff.State)
+	TileButtonOnOff.State = Not(TileButtonOnOff.State)
 	TileButtonOnOff.StateText = IIf(TileButtonOnOff.State, "ON", "OFF")
 	TileEventViewer.Insert($"[TileButtonOnOff] state=${TileButtonOnOff.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] ${TileEventViewer.StateSummary}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] slidermax=${TileSeekBarIndicator.MaxValue}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileSeekBar.ShowValue = Not(TileSeekBar.ShowValue)
 End Sub
 
 ' Button with fontawesome looks like a toggle switch.
 Private Sub TileButtonToggle_Click
-	TileButtonToggle.SetState(TileButtonToggle.State)
+	TileButtonToggle.State = Not(TileButtonToggle.State)
 	TileButtonToggle.StateText = IIf(TileButtonToggle.State, Chr(0xF205), Chr(0xF204)) ' FA toggle-on / toggle-off
 	TileEventViewer.Insert($"[TileButtonToggle] state=${TileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	
@@ -156,6 +203,10 @@ Private Sub TileButtonAlarm_Click
 		TileButtonAlarm.SetAlarm("ALARM")
 	End If
 	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
+End Sub
+
+Private Sub TileButtonFA_Click
+	TileEventViewer.Insert($"[TileButtonFA] Clicked"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub
 
 ' ================================================================
@@ -175,18 +226,22 @@ End Sub
 ' Set the value and style (Normal, Warning, Alarm) for selected tiles.
 Private Sub TileSeekBar_ValueChanged (value As Int)
 	Dim level As Int
+	TileReadOut.Value = value
 	TileLevel.Value = value
 	TileGauge.Value = value
 	TileSensor.Value = value
 	TileSeekBarIndicator.Value = value
+	TileSeekBarIndicator2.Value = value
 	TileTrend.Add(value)
 
 	If value > 90 Then
+		TileReadOut.SetStyleAlarm
 		TileLevel.SetStyleAlarm
 		TileGauge.SetStyleAlarm
 		TileSensor.SetStyleAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else if value > 70 Then
+		TileReadOut.SetStyleWarning
 		TileLevel.SetStyleWarning
 		TileGauge.SetStyleWarning
 		TileSensor.SetStyleWarning
@@ -195,6 +250,7 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 		TileLevel.SetStyleAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else
+		TileReadOut.SetStyleNormal
 		TileLevel.SetStyleNormal
 		TileGauge.SetStyleNormal
 		TileSensor.SetStyleNormal
@@ -209,7 +265,7 @@ End Sub
 ' ================================================================
 
 Private Sub TileEventViewer_ItemClick (Index As Int, Value As Object)
-	TileEventViewer.Insert($"[TileEventViewer_ItemClick] index=${Index}, value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	Log($"[TileEventViewer_ItemClick] index=${Index}, value=${Value}"$)
 End Sub
 
 ' ================================================================
@@ -282,4 +338,31 @@ End Sub
 
 Private Sub TileSelect_ValueChanged (Value As Object)
 	TileEventViewer.Insert($"[TileSelect_ValueChanged] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' SELECT
+' ================================================================
+
+Private Sub TileTimer_Start
+	TileEventViewer.Insert($"[TileTimer] Started"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+Private Sub TileTimer_Stop
+	TileEventViewer.Insert($"[TileTimer] Stopped"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+Private Sub TileTimer_Finished
+	TileEventViewer.Insert($"[TileTimer] Finished"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+
+' ================================================================
+' STATUSINDICATORS
+' ================================================================
+Private Sub TileStatusIndicators_Click(data As IndicatorData)
+	Dim indicator As HMITileStatusIndicators = Sender
+	TileEventViewer.Insert($"[TileStatusIndicators] ${data}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	Dim sf As Object = xui.Msgbox2Async($"${indicator.GetStateText(data.State)}${CRLF}${data.description}"$, $"Status ${data.text}"$, "OK", "", "", Null)
+	Wait For (sf) Msgbox_Result (Result As Int)
 End Sub

@@ -8,8 +8,8 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileSelectList.bas
 ' Brief:    	CustomView HMITile to select items from customlistview with primary labels.
-' Date:			2025-12-30
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-01-24
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+------------------+
 '				|      Label       |   < Title
@@ -31,7 +31,7 @@ Version=10.3
 ' Events
 #Event: ItemClick (Index As Int, Value As Object)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	#If B4J
 	'Private fx As JFX
 	#End If
@@ -57,7 +57,7 @@ Sub Class_Globals
 
 	' CLV
 	Private mSelectedItemIndex As Int = -1	' Keep track of the command selected
-	Private mSelectedItem As String			' Keep the item selected astring
+	Private mSelectedItem As String			' Keep the item selected string
 	Private mScrollbar As Boolean			' Flag to show or hide the scrollbar
 End Sub
 
@@ -66,7 +66,7 @@ Public Sub Initialize (Callback As Object, EventName As String)
 	mCallBack = Callback
 End Sub
 
-Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mLbl = Lbl
 	Tag = mBase.Tag
@@ -147,18 +147,30 @@ Public Sub getCompactMode As Boolean
 	Return mCompactMode
 End Sub
 
-Public Sub SetSelectedItem(index As Int)
-	mSelectedItem = index
+Public Sub setSelectedItem(item As String)
+	mSelectedItem = item
 	If ClvSelect.Size > 0 Then
+		For i = 0 To ClvSelect.Size - 1
+			If ClvSelect.GetValue(i) == item Then
+				ClvSelect_ItemClick(i, ClvSelect.GetValue(i))
+				ClvSelect.AsView.RequestFocus				
+			End If
+		Next
+	End If
+End Sub
+Public Sub getSelectedItem As String
+	Return mSelectedItem
+End Sub
+
+Public Sub setSelectedItemIndex(index As Int)
+	mSelectedItemIndex = index
+	If ClvSelect.Size > 0 Then
+		ClvSelect.JumpToItem(index)
 		ClvSelect_ItemClick(index, ClvSelect.GetValue(index))
 		ClvSelect.AsView.RequestFocus
 	End If
 End Sub
-Public Sub SelectedItem As String
-	Return mSelectedItem
-End Sub
-
-Public Sub SelectedItemIndex As Int
+Public Sub getSelectedItemIndex As Int
 	Return mSelectedItemIndex
 End Sub
 

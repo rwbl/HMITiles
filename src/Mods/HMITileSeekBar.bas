@@ -7,33 +7,35 @@ Version=10.3
 ' ================================================================
 ' File:			HMITileSeekBar
 ' Brief:		Custom SeekBar with optional tickmarks (horizontal/vertical).
-' Date:			2025-12-17
+' Date:			2026-04-15
 ' Author:		Robert W.B. Linn (c) 2025 MIT
-' Description:	See brief.
-' Supports:		See designer properties
-'				Important: The bar width/hight and the ticks size/position depens on the thumb radius. Set as required.
+' Description:	This seekbar is primarily designed for horizontal orientation.
+'				Important: 
+'				- The bar width/hight and the ticks size/position depends on the thumb radius. Set as required.
+'				- The title & value are set according to the default size 120px (see HMITileUtils).
+'				  This apllies esp. for the orientation vertical if the hight > 120px.
 ' Credits:		Based upon the B4XSeekbar from the XUIViews library. Thanks for sharing.
 ' ================================================================
 
 ' Designer Properties
-
 #DesignerProperty: Key: Title, 				DisplayName: Title, FieldType: String, DefaultValue: Title
 #DesignerProperty: Key: Value, 				DisplayName: Value, FieldType: Int, DefaultValue: 50
 #DesignerProperty: Key: Min, 				DisplayName: Minimum, FieldType: Int, DefaultValue: 0
 #DesignerProperty: Key: Max, 				DisplayName: Maximum, FieldType: Int, DefaultValue: 100
 #DesignerProperty: Key: Interval, 			DisplayName: Interval, FieldType: Int, DefaultValue: 1, Description: Interval stepping.
+#DesignerProperty: Key: ShowValue, 			DisplayName: Show Value, FieldType: Boolean, DefaultValue: True
 #DesignerProperty: Key: Unit, 				DisplayName: Unit, FieldType: String, DefaultValue: Unit
-#DesignerProperty: Key: ColorBar, 			DisplayName: Color Bar, FieldType: Color, DefaultValue: 0xFFD0D0D0, Description: Track left/back.
-#DesignerProperty: Key: ColorBarFill, 		DisplayName: Color Bar Fill, FieldType: Color, DefaultValue: 0xFFA8A8A8, Description: Track right/front.
+#DesignerProperty: Key: ColorBar, 			DisplayName: Color Bar, FieldType: Color, DefaultValue: 0xFFB8B8B8, Description: Track left/back.
+#DesignerProperty: Key: ColorBarFill, 		DisplayName: Color Bar Fill, FieldType: Color, DefaultValue: 0xFFFFFFFF, Description: Track right/front.
 #DesignerProperty: Key: ActiveBarWidth, 	DisplayName: Active Bar Width, FieldType: Int, DefaultValue: 6
 #DesignerProperty: Key: InActiveBarWidth, 	DisplayName: Inactive Bar Width, FieldType: Int, DefaultValue: 3
 #DesignerProperty: Key: ThumbRadius, 		DisplayName: Thumb Radius, FieldType: Int, DefaultValue: 8, Description: Thumb radius size if not pressed.
-#DesignerProperty: Key: ThumbRadiusPressed, DisplayName: Thumb Radius Pressed, FieldType: Int, DefaultValue: 18, Description: Thumb radius size if pressed. This size is also used to set the bar left & right margin. If ticks not fit then increase.
-#DesignerProperty: Key: ThumbColor, 		DisplayName: Thumb Color, FieldType: Color, DefaultValue: 0x58006AFF
+#DesignerProperty: Key: ThumbRadiusPressed, DisplayName: Thumb Radius Pressed, FieldType: Int, DefaultValue: 12, Description: Thumb radius size if pressed. This size is also used to set the bar left & right margin. If ticks not fit then increase.
+#DesignerProperty: Key: ThumbColor, 		DisplayName: Thumb Color, FieldType: Color, DefaultValue: 0xFF4A4A4A
 #DesignerProperty: Key: ShowThumb, 			DisplayName: Show Thumb, FieldType: Boolean, DefaultValue: True
 #DesignerProperty: Key: ShowTicks, 			DisplayName: Show Ticks, FieldType: Boolean, DefaultValue: False, Description: Tick marks with labels.
 #DesignerProperty: Key: TickCount, 			DisplayName: Tick Count, FieldType: Int, DefaultValue: 5, Description: Default 5 - Min, 25%, 50%, 75%, Max.
-#DesignerProperty: Key: TickValueColor, 	DisplayName: Tick Value Color, FieldType: Color, DefaultValue: 0xFF1E1E1E
+#DesignerProperty: Key: TickValueColor, 	DisplayName: Tick Value Color, FieldType: Color, DefaultValue: 0xFFFFFFFF
 #DesignerProperty: Key: Vertical, 			DisplayName: Vertical, FieldType: Boolean, DefaultValue: False, Description: Orientation vertical.
 #DesignerProperty: Key: TouchStateChanged,	DisplayName: Use TouchState, FieldType: Boolean, DefaultValue: False, Description: Use touchstate released to trigger event instead every value change.
 
@@ -41,7 +43,7 @@ Version=10.3
 #Event: ValueChanged (Value As Int)
 #Event: TouchStateChanged (Pressed As Boolean)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Events
 	Private mEventName As String
 	Private mCallBack As Object
@@ -59,9 +61,10 @@ Sub Class_Globals
 	Private mTouchStateChanged As Boolean
 	Private Pressed As Boolean
 
-	' Title
+	' Title/Value/Unit
 	Private LabelTitle As B4XView
 	Private LabelValue As B4XView
+	Private mShowValue As Boolean
 	Private LabelUnit As B4XView
 
 	' Values
@@ -82,6 +85,8 @@ Sub Class_Globals
 	' Bar
 	Private mColorBar As Int					' Base color
 	Private mColorBarFill As Int				' Color when thumb is moving
+	Private mBarTop As Double 
+	Private mBarBottom As Double
 
 	' Layout
 	Private mActiveBarWidth As Int
@@ -103,7 +108,7 @@ Public Sub Initialize(Callback As Object, EventName As String)
 End Sub
 
 ' ------------------------------------------------
-Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mBase.Tag = Me
 
@@ -146,7 +151,7 @@ Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
 	TouchPanel = xui.CreatePanel("TouchPanel")
 	mBase.AddView(TouchPanel, 0, 0, mBase.Width, mBase.Height)
 
-	If xui.IsB4A Then mThumbRadiusPressed = 20dip
+	' If xui.IsB4A Then mThumbRadiusPressed = 20dip
 	
 	' Labels
 	LabelTitle = CreateLabel
@@ -160,6 +165,10 @@ Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
 	LabelValue.Text		= Props.Get("Value")
 	LabelUnit.Text		= Props.Get("Unit")
 
+	mShowValue			= Props.GetDefault("ShowValue", True)
+	LabelValue.Visible	= mShowValue
+	LabelValue.Enabled	= mShowValue
+	
 	' First apply the style because used by Update	
 	ApplyStyle
 	Base_Resize(mBase.Width, mBase.Height)
@@ -173,18 +182,30 @@ Public Sub Base_Resize(Width As Double, Height As Double)
 		Return
 	End If
 	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
+	Dim newheight As Double = Height
+	Dim unittop As Double	= Height * 0.80
 
 	'								 d  l             t              w                h
 	#If B4A
-	LabelTitle.SetLayoutAnimated	(0, 0,            pad,           Width, Height * 0.25)
-	LabelValue.SetLayoutAnimated	(0, 0,            Height * 0.25, Width, Height * 0.25)
-	LabelUnit.SetLayoutAnimated		(0, 0,            Height * 0.80, Width, Height * 0.15)
+	' Need to set the height based on the default tile size
+	If Height > HMITileUtils.TILE_DEFAULT_SIZE Then
+		newheight = HMITileUtils.TILE_DEFAULT_SIZE
+		unittop = Height * 0.9
+	End If
+	LabelTitle.SetLayoutAnimated	(0, 0,            pad,              Width, newheight * 0.3)
+	LabelValue.SetLayoutAnimated	(0, 0,            newheight * 0.3, Width, newheight * 0.3)
+	LabelUnit.SetLayoutAnimated		(0, 0,            unittop,          Width, newheight * 0.2)
 	#End If
 
 	#If B4J
-	LabelTitle.SetLayoutAnimated	(0, 0,            pad,           Width, Height * 0.25)
-	LabelValue.SetLayoutAnimated	(0, 0,            Height * 0.25, Width, Height * 0.25)
-	LabelUnit.SetLayoutAnimated		(0, 0,            Height * 0.80, Width, Height * 0.10)
+	' Need to set the height based on the default tile size
+	If Height > HMITileUtils.TILE_DEFAULT_SIZE Then
+		newheight = HMITileUtils.TILE_DEFAULT_SIZE
+		unittop = Height * 0.9
+	End If
+	LabelTitle.SetLayoutAnimated	(0, 0,            pad,              Width, newheight * 0.25)
+	LabelValue.SetLayoutAnimated	(0, 0,            newheight * 0.25, Width, newheight * 0.25)
+	LabelUnit.SetLayoutAnimated		(0, 0,            unittop,          Width, newheight * 0.10)
 	#End If
 
 	TouchPanel.SetLayoutAnimated(0, 0, 0, Width, Height)
@@ -192,34 +213,43 @@ Public Sub Base_Resize(Width As Double, Height As Double)
 	Update
 End Sub
 
-' ------------------------------------------------
+' ================================================================
 ' Redraws slider and tickmarks
-'
+' ================================================================
 Public Sub Update
 	Dim x1,y1,x2,y2 As Float
-	
-	If mVertical Then
-		mSize = mBase.Height - 2 * mThumbRadiusPressed
-	Else
-		mSize = mBase.Width - 2 * mThumbRadiusPressed
-	End If
 
 	' Clear the canvs rect
 	CanvasSeekBar.ClearRect(CanvasSeekBar.TargetRect)
 
-	' Check if size > 0
-	If mSize <= 0 Then Return
-
-	' Layout Orientation
+	' ----------------------------------------------------------------
+	' Horizontal
+	' ----------------------------------------------------------------
 	If Not(mVertical) Then 
-		' Horizontal
-		Dim y As Int = (mBase.Height / 2) + (HMITileUtils.PADDING * 2.5)
+		mSize = mBase.Width - 2 * mThumbRadiusPressed
+		#if b4a
+		mSize = mBase.Width - 4 * mThumbRadiusPressed
+		#End If
+		' Check if size > 0
+		If mSize <= 0 Then Return
+		If mShowValue Then
+			Dim y As Int = (mBase.Height / 2) + (HMITileUtils.PADDING * 2.5)
+		Else
+			Dim y As Int = (mBase.Height / 2) - (HMITileUtils.PADDING)
+		End If
+
 		Dim w As Int = mThumbRadiusPressed + (mValue - mMinValue) / (mMaxValue - mMinValue) * mSize
 
 		' Draw left/back track x1,y1,x2,y2,color,strokewidth
 		x1 = mThumbRadiusPressed
+'		#if B4A
+'		x1 = mThumbRadiusPressed * 2
+'		#End If
 		y1 = y 
 		x2 = w
+'		#if B4A
+'		x2 = x2 - (mThumbRadiusPressed * 2)
+'		#End If
 		y2 = y
 		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorBar, mActiveBarWidth)
 
@@ -243,7 +273,11 @@ Public Sub Update
 				
 				' Tick line
 				x1 = xTick
-				y1 = (mBase.Height / 2) + (HMITileUtils.PADDING * 2)
+				If mShowValue Then
+					y1 = (mBase.Height / 2) + (HMITileUtils.PADDING * 2)
+				Else
+					y1 = (mBase.Height / 2) - (HMITileUtils.PADDING)
+				End If
 				x2 = xTick
 				y2 = y1 + mActiveBarWidth
 				If i = 0 Or i = mTickCount - 1 Then
@@ -269,20 +303,41 @@ Public Sub Update
 				CanvasSeekBar.DrawText(tickVal, x1, y1, fnt, mTickValueColor, "CENTER")
 			Next
 		End If
-	Else 
-		' Vertical
+	End If
+	
+	' ----------------------------------------------------------------
+	' Vertical
+	' ----------------------------------------------------------------
+	If mVertical Then
 		Dim x As Int	= mBase.Width / 2
-		Dim s1 As Int	= mThumbRadiusPressed + (mMaxValue - mValue) / (mMaxValue - mMinValue) * mSize	'ignore
 		Dim dy As Float
+		Dim yoffset As Double
+		
+		yoffset = LabelTitle.Top + LabelTitle.Height
+		If mShowValue Then
+			yoffset = yoffset + LabelValue.Height
+		End If
+		#if B4A
+		yoffset = yoffset + 5dip
+		#End If
 
-		x1 = x 
-		y1 = mBase.Height * 0.5
+		mBarTop = yoffset
+		
+		mBarBottom = LabelUnit.top - 2dip	' mBase.Height * 0.85
+		mSize = mBarBottom - mBarTop
+		' Check if size > 0
+		If mSize <= 0 Then Return
+
+		x1 = x
+		y1 = mBarTop
 		x2 = x1
-		y2 = mBase.Height * 0.8
+		y2 = mBarBottom
 		dy = y2 - y1
 
 		' Draw bottom/back track
-		CanvasSeekBar.DrawLine(x1,y1,x2,y2, mColorBarFill, mInActiveBarWidth)
+		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorBarFill, mInActiveBarWidth)
+		' Log($"BACK top=${mBarTop} x1=${x1} y1=${y1} x2=${x2} y2=${y2} dy=${dy} dytick=${(y2-y1)/mTickCount}"$)
+
 		'CanvasSeekBar.DrawLine(x, mThumbRadiusPressed, x, s1, mColorBarFill, mInActiveBarWidth)
 
 		' Draw top/front track
@@ -292,6 +347,7 @@ Public Sub Update
 		x2 = x1
 		y2 = y2
 		CanvasSeekBar.DrawLine(x1,y1,x2,y2, mColorBar, mActiveBarWidth)
+		' Log($"FRONT top=${mBarTop} x1=${x1} y1=${y1} x2=${x2} y2=${y2} "$)
 		' CanvasSeekBar.DrawLine(x, s1, x, mBase.Height - mThumbRadiusPressed, mColorBar, mActiveBarWidth)
 
 		' Draw thumb
@@ -303,22 +359,24 @@ Public Sub Update
 		' Draw tickmarks if enabled
 		Dim yTick As Float
 		Dim x2Tick As Float
-		Dim dyTick As Float = (dy / mTickCount) + 2
+		Dim dyTick As Float = (dy / (mTickCount - 1))
 
-		If mShowTicks And mTickCount > 1 Then
+		' Expect at least 2 tickcounts for top and bottom
+		If mShowTicks And mTickCount > 2 Then
 			For i = 0 To mTickCount - 1
-				yTick = (mBase.Height * 0.5) + i * dyTick
-				' yTick = mThumbRadiusPressed + i * mSize / (mTickCount - 1)
-				
+				yTick = mBarTop + (i * dyTick)
+			
 				' Tick line
 				x2Tick = x - (mInActiveBarWidth / 2)
 				If i = 0 Or i = mTickCount - 1 Then x2Tick = x + (mInActiveBarWidth / 2)
 				CanvasSeekBar.DrawLine(x - (mInActiveBarWidth/2) - 4dip, yTick, x2Tick, yTick, mColorBar, 1dip)
-				' CanvasSeekBar.DrawLine(x - mInActiveBarWidth, yTick, x2Tick, yTick, mColorBar, 1dip)
 
 				' Tick label left of tick
 				Dim tickVal As Int = mMaxValue - i * (mMaxValue - mMinValue) / (mTickCount - 1)
 				CanvasSeekBar.DrawText(tickVal, x - (mInActiveBarWidth/2) - 8dip, yTick + 4dip, xui.CreateDefaultFont(mTickFontSize), mTickValueColor, "RIGHT")
+
+				' Log($"${i}=${yTick} ${tickVal}"$)
+
 			Next
 		End If
 	End If
@@ -498,6 +556,19 @@ Public Sub getValue As Int
 	Return mValue
 End Sub
 
+' Get / set the show value option.
+' Parameters:
+'	visible Boolean
+Public Sub setShowValue(visible As Boolean)
+	mShowValue = visible
+	LabelValue.Visible = mShowValue
+	LabelValue.Enabled = mShowValue
+	Update
+End Sub
+Public Sub getShowValue As Boolean
+	Return mShowValue
+End Sub
+
 ' Get / set the bar minvalue.
 ' Parameters:
 '	v Int - Bar min value.
@@ -572,11 +643,6 @@ Private Sub ApplyStyle
 	#if B4J
 	CSSUtils.SetStyleProperty(LabelUnit, "-fx-font-size", HMITileUtils.TEXT_SIZE_SMALL)
 	#end if
-	
-	mColorBar 		= HMITileUtils.COLOR_SLIDER_ACTIVE
-	mColorBarFill 	= HMITileUtils.COLOR_SLIDER_TRACK
-	mThumbColor 	= HMITileUtils.COLOR_SLIDER_KNOB
-	mTickValueColor	= HMITileUtils.COLOR_SLIDER_LABEL_TEXT
 
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
@@ -591,8 +657,10 @@ Private Sub TouchPanel_Touch(Action As Int, X As Float, Y As Float)
 		Pressed = True
 		RaiseTouchStateEvent
 		SetValueBasedOnTouch(X, Y)
+
 	Else If Action = TouchPanel.TOUCH_ACTION_MOVE Then
 		SetValueBasedOnTouch(X, Y)
+
 	Else If Action = TouchPanel.TOUCH_ACTION_UP Then
 		Pressed = False
 		RaiseTouchStateEvent
@@ -602,6 +670,7 @@ Private Sub TouchPanel_Touch(Action As Int, X As Float, Y As Float)
 			End If
 		End If
 	End If
+
 	Update
 End Sub
 
@@ -614,7 +683,8 @@ End Sub
 Private Sub SetValueBasedOnTouch(x As Int, y As Int)
 	Dim v As Int
 	If mVertical Then
-		v = (mBase.Height - mThumbRadiusPressed - y) / mSize * (mMaxValue - mMinValue) + mMinValue
+		v = (mBarBottom - y) / mSize * (mMaxValue - mMinValue) + mMinValue
+		' v = (mBase.Height - mThumbRadiusPressed - y) / mSize * (mMaxValue - mMinValue) + mMinValue
 	Else
 		v = (x - mThumbRadiusPressed) / mSize * (mMaxValue - mMinValue) + mMinValue
 	End If
@@ -629,4 +699,5 @@ Private Sub SetValueBasedOnTouch(x As Int, y As Int)
 		End If
 	End If
 End Sub
+
 #End Region

@@ -80,7 +80,7 @@ Version=10.3
 
 ' Designer Properties
 #DesignerProperty: Key: Title, 		DisplayName: Title, FieldType: String, DefaultValue: Title
-#DesignerProperty: Key: State, 		DisplayName: State, FieldType: String, DefaultValue: Button, Description: Use designer property Label
+#DesignerProperty: Key: State, 		DisplayName: State, FieldType: String, DefaultValue: Button
 #DesignerProperty: Key: TypeStyle, 	DisplayName: Button Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
 ' Events
@@ -104,7 +104,8 @@ Private Sub Class_Globals
 	' Fixed properties
 	Private mTypeStyle As String
 	Private mIsPressed As Boolean = False			'ignore
-	Private mState As Boolean = False
+	Private mState As Boolean
+	Private mStateText As String
 End Sub
 
 Private Sub Initialize (Callback As Object, EventName As String)	'ignore
@@ -134,8 +135,13 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 
 	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
 	
-	LabelTitle.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0.25)
-	LabelState.SetLayoutAnimated(0, pad,  Height * 0.25, Width - pad * 2, Height * 0.60)
+	If LabelTitle.Text.Length > 0 Then
+		LabelTitle.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0.25)
+		LabelState.SetLayoutAnimated(0, pad,  Height * 0.25, Width - pad * 2, Height * 0.60)
+	Else
+		LabelTitle.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0)
+		LabelState.SetLayoutAnimated(0, pad,  0,        	 Width - pad * 2, Height)
+	End If
 End Sub
 
 ' ================================================================
@@ -153,19 +159,25 @@ End Sub
 
 ' Get or set the state text of the button.
 Public Sub setStateText(value As String)
-	LabelState.Text = value
+	mStateText = value
+	LabelState.Text = mStateText
 End Sub
 Public Sub getStateText As String
-	Return LabelState.Text
+	Return mStateText
 End Sub
 
 ' Get or set the state of the button.
-Public Sub setState(state As Boolean)
-	mState = state
-	HMITileUtils.ApplyStyleStateOnOff(mBase, LabelState, state)
+Public Sub setState(value As Boolean)
+	mState = value
+	HMITileUtils.ApplyStyleStateOnOff(mBase, LabelState, mState)
 End Sub
 Public Sub getState As Boolean
 	Return mState
+End Sub
+
+Public Sub NewState(value As Boolean)
+	mState = value
+	HMITileUtils.ApplyStyleStateOnOff(mBase, LabelState, mState)
 End Sub
 
 ' Set the font of the label state to fontawesome.
@@ -271,13 +283,17 @@ End Sub
 Private Sub LabelState_MouseClicked(EventData As MouseEvent)
 	LabelState_Click
 End Sub
+
+Private Sub LabelTitle_MouseClicked (EventData As MouseEvent)
+	LabelState_Click
+End Sub
 #End If
 
 ' B4X - use click only
 Private Sub LabelState_Click
-	mState = Not(mState)
+	'mState = Not(mState)
 	If SubExists(mCallBack, mEventName & "_Click") Then
-		CallSub(mCallBack, mEventName & "_Click")
+		CallSubDelayed(mCallBack, mEventName & "_Click")
 	End If
 End Sub
 

@@ -223,7 +223,7 @@ End Sub
 
 Private Sub PaneClock_Click
 	If SubExists(mCallBack, mEventName & "_Click") Then
-		CallSub(mCallBack, mEventName & "_Click")
+		CallSubDelayed(mCallBack, mEventName & "_Click")
 	End If
 End Sub
 #End Region

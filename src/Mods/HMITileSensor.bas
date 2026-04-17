@@ -11,10 +11,9 @@ Version=10.3
 '				- top an icon/label centered
 '				- bottom a label with value
 '				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2025-12-28
+' Date:			2026-01-09
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Hints: 		HMITile can not be resized after form loaded.
-' 				DesignerProperty FieldType - One of the following values (case insensitive): String, Int, Float, Boolean or Color.
 ' Layout:
 '				+------------------+
 '				|       Label      |  < 25%
@@ -34,14 +33,14 @@ Version=10.3
 ' Events
 #Event: Click
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Events
 	Private mEventName As String
 	Private mCallBack As Object
 
 	' Base
 	Public mBase As B4XView
-	Public mLbl As B4XView
+	Private mLbl As B4XView	'ignore
 	Public Tag As Object
 
 	' XUI
@@ -67,7 +66,7 @@ Public Sub Initialize(Callback As Object, EventName As String)
 End Sub
 
 
-Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mLbl = Lbl
 	Tag = mBase.Tag
@@ -81,9 +80,13 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Store designer properties
 	LabelTitle.Text = Props.Get("TitleText")
 	LabelIcon.Text  = Props.Get("Icon")
+	' Check to remove 0x tn case icon starts with
+	If LabelIcon.Text.ToLowerCase.Contains("0x") Then
+		LabelIcon.Text = LabelIcon.Text.ToLowerCase.Replace("0x","")
+	End If
 	LabelValue.Text = Props.Get("ValueText")
 	mValueText		= Props.Get("ValueText")
-	mValue = mValueText
+	mValue 			= mValueText
 	mUnitText		= Props.Get("UnitText")
 	mTypeStyle		= Props.Get("TypeStyle")
 
@@ -97,11 +100,12 @@ End Sub
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelValue.IsInitialized) Then Return
 
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + 4dip
+	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
 
-	LabelTitle.SetLayoutAnimated(0, pad, pad, Width - pad*2, Height * 0.25)
-	LabelIcon.SetLayoutAnimated(0, pad, Height*0.25, Width - pad*2, Height*0.50)
-	LabelValue.SetLayoutAnimated(0, pad, Height*0.75, Width - pad*2, Height*0.25)
+	'								 d  l    t              w                h
+	LabelTitle.SetLayoutAnimated	(0, pad, pad,           Width - pad * 2, Height * 0.25)
+	LabelIcon.SetLayoutAnimated		(0, pad, Height * 0.25, Width - pad * 2, Height * 0.50)
+	LabelValue.SetLayoutAnimated	(0, pad, Height * 0.75, Width - pad * 2, Height * 0.25)
 End Sub
 
 ' ===================================================================
@@ -148,12 +152,9 @@ End Sub
 
 ' Value
 Public Sub setValue(value As String)
-	Try
-		mValue = value
-		LabelValue.Text = value & mUnitText
-	Catch
-		Log($"[HMITileSensor.setValue][E] ${LastException}"$)
-	End Try
+	mValue = value
+	mValueText = mValue & mUnitText
+	LabelValue.Text = mValueText
 End Sub
 Public Sub getValue As String
 	Return mValue
@@ -161,7 +162,8 @@ End Sub
 
 Public Sub setUnit(unit As String)
 	mUnitText = unit
-	LabelValue.Text =  mValueText & unit
+	mValueText = mValue & mUnitText
+	LabelValue.Text =  mValueText
 End Sub
 Public Sub getUnit As String
 	Return mUnitText
@@ -188,7 +190,7 @@ Public Sub getTypeStyle As String
 End Sub
 
 ' ================================================================
-' HMITile STYLING
+' Tile STYLING
 ' ================================================================
 #Region HMITile Styling
 ' ApplyStyle
@@ -241,7 +243,7 @@ End Sub
 ' B4X - use click only
 Private Sub LabelIcon_Click
 	If SubExists(mCallBack, mEventName & "_Click") Then
-		CallSub(mCallBack, mEventName & "_Click")
+		CallSubDelayed(mCallBack, mEventName & "_Click")
 	End If
 End Sub
 #End Region

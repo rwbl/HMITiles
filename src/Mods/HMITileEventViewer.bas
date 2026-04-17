@@ -9,7 +9,7 @@ Version=10.3
 ' File:     HMITileEventViewer.bas
 ' Brief:    HMITile with a title, customlistview and trash icon (clear all event messages).
 '			The customlistview contains an event list with each line being an event (Or "event message")
-' Date:		2026-01-04
+' Date:		2026-01-07
 ' Author:	Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '			+------------------+
@@ -67,6 +67,7 @@ Private Sub Class_Globals
 	Private mShowTrash As Boolean
 	Private mCompactMode As Boolean
 	Private mLogging As Boolean
+	Private mRowHeight As Double	
 	
 	' List
 	Private Events As List
@@ -98,10 +99,11 @@ Private Sub AfterLoadLayout(Props As Map)
 	LabelTitle.Text = Props.Get("TitleText")
 	mTimeStamp		= Props.Get("TimeStamp")
 	mMaxEvents		= Props.Get("MaxItems")
-	mShowTitle		= Props.Get("ShowTitle")
-	mShowTrash		= Props.Get("ShowTrash")
-	mCompactMode	= Props.Get("CompactMode")
+	mShowTitle		= Props.GetDefault("ShowTitle", True)
+	mShowTrash		= Props.GetDefault("ShowTrash", True)
+	mCompactMode	= Props.GetDefault("CompactMode", False)
 	mLogging		= Props.GetDefault("Logging", True)
+	mRowHeight		= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_HEIGHT, HMITileUtils.EVENT_NORMAL_HEIGHT)
 
 	' UI settings
 	LabelTrash.TextColor = HMITileUtils.COLOR_TEXT_SECONDARY
@@ -207,6 +209,21 @@ End Sub
 Public Sub getLogging As Boolean
 	Return mLogging
 End Sub
+
+Public Sub setRowHeight(value As Double)
+	mRowHeight = value
+End Sub
+Public Sub getRowHeight As Double
+	Return mRowHeight
+End Sub
+
+Public Sub setTimeStamp(enabled As Boolean)
+	mTimeStamp = enabled
+End Sub
+Public Sub getTimeStamp As Boolean
+	Return mTimeStamp
+End Sub
+
 #End Region
 
 ' ================================================================
@@ -329,7 +346,7 @@ Private Sub ClvEventsCreateItem(item As String, level As Int) As Pane
 Private Sub ClvEventsCreateItem(item As String, level As Int) As Panel
 #end if
 	' Item height and padding
-	Dim rowheight As Int	= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_HEIGHT, HMITileUtils.EVENT_NORMAL_HEIGHT)
+	Dim rowheight As Double	= mRowHeight
 	Dim rowpadding As Int	= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_PADDING, HMITileUtils.EVENT_NORMAL_PADDING)
 
 	' Create panel to hold the item
@@ -418,7 +435,7 @@ End Sub
 '	value String - Item content
 Private Sub ClvEvents_ItemClick (index As Int, value As Object)
 	If SubExists(mCallBack, mEventName & "_ItemClick") Then
-		CallSub3(mCallBack, mEventName & "_ItemClick", index, value)
+		CallSubDelayed3(mCallBack, mEventName & "_ItemClick", index, value)
 	End If
 End Sub
 

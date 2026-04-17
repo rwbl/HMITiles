@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileUtils.bas
 ' Brief:		Common constants and helper subs used by the customview HMITiles.
-' Date:			2026-01-04
+' Date:			2026-04-17
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Central styling module for HMITiles library.
 '     			- Base colors (neutral blue-green scale)
@@ -68,8 +68,9 @@ Private Sub Process_Globals
 	' ================================================================
 	' TILE SIZE
 	' ================================================================
-	Public Const TILE_DEFAULT_SIZE As Int = 120								' Minimum tile size: ~120×120 px for tiles with a title.
-																			' Smaller tiles are allowed only when:They have NO title or contain a single numeric value only.
+	Public Const TILE_DEFAULT_SIZE 				As Int = 120							' Recommended tile size: ~120×120 px for tiles with a title.
+																						' Smaller tiles are allowed only when:
+																						' They have NO title or contain a single numeric value only.
 	
 	' ================================================================
 	' BACKGROUND COLORS
@@ -105,12 +106,12 @@ Private Sub Process_Globals
 	' ================================================================
 	' TEXT COLORS
 	' ================================================================
-	Public Const COLOR_TEXT_PRIMARY    			As Int = 0xFFFFFFFF						' strog white, could also use F2F2F2 off-white
+	Public Const COLOR_TEXT_PRIMARY    			As Int = 0xFFFFFFFF						' strong white, could also use F2F2F2 off-white
 	Public Const COLOR_TEXT_SECONDARY  			As Int = 0xFFDADADA
-	Public Const COLOR_TEXT_DISABLED   			As Int = 0xFF7A7A7A
+	Public Const COLOR_TEXT_DISABLED   			As Int = 0xFF444444						' Dimmed text, if stronger then 0xFF7A7A7A
 	Public Const COLOR_TEXT_WARNING             As Int = 0xFF000000   					' black (max contrast)	COLOR_STATUS_WARNING
 	Public Const COLOR_TEXT_ALARM               As Int = 0xFFFFFFFF   					' white COLOR_STATUS_ALARM_HI
-	Public Const COLOR_TEXT_ERROR               As Int = 0xFFFFFFFF   					' white 
+	Public Const COLOR_TEXT_ERROR               As Int = 0xFFFFFFFF   					' white
 
 	' ================================================================
 	' TILE STATES
@@ -127,7 +128,7 @@ Private Sub Process_Globals
 	' ================================================================
 	' TILE COLORS PER STATE
 	' ================================================================
-	Public Const COLOR_TILE_NORMAL_BACKGROUND   As Int = COLOR_BACKGROUND_DEFAULT
+	Public COLOR_TILE_NORMAL_BACKGROUND   		As Int = COLOR_BACKGROUND_DEFAULT	' Not as constant because can be changed (not recommended)
 	Public Const COLOR_TILE_NORMAL_TEXT         As Int = COLOR_TEXT_PRIMARY
 
 	Public Const COLOR_TILE_WARNING_BACKGROUND  As Int = COLOR_STATUS_WARNING
@@ -136,7 +137,7 @@ Private Sub Process_Globals
 	Public Const COLOR_TILE_ALARM_BACKGROUND    As Int = COLOR_STATUS_ALARM_HI
 	Public Const COLOR_TILE_ALARM_TEXT          As Int = 0xFFFFFFFF
 
-	Public Const COLOR_TILE_DISABLED_BACKGROUND As Int = 0xFFDDDDDD
+	Public Const COLOR_TILE_DISABLED_BACKGROUND As Int = 0xFF707070					' Stronger 0xFFDDDDDD
 	Public Const COLOR_TILE_DISABLED_TEXT       As Int = COLOR_TEXT_DISABLED
 
 	Public Const COLOR_TILE_ENABLED_BACKGROUND   As Int = COLOR_BACKGROUND_DARK
@@ -165,7 +166,6 @@ Private Sub Process_Globals
 	' ================================================================
 	' TEXT SIZES
 	' ================================================================
-
 	' Titles (screen section headers, panel titles)
 	Public Const TEXT_SIZE_TITLE        		As Float = 16
 	' Label (the top label inside a tile)
@@ -304,22 +304,43 @@ Private Sub Process_Globals
 	' ================================================================
 	' SLIDER COLORS
 	' ================================================================
-	Public Const COLOR_SLIDER_TRACK            As Int = 0xFFFFFFFF								' Track (background / inactive area)
-	Public Const COLOR_SLIDER_ACTIVE           As Int = 0xFFB8B8B8								' Active track (portion indicating the set value)
-	Public Const COLOR_SLIDER_KNOB             As Int = 0xFF4A4A4A								' Slider knob (handle)
-	Public Const COLOR_SLIDER_DISABLED_TRACK   As Int = 0xFFE0E0E0   							' Disabled state track
-	Public Const COLOR_SLIDER_DISABLED_KNOB    As Int = 0xFFA8A8A8   							' Disabled knob
-	Public Const COLOR_SLIDER_VALUE_TEXT       As Int = 0xFF2A2A2A   							' Value text color (live numeric value)
-	Public Const COLOR_SLIDER_LABEL_TEXT       As Int = COLOR_TEXT_SECONDARY   					' Label text color (caption / description)
-	Public Const COLOR_SLIDER_UNIT_TEXT        As Int = 0xFF3A3A3A  							' Units text color (optional)
-	Public Const COLOR_SLIDER_KNOB_BORDER 		As Int = 0xFF2F2F2F
+	Public Const COLOR_SLIDER_TRACK            		As Int = 0xFFFFFFFF				' Track (background / inactive area)
+	Public Const COLOR_SLIDER_ACTIVE           		As Int = 0xFFB8B8B8				' Active track (portion indicating the set value)
+	Public Const COLOR_SLIDER_KNOB             		As Int = 0xFF4A4A4A				' Slider knob (handle)
+	Public Const COLOR_SLIDER_DISABLED_TRACK   		As Int = 0xFFE0E0E0   			' Disabled state track
+	Public Const COLOR_SLIDER_DISABLED_KNOB    		As Int = 0xFFA8A8A8   			' Disabled knob
+	Public Const COLOR_SLIDER_VALUE_TEXT       		As Int = 0xFF2A2A2A   			' Value text color (live numeric value)
+	Public Const COLOR_SLIDER_LABEL_TEXT       		As Int = COLOR_TEXT_SECONDARY   ' Label text color (caption / description)
+	Public Const COLOR_SLIDER_UNIT_TEXT        		As Int = 0xFF3A3A3A  			' Units text color (optional)
+	Public Const COLOR_SLIDER_KNOB_BORDER			As Int = 0xFF2F2F2F
 
 	' ================================================================
 	' TILE TREND
 	' ================================================================
-	Public Const COLOR_TREND_LINE     As Int = 0xFF404040	' 0xFF707070
-	Public Const COLOR_TREND_BG       As Int = 0xFFF5F5F5   ' optional
-	Public Const COLOR_TREND_BORDER   As Int = 0xFFB0B0B0   ' optional
+	Public Const COLOR_TREND_LINE     				As Int = 0xFF404040				' 0xFF707070
+	Public Const COLOR_TREND_BG       				As Int = 0xFFF5F5F5				' optional
+	Public Const COLOR_TREND_BORDER   				As Int = 0xFFB0B0B0				' optional
+
+	' ================================================================
+	' TILE NAVBUTTON
+	' ================================================================
+	Public Const NAV_SELECT_TYPE_PAGE 				As String = "Page"
+	Public Const NAV_SELECT_TYPE_BACK 				As String = "Back"
+	Public Const NAV_ICON_BACK 						As String = Chr(0xF060)			' fa-arrow-left
+
+	' ================================================================
+	' TILE STATUSINDICATORS
+	' ================================================================
+	Public Const COLOR_INDICATOR_TRUE_DEFAULT 		As Int = 0xFFE8E8E8				' light-gray
+	Public Const COLOR_INDICATOR_FALSE_DEFAULT 		As Int = 0xFF323232				' dark-gray
+	Public Const COLOR_INDICATOR_DISABLED_DEFAULT 	As Int = 0xFF808080				' medium-gray
+	Public Const COLOR_INDICATOR_TRUE_GREEN 		As Int = 0xFF00FF00				' full green
+	Public Const COLOR_INDICATOR_FALSE_RED 			As Int = 0xFFFF0000				' full red
+	Public Const COLOR_TEXT_INDICATOR_TRUE			As Int = 0xFF000000   			' white
+	Public Const COLOR_TEXT_INDICATOR_FALSE			As Int = 0xFFFFFFFF   			' black
+	Public Const TEXT_INDICATOR_TRUE				As String = "OK"   				
+	Public Const TEXT_INDICATOR_FALSE				As String = "ERROR"   			
+	Public Const TEXT_INDICATOR_DISABLED			As String = "Disabled"
 
 	' ================================================================
 	' HELPERS
@@ -328,10 +349,11 @@ Private Sub Process_Globals
 	Public ByteConv As ByteConverter
 End Sub
 
+#Region Apply Styles
 ' ================================================================
-' TILE STYLING
+' HELPER: APPLY STYLES
 ' ================================================================
-#Region HMITile Styling
+
 ' ApplyHMITileTitleStyle
 ' For all HMITiles the title style are consistent
 ' Parameters:
@@ -370,11 +392,7 @@ Public Sub ApplyStyleStateOnOff(HMITilepane As B4XView, statelabel As B4XView, s
 		HMITilepane.SetColorAndBorder(COLOR_STATE_OFF_BACKGROUND, 0, 0, BORDER_RADIUS)
 	End If
 End Sub
-#End Region
 
-' ================================================================
-' HELPER: APPLY STYLES
-' ================================================================
 Public Sub ApplyTitleStyle(lbl As B4XView)
 	If lbl.IsInitialized Then
 		#if B4J
@@ -472,6 +490,20 @@ Public Sub ApplyFontAwesomeStyle(lbl As B4XView)
 	End If
 End Sub
 
+Public Sub ApplyStateStyle(lbl As B4XView)
+	If lbl.IsInitialized Then
+		#if B4J
+		lbl.TextSize = TEXT_SIZE_TITLE
+		lbl.TextColor = COLOR_TEXT_PRIMARY
+		SetStyleBold(lbl, True)
+		#end if
+		#if B4A
+		lbl.Font = xui.CreateDefaultBoldFont(TEXT_SIZE_TITLE)
+		lbl.TextColor = COLOR_TEXT_PRIMARY
+		#End If
+	End If
+End Sub
+
 #if B4J
 Public Sub SetStyleBold(node As Node, value As Boolean)
 	If value Then
@@ -500,66 +532,18 @@ Public Sub GetStyleBorderRadius(node As Node) As Double
 End Sub
 #end if
 
-' ================================================================
-' HELPER CONVERSIONS
-' ================================================================
-
-'Convert a color hex string to int.
-'The hex string must be 8. If length 6 then FF is set as prefix.
-Public Sub HexToColor(hex As String) As Int	'ignore
-	Dim bc As ByteConverter
-	If hex.StartsWith("#") Then
-		hex = hex.SubString(1)
-	Else If hex.StartsWith("0x") Then
-		hex = hex.SubString(2)
-	End If
-	If hex.Length == 6 Then hex = $"FF${hex}"$
-	Dim b() As Byte = bc.HexToBytes(hex)
-	Dim ints() As Int = bc.IntsFromBytes(b)
-	Return ints(0)
-End Sub
-
-Public Sub ColorToHexARGB(clr As Int) As String
-	Dim bc As ByteConverter
-	Return bc.HexFromBytes(bc.IntsToBytes(Array As Int(clr)))
-End Sub
-
-Public Sub ColorToHexRGB(clr As Int) As String
-	Dim bc As ByteConverter
-	Dim hex As String = bc.HexFromBytes(bc.IntsToBytes(Array As Int(clr)))
-	Return hex.SubString2(2, hex.Length)
-End Sub
-
-#if B4J
-Public Sub ColorXUIToFX(value As Int) As Paint
-	Return fx.Colors.From32Bit(xui.Color_White)
-End Sub
-#end if
-
-' Set text color safely (null-safe)
-Public Sub SetTextColor(lbl As B4XView, col As Int)
-	If lbl.IsInitialized Then lbl.TextColor = col
-End Sub
-
-Public Sub CopyLabelProps(src As B4XView, dest As B4XView) As B4XView
-	dest.Text = src.Text
-	dest.Font = src.Font
-	dest.Color = src.Color
-	dest.TextColor = src.TextColor
-	dest.TextSize = src.TextSize
-	Return dest
-End Sub
-
-' Call like: ChangeButtonTextAnimated(HMITileButton1, newText)
-Public Sub ChangeButtonTextAnimated(target As B4XView, newText As String)
-	Dim duration As Int = 240
-	' Fade out
-	target.SetAlphaAnimated(duration, 0) ' duration in ms, alpha 0 = invisible
-	Sleep(120)
-	' Change text
-	target.Text = newText
-	' Fade back in
-	target.SetAlphaAnimated(duration, 1) ' alpha 1 = fully visible
+' SetAllTilesBackgroundColor
+' Helper to change the default background color of all (!) tiles.
+' This sub should be called at app start prior loadlayout.
+' Recommend to stick to the default background color as conflicting with HMITiles concept.
+' Parameters:
+'	clr - New all tiles background color
+' Example:
+'	Private Sub B4XPage_Created (Root1 As B4XView)
+'		HMITileUtils.SetAllTilesBackgroundColor(xui.Color_Blue)
+'		Root = Root1
+Public Sub SetAllTilesBackgroundColor(clr As Int)
+	COLOR_TILE_NORMAL_BACKGROUND = clr
 End Sub
 
 Public Sub StateStyleToState(state As String) As Int
@@ -582,13 +566,16 @@ Public Sub StateStyleToState(state As String) As Int
 	End Select
 	Return result
 End Sub
+#End Region
 
+#Region Helper CustomListView
 ' ================================================================
 ' HELPER CUSTOMLISTVIEW
 ' ================================================================
 
 ' Set CLV background transparent
 ' Example: SetCLVBackgroundTransparent(ClvCommands)
+#If Not(LINUX)
 Public Sub SetCLVBackgroundTransparent(clv As CustomListView)
 #if B4J
 	Dim sp As ScrollPane = clv.sv
@@ -600,11 +587,18 @@ Public Sub SetCLVBackgroundTransparent(clv As CustomListView)
 	CSSUtils.SetStyleProperty(sp, "-fx-control-inner-background-alt", "transparent")
 #end if
 End Sub
+#else
+' Linux: leave default styling (JavaFX transparency behaves differently)
+Public Sub SetCLVBackgroundTransparent(clv As CustomListView)
+    ' Do nothing – prevents invisible CLV items on Linux
+End Sub
+#End If
 
 ' Set the CLV scrollbar visibility
 ' Parameters:
 '	clv CustomListView
 '	visible Bolean
+#If Not(LINUX)
 Public Sub SetCLVScrollBars(clv As CustomListView, visible As Boolean)
 #If B4J
 	Dim nsv As ScrollPane = clv.sv
@@ -618,6 +612,11 @@ Public Sub SetCLVScrollBars(clv As CustomListView, visible As Boolean)
 	clv.Base_Resize(clv.AsView.Width, clv.AsView.Height)
 #End If	
 End Sub
+#Else
+' Linux: leave default styling (JavaFX transparency behaves differently)
+Public Sub SetCLVScrollBars(clv As CustomListView, visible As Boolean)
+End Sub
+#End If
 
 ' Set alpha level for a tile.
 ' Parameters:
@@ -625,8 +624,9 @@ End Sub
 Public Sub SetAlpha(enabled As Boolean) As Float
 	Return IIf(enabled, 1, 0.4)
 End Sub
+#End Region
 
-#Region HMITileGrid
+#Region TileGrid
 ' ================================================================
 ' TILE GRID - EXPERIMENTAL
 ' B4J only
@@ -689,6 +689,7 @@ End Sub
 ' ================================================================
 ' Snap full bounding box (position + size)
 ' ================================================================
+
 Public Sub SnapViewFull(v As B4XView)
 	SnapViewToGrid(v)
 	SnapSizeToGrid(v)
@@ -707,7 +708,165 @@ End Sub
 '	Sleep(1)
 '	HMITileUtils.DisableHMITileGrid
 '	Sleep(1)
-
+#End If
 #End Region
 
-#End If
+#Region Special
+' ================================================================
+' Special
+' ================================================================
+
+' SetBatteryStateIcon
+' Set the battery state fontawesome icon depending value 0-100%.
+' Parameters:
+'	value - Battery state 0-100
+' Returns:
+'	Fontawesome character
+Public Sub SetBatteryStateIcon(value As Int) As String
+	Private BAT_WARN As String = Chr(0xF071)
+	Private BAT_EMPTY As String = Chr(0xF244)
+	Private BAT_QUARTER As String = Chr(0xF243)
+	Private BAT_HALF As String = Chr(0xF242)
+	Private BAT_THREE_QUARTERS As String = Chr(0xF241)
+	Private BAT_FULL As String = Chr(0xF240)
+	
+	If value <= 0 Then
+		Return BAT_EMPTY
+	End If
+	If value > 0 And value <= 25 Then
+		Return BAT_QUARTER
+	End If
+	If value > 25 And value <= 50 Then
+		Return BAT_HALF
+	End If
+	If value > 50 And value <= 75 Then
+		Return BAT_THREE_QUARTERS
+	End If
+	If value > 75 Then
+		Return BAT_FULL
+	End If
+	Return BAT_WARN
+End Sub
+
+' SetComfortState
+'| State            | Temperature | Humidity |
+'| ---------------- | ----------- | -------- |
+'| **Comfortable**  | 20–24 °C    | 40–60 %  |
+'| **Too Cold**     | < 18 °C     | any      |
+'| **Cold & Dry**   | 18–20 °C    | < 40 %   |
+'| **Cold & Humid** | 18–20 °C    | > 60 %   |
+'| **Too Hot**      | > 26 °C     | any      |
+'| **Hot & Dry**    | 24–26 °C    | < 40 %   |
+'| **Hot & Humid**  | 24–26 °C    | > 60 %   |
+'| **Dry**          | any         | < 30 %   |
+'| **Humid**        | any         | > 70 %   |
+' Parameters:
+'	t Temperature
+'	h Humidity
+' Return:
+'	Comfort indication
+Public Sub SetComfortState(t As Double, h As Int) As String
+	' t = temperature in °C
+	' h = relative humidity in %
+
+	' Extreme humidity first (overrides temperature)
+	If h < 30 Then Return "Very Dry"
+	If h > 70 Then Return "Very Humid"
+
+	' Temperature-driven comfort
+	If t < 18 Then Return "Too Cold"
+	If t > 26 Then Return "Too Hot"
+
+	' Combined states
+	If t >= 20 And t <= 24 And h >= 40 And h <= 60 Then
+		Return "Comfortable"
+	End If
+
+	If t < 20 Then
+		If h < 40 Then Return "Cold & Dry"
+		If h > 60 Then Return "Cold & Humid"
+	End If
+
+	If t > 24 Then
+		If h < 40 Then Return "Hot & Dry"
+		If h > 60 Then Return "Hot & Humid"
+	End If
+
+	Return "Moderate"
+End Sub
+#End Region
+
+#Region Helper Conversions
+' ================================================================
+' HELPER CONVERSIONS
+' ================================================================
+
+'Convert a color hex string to int.
+'The hex string must be 8. If length 6 then FF is set as prefix.
+Public Sub HexToColor(hex As String) As Int	'ignore
+	Dim bc As ByteConverter
+	If hex.StartsWith("#") Then
+		hex = hex.SubString(1)
+	Else If hex.StartsWith("0x") Then
+		hex = hex.SubString(2)
+	End If
+	If hex.Length == 6 Then hex = $"FF${hex}"$
+	Dim b() As Byte = bc.HexToBytes(hex)
+	Dim ints() As Int = bc.IntsFromBytes(b)
+	Return ints(0)
+End Sub
+
+Public Sub ColorToHexARGB(clr As Int) As String
+	Dim bc As ByteConverter
+	Return bc.HexFromBytes(bc.IntsToBytes(Array As Int(clr)))
+End Sub
+
+Public Sub ColorToHexRGB(clr As Int) As String
+	Dim bc As ByteConverter
+	Dim hex As String = bc.HexFromBytes(bc.IntsToBytes(Array As Int(clr)))
+	Return hex.SubString2(2, hex.Length)
+End Sub
+
+#if B4J
+Public Sub ColorXUIToFX(value As Int) As Paint
+	Return fx.Colors.From32Bit(xui.Color_White)
+End Sub
+#end if
+
+' Set text color safely (null-safe)
+Public Sub SetTextColor(lbl As B4XView, col As Int)
+	If lbl.IsInitialized Then lbl.TextColor = col
+End Sub
+
+Public Sub CopyLabelProps(src As B4XView, dest As B4XView) As B4XView
+	dest.Text = src.Text
+	dest.Font = src.Font
+	dest.Color = src.Color
+	dest.TextColor = src.TextColor
+	dest.TextSize = src.TextSize
+	Return dest
+End Sub
+
+' Call like: ChangeButtonTextAnimated(HMITileButton1, newText)
+Public Sub ChangeButtonTextAnimated(target As B4XView, newText As String)
+	Dim duration As Int = 240
+	' Fade out
+	target.SetAlphaAnimated(duration, 0) ' duration in ms, alpha 0 = invisible
+	Sleep(120)
+	' Change text
+	target.Text = newText
+	' Fade back in
+	target.SetAlphaAnimated(duration, 1) ' alpha 1 = fully visible
+End Sub
+
+' ByteToUnsigned
+' Convert Byte to Unsigned Int 0-255
+' Parameters:
+'	b byte
+' Returns:
+'	Unsigned Int 0-255
+Public Sub ByteToUnsigned(b As Byte) As Int
+	Return Bit.And(0xFF, b)
+End Sub
+#End Region
+

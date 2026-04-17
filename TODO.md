@@ -3,8 +3,11 @@
 ---
 
 ### ShortList
-- All classes upadet private/public subs, align docs.
-- HMI for RailShunt project.
+- HMITileTrafficLight - Title (25%) + padding + LabelR (20%) + padding + Y (20%) + padding + B (20%) + padding + Label Unit (5%).
+- HMITileEventViewer - Option hide the icon at beginning of the row: EVENT_LEVEL_NONE.
+- HMITileIcon - API to change icon.
+- All classes update private/public subs, align docs.
+- Test on RPi with TouchScreen.
 
 ---
 
