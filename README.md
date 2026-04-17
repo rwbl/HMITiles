@@ -116,18 +116,14 @@ Private Sub HMITileButtonOnOff_Click
 End Sub
 ```
 
-## Roadmap
-
-Planned additions include:
-- HMITileStateIndicator
-- HMITileFormHeader
-- HMITileMenuButton
-- FarmKit32 example to control the Keyestudio Smart Farm Kit KS0567, similar in concept to HomeKit32
+---
 
 ## Versioning
 
 This project does not follow strict semantic versioning.
 Updates are published when improvements are available.
+
+---
 
 ## Disclaimer & Project Scope
 
@@ -156,6 +152,8 @@ Use it at your own risk.
 No guarantees are made regarding correctness, reliability, or suitability for any application.
 
 For full legal terms, see the LICENSE file (MIT).
+
+---
 
 ## License
 
