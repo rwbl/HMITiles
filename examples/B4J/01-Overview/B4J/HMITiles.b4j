@@ -1,7 +1,9 @@
 ﻿AppType=JavaFX
 Build1=Default,com.rwblinn.hmitiles
 File1=mainpage.bjl
+File2=page2.bjl
 FileGroup1=New Group
+FileGroup2=Default Group
 Group=Default Group
 Library1=b4xpages
 Library2=byteconverter
@@ -11,10 +13,11 @@ Library5=jfx
 Library6=xui views
 Library7=hmitiles
 Module1=|relative|..\B4XMainPage
-NumberOfFiles=1
+Module2=|relative|..\B4XPage2
+NumberOfFiles=2
 NumberOfLibraries=7
-NumberOfModules=1
-Version=10.3
+NumberOfModules=2
+Version=10.5
 @EndOfDesignText@
 ' ================================================================
 ' File:			HMITiles
