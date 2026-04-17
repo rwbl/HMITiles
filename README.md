@@ -14,6 +14,8 @@ It provides reusable, professional-grade HMI tiles for:
 
 The focus of this library is **clarity, consistency, and disciplined HMI design** - not visual effects or UI decoration.
 
+Use in **industrial or safety-critical environments** is entirely at your **own risk**.
+
 ---
 
 ## Design Goals
@@ -121,6 +123,39 @@ Planned additions include:
 - HMITileFormHeader
 - HMITileMenuButton
 - FarmKit32 example to control the Keyestudio Smart Farm Kit KS0567, similar in concept to HomeKit32
+
+## Versioning
+
+This project does not follow strict semantic versioning.
+Updates are published when improvements are available.
+
+## Disclaimer & Project Scope
+
+This project was created:
+- to explore the development of HMI / SCADA-style tile interfaces
+- for personal use and experimentation
+- to share knowledge and ideas within the B4X community
+
+This is a hobby project and is provided as-is.
+
+### Intended Use
+
+This library is not intended for production-critical or safety-related systems.
+
+### Support Policy
+
+- Issues are disabled or not actively monitored
+- No support, bug fixes, or feature requests are guaranteed
+- You are welcome to fork and adapt the code
+
+### Warranty & Liability
+
+This software is provided **"as is"**, without any warranty.  
+Use it at your own risk.
+
+No guarantees are made regarding correctness, reliability, or suitability for any application.
+
+For full legal terms, see the LICENSE file (MIT).
 
 ## License
 
