@@ -6,7 +6,7 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.6.1] - 2026-04-DD
+## [1.6.1] - 2026-04-16
 * NEW: HMITileTimer - Counter UP or DOWN
 * NEW: HMITileStatusIndicators - 3x3 Responsive HMI Indicator
 * NEW: HMITileUtils - Various colors & text constants
