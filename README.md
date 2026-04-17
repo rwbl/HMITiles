@@ -183,6 +183,6 @@ For full legal terms, see the LICENSE file (MIT).
 
 ## License
 
-- **HMITiles** – MIT License © 2025-2026 Robert W. W. Linn
+- **HMITiles** – MIT License © 2025-2026 Robert W. B. Linn
 - See LICENSE for details.
 
