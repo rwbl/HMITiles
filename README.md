@@ -146,6 +146,7 @@ End Sub
 ## Versioning
 
 This project does not follow strict semantic versioning.
+
 Updates are published when improvements are available.
 
 ---
