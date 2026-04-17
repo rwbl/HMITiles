@@ -125,5 +125,5 @@ Planned additions include:
 ## License
 
 - **HMITiles** – MIT License © 2025-2026 Robert W. W. Linn
-See LICENSE for details.
+- See LICENSE for details.
 
