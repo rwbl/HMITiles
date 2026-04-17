@@ -90,7 +90,7 @@ All tiles share a **unified styling and state model**.
 
 ## Installation
 
-1. Download the latest release (`HMITiles.b4xlib`)
+1. Download the latest release (`HMITiles.b4xlib`) from the `libs' folder.
 2. Copy it to the **B4J** or **B4A Additional Libraries** folder
 3. Restart the B4X IDE if required
 
