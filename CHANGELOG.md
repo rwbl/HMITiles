@@ -6,7 +6,10 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.6.1] - 2026-04-16
+## [1.6.2] - 2026-04-18
+* UPD: B4A Examples - Reworked BLEScanner, ESP32BLELED (replaced BLE library rBLEServer to rNimBLEServer)
+
+## [1.6.1] - 2026-04-17
 * NEW: HMITileTimer - Counter UP or DOWN
 * NEW: HMITileStatusIndicators - 3x3 Responsive HMI Indicator
 * NEW: HMITileUtils - Various colors & text constants

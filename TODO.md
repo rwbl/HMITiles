@@ -8,6 +8,9 @@
 - HMITileIcon - API to change icon.
 - All classes update private/public subs, align docs.
 - Test on RPi with TouchScreen.
+- Additional Get Started examples.
+- Short developers documentation (how-to's, concept).
+- Plugin external HMITiles without changing core.
 
 ---
 
