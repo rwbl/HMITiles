@@ -55,28 +55,32 @@ All tiles share a **unified styling and state model**.
 
 ## HMITiles Overview
 
-- **HMITileButton** – Configurable button tile with styling, icons, and click handling.
-- **HMITileClock** – Analog clock tile with customizable hands and appearance.
-- **HMITileDigitalClock** – Digital clock tile with flexible time and date formats.
-- **HMITileEventViewer** – Scrollable event/log viewer for real-time messages.
-- **HMITileGauge** – Circular or linear gauge for visualizing numeric values.
-- **HMITileGridHelper** – Utility for aligning and arranging tiles in grid layouts.
-- **HMITileImage** – Displays images with scaling and positioning options.
-- **HMITileImageIcon** – Image-based icon tile with basic interaction support.
-- **HMITileLabel** – Text label tile with styling and alignment options.
-- **HMITileLevel** – Level indicator (e.g., tank/bar) showing percentage or value.
-- **HMITileList** – List display tile for dynamic or selectable items.
-- **HMITileNavButton** – Navigation button tile for switching views or pages.
-- **HMITileReadout** – Numeric or text readout tile for process or system values.
-- **HMITileRGB** – RGB color control or display tile (e.g., lighting control).
-- **HMITileSeekBar** – Slider control tile for interactive value adjustment.
-- **HMITileSelect** – Dropdown selection tile for choosing a single option.
-- **HMITileSelectList** – Extended selection list supporting multiple options.
-- **HMITileSensor** – Sensor tile for displaying live values with status indication.
-- **HMITileShape** – Renders basic shapes (rectangles, circles, etc.) for layout and decoration.
-- **HMITileSPPV** – Setpoint vs. process value (SP/PV) visualization tile.
-- **HMITileTrend** – Trend/chart tile for plotting time-series data.
-- **HMITileUtils** – Shared helper and utility functions.
+| Tile Type                     | Brief                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------- |
+| **HMITileButton**             | Configurable button tile with styling, icons, and click handling.           |
+| **HMITileClock**              | Analog clock tile with customizable hands and appearance.                   |
+| **HMITileDigitalClock**       | Digital clock tile with flexible time and date formats.                     |
+| **HMITileEventViewer**        | Scrollable event/log viewer for real-time messages.                         |
+| **HMITileGauge**              | Circular or linear gauge for visualizing numeric values.                    |
+| **HMITileGridHelper**         | Utility for aligning and arranging tiles in grid layouts.                   |
+| **HMITileImage**              | Displays images with scaling and positioning options.                       |
+| **HMITileImageIcon**          | Image-based icon tile with basic interaction support.                       |
+| **HMITileLabel**              | Text label tile with styling and alignment options.                         |
+| **HMITileLevel**              | Level indicator (e.g., tank/bar) showing percentage or value.               |
+| **HMITileList**               | List display tile for dynamic or selectable items.                          |
+| **HMITileNavButton**          | Navigation button tile for switching views or pages.                        |
+| **HMITileReadout**            | Numeric or text readout tile for process or system values.                  |
+| **HMITileRGB**                | RGB color control or display tile (e.g., lighting control).                 |
+| **HMITileSeekBar**            | Slider control tile for interactive value adjustment.                       |
+| **HMITileSelect**             | Dropdown selection tile for choosing a single option.                       |
+| **HMITileSelectList**         | Extended selection list supporting multiple options.                        |
+| **HMITileSensor**             | Sensor tile for displaying live values with status indication.              |
+| **HMITileShape**              | Renders basic shapes (rectangles, circles, etc.) for layout and decoration. |
+| **HMITileSPPV**               | Setpoint vs. process value (SP/PV) visualization tile.                      |
+| **HMITileStatusIndicators**   | Extended selection list supporting multiple options.                        |
+| **HMITileTimer**              | Up or down counter usig seconds timer.                                      |
+| **HMITileTrend**              | Trend/chart tile for plotting time-series data.                             |
+| **HMITileUtils**              | Shared helper and utility functions.                                        |
 
 ---
 

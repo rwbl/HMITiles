@@ -2,7 +2,7 @@
 
 ---
 
-### ShortList
+### NEW: ShortList
 - HMITileTrafficLight - Title (25%) + padding + LabelR (20%) + padding + Y (20%) + padding + B (20%) + padding + Label Unit (5%).
 - HMITileEventViewer - Option hide the icon at beginning of the row: EVENT_LEVEL_NONE.
 - HMITileIcon - API to change icon.
@@ -14,24 +14,25 @@
 ### NEW: Tiles
 | Tile Type                        | Alarm Allowed?  | Reason                               | State | Notes                    |
 | -------------------------------- | --------------- | ------------------------------------ | ----- | ------------------------ |
-| **TileLabel**                    | YES             | Status indicator                     | Done  |                          |
+| **TileBarGraph**                 | YES             | Displays monitored variables         | Open  |                          |
 | **TileButton**                   | CONDITIONAL     | Only for alarm acknowledgement/reset | Done  |                          |
 | **TileEvents**                   | YES             | Event/alarm viewer                   | Done  |                          |
-| **TileSensor**                   | YES             | Process values can be in alarm       | Done  |                          |
-| **TileReadOut**                  | YES             | Process values can be in alarm       | Done  |                          |
-| **TileValue (numeric, analog)**  | YES             | Process values can be in alarm       | Done  | Use TileLabel            |
-| **TileLevel**                    | YES             | Displays monitored level             | Done  |                          |
-| **TileGauge**                    | YES             | Displays monitored variables         | Done  |                          |
-| **TileBarGraph**                 | YES             | Displays monitored variables         | Open  |                          |
-| **TileTrend**                    | YES             | Displays monitored variables         | Done  |                          |
-| **TileStateIndicator**           | YES             | Represents safety/equipment state    | Open  |                          |
 | **TileFormHeader**               | NO              | Navigation/layout                    | Open  |                          |
-| **TileMenuButton**               | NO              | Navigation only                      | Open  |                          |
-| **TileImage**                    | NO              | Decorative                           | Done  |                          |
+| **TileGauge**                    | YES             | Displays monitored variables         | Done  |                          |
 | **TileGrid**                     | NO              | Layout                               | Done  |                          |
-| **TileSeparator**                | NO              | Layout                               | Open  |                          |
+| **TileImage**                    | NO              | Decorative                           | Done  |                          |
+| **TileLabel**                    | YES             | Status indicator                     | Done  |                          |
+| **TileLevel**                    | YES             | Displays monitored level             | Done  |                          |
+| **TileMenuButton**               | NO              | Navigation only                      | Open  |                          |
 | **TileRGB**                      | NO              | RGB Color control                    | Done  |                          |
+| **TileReadOut**                  | YES             | Process values can be in alarm       | Done  |                          |
+| **TileSensor**                   | YES             | Process values can be in alarm       | Done  |                          |
+| **TileSeparator**                | NO              | Layout                               | Open  |                          |
 | **TileSlider**                   | NO              | Process value set			        | Done  |                          |
+| **TileStateIndicator**           | YES             | Represents safety/equipment state    | Open  |                          |
+| **TileTrend**                    | YES             | Displays monitored variables         | Done  |                          |
+| **TileValue (numeric, analog)**  | YES             | Process values can be in alarm       | Done  | Use TileLabel            |
+
 #### Status
 In progress.
 
