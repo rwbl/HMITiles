@@ -4,29 +4,32 @@ ModulesStructureVersion=1
 Type=StaticCode
 Version=4
 @EndOfDesignText@
-#Region Module Header
 ' ================================================================
 ' File:        	DevLED.bas
-' Project:     	ESP32BLELED
 ' Brief:       	Set/Get the state of the led ON or OFF.
-' Date:        	2025-12-31
+' Date:        	2026-04-18
 ' Author:      	Robert W.B. Linn (c) 2025 MIT
-' Description:	See brief.
-' DeviceID: 0x01
-' Sets the state to on or off (Command 0x01).
-' 	Length: 3 Bytes
-' 	Byte 0 Device:	0x01
-' 	Byte 1 Command:	0x01 > Set
-' 	Byte 2 State:	0x01 > ON or 0x00 > OFF
-'	Example: Set ON = 010101
+' Description:	Handle LED set or get state commands
+' Example Frame:
+'				Address: 0x60
+'				Set LED state ON/OFF (Command 0x01).
+'				Length: 5 Bytes
+'				Byte 0 Header:	0x19 (fixed)
+'				Byte 1 Address:	0x60
+'				Byte 2 Command:	0x01 > Set
+'				Byte 3 Value:	0x01 > ON Or 0x00 > OFF
+'				Byte 4 Footer:	0x58 (fixed)
+'				Example: Set ON = 1960010158
 '
-' Get the state (Command 0x02)
-' 	Length: 2 Bytes
-' 	Byte 0 Device:	0x01
-' 	Byte 1 Command:	0x02 > Get
-'	Returns Byte 0=ON, 1=ON
-'	Example Get State = 0102 which returns like 010201 (last byte holds LED state 0 (OFF), 1 (ON).
-' Hardware:		DFRobot Digital Green LED Module V2.
+'				Get the state (Command 0x02)
+'				Length: 5 Bytes
+'				Byte 0 Header:	0x19 (fixed)
+'				Byte 1 Address:	0x60
+'				Byte 2 Command:	0x02 > Get
+'				Byte 3 Value:	0x00
+'				Byte 4 Footer:	0x58 (fixed)
+'				Returns Byte 0=ON, 1=ON
+'				Example Get State = 1060010200 which returns like 1960020158 (last byte holds Led state 0 (OFF), 1 (ON).
 ' ================================================================
 #End Region
 
@@ -87,46 +90,35 @@ End Sub
 ' BLE integration 
 ' ------------------------------------------------
 #Region BLE Control
-' ProcessBLE
-' DeviceID: 0x01
-' Sets the state to on or off (Command 0x01).
-' 	Length: 3 Bytes
-' 	Byte 0 Device:	0x01
-' 	Byte 1 Command:	0x01 > Set
-' 	Byte 2 State:	0x01 > ON or 0x00 > OFF
-'	Example: Set ON = 010101
-'
-' Get the state (Command 0x02)
-' 	Length: 2 Bytes
-' 	Byte 0 Device:	0x01
-' 	Byte 1 Command:	0x02 > Get
-'	Returns Byte 0=ON, 1=ON
-'	Example Get State = 0102 which returns like 010201 (last byte holds LED state 0 (OFF), 1 (ON).
-'
+' ProcessCommand
 ' Parameters:
 '   payload() - Payload array byte buffer.
-Public Sub ProcessBLE(payload() As Byte)
-	Log("[DevLED.ProcessBLE] payload=", Convert.BytesToHex(payload))
-	
-	Dim command As Byte = payload(1)
-	Select command
+Public Sub ProcesCommand(cmd As Byte, val As Byte)
+	Log("[DevLED.ProcessCommand] cmd=", Convert.ByteToHex(cmd), " val=", Convert.ByteToHex(val))
+		
+	Select cmd
 		Case CommBLE.CMD_SET_STATE
-			Dim value As Byte = payload(2)
-			Set(IIf(value == 1, True, False))
-			WriteToBLE(command, value)
+			Set(IIf(val == 1, True, False))
+			WriteToBLE(cmd, val)
 		Case CommBLE.CMD_GET_STATE
 			Dim state As Byte = IIf(Get, 1, 0)
-			WriteToBLE(command, state)
+			WriteToBLE(cmd, state)
 	End Select
 End Sub
 
 ' WriteToBLE
-' Write to BLE the state.
+' Write to BLE the command & value (connected client).
 ' Parameters:
-'	state - Byte
-Public Sub WriteToBLE(command As Byte, state As Byte)
-	Dim payload() As Byte = Array As Byte(CommBLE.DEV_LED, command, state)
-	CommBLE.BLEServer_Write(payload)
+'	cmd - Byte
+'	val - Byte
+Public Sub WriteToBLE(cmd As Byte, val As Byte)
+	Dim payload(5) As Byte = Array As Byte( _
+		CommBLE.FRAME_HEADER, _ 
+		CommBLE.ADR_LED, _ 
+		cmd, _ 
+		val, _
+		CommBLE.FRAME_FOOTER)
 	Log("[DevLED.WriteToBLE] payload=", Convert.BytesToHex(payload))
+	CommBLE.Write(payload)
 End Sub
 #End Region

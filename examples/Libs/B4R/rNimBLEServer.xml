@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+    <doclet-version-NOT-library-version>1.00</doclet-version-NOT-library-version>
+    <class>
+        <name>B4R::B4RNimBLEServer</name>
+        <shortname>NimBLEServer</shortname>
+        <comment>@class B4RNimBLEServer
+@brief Lightweight BLE server wrapper for B4R.</comment>
+        <event>Connected ()</event>
+        <event>Disconnected ()</event>
+        <event>Write (Buffer() As Byte)</event>
+        <method>
+            <name DesignerName="Initialize">Initialize</name>
+            <comment>@brief Initializes the BLE server.
+
+@param DeviceName Name of the BLE device (advertised)
+@param ServiceUUID UUID of the BLE service
+@param CharUUID UUID of the characteristic (RX/TX combined)
+@param OnConnected Callback when client connects
+@param OnDisconnected Callback when client disconnects
+@param OnWrite Callback when client writes data
+@param Debug Enable Serial debug output</comment>
+            <returntype>B4R::void</returntype>
+            <parameter>
+                <name>DeviceName</name>
+                <type>B4R::B4RString*</type>
+            </parameter>
+            <parameter>
+                <name>ServiceUUID</name>
+                <type>B4R::B4RString*</type>
+            </parameter>
+            <parameter>
+                <name>CharUUID</name>
+                <type>B4R::B4RString*</type>
+            </parameter>
+            <parameter>
+                <name>OnConnected</name>
+                <type>SubVoidVoid</type>
+            </parameter>
+            <parameter>
+                <name>OnDisconnected</name>
+                <type>SubVoidVoid</type>
+            </parameter>
+            <parameter>
+                <name>OnWrite</name>
+                <type>SubVoidArray</type>
+            </parameter>
+            <parameter>
+                <name>Debug</name>
+                <type>bool</type>
+            </parameter>
+        </method>
+        <method>
+            <name DesignerName="Start">Start</name>
+            <comment>@brief Starts the BLE server and begins advertising.</comment>
+            <returntype>B4R::void</returntype>
+        </method>
+        <method>
+            <name DesignerName="Stop">Stop</name>
+            <comment>@brief Stops the BLE server and advertising.</comment>
+            <returntype>B4R::void</returntype>
+        </method>
+        <method>
+            <name DesignerName="Write">Write</name>
+            <comment>@brief Sends notification to connected client.
+@param data Byte array to send</comment>
+            <returntype>B4R::void</returntype>
+            <parameter>
+                <name>data</name>
+                <type>Byte[]</type>
+            </parameter>
+        </method>
+        <method>
+            <name DesignerName="SetConnected">SetConnected</name>
+            <comment>@brief Set cleitn connection state.
+@param state bool true or false</comment>
+            <returntype>B4R::void</returntype>
+            <parameter>
+                <name>state</name>
+                <type>bool</type>
+            </parameter>
+        </method>
+        <method>
+            <name DesignerName="IsConnected">IsConnected</name>
+            <comment>@brief Returns connection status.</comment>
+            <returntype>bool</returntype>
+        </method>
+        <method>
+            <name DesignerName="HandleConnect">HandleConnect</name>
+            <comment>Internal event handlers</comment>
+            <returntype>B4R::void</returntype>
+        </method>
+        <method>
+            <name DesignerName="HandleDisconnect">HandleDisconnect</name>
+            <returntype>B4R::void</returntype>
+        </method>
+        <method>
+            <name DesignerName="HandleWrite">HandleWrite</name>
+            <returntype>B4R::void</returntype>
+            <parameter>
+                <name>data</name>
+                <type>B4R::uint8_t*</type>
+            </parameter>
+            <parameter>
+                <name>length</name>
+                <type>B4R::size_t</type>
+            </parameter>
+        </method>
+        <method>
+            <name DesignerName="SendAck">SendAck</name>
+            <returntype>B4R::void</returntype>
+            <parameter>
+                <name>data</name>
+                <type>B4R::uint8_t*</type>
+            </parameter>
+            <parameter>
+                <name>length</name>
+                <type>B4R::size_t</type>
+            </parameter>
+        </method>
+        <field>
+            <name DesignerName="instance">instance</name>
+            <comment>@brief Singleton instance for static callbacks</comment>
+            <returntype>B4R::B4RNimBLEServer*</returntype>
+        </field>
+        <field>
+            <name DesignerName="debug">debug</name>
+            <comment>@brief Enable debug logging</comment>
+            <returntype>bool</returntype>
+        </field>
+        <field>
+            <name DesignerName="FRAME_START">FRAME_START</name>
+            <comment>NOT USED as handled by B4R
+ --- HubController Protocol ---</comment>
+            <returntype>B4R::uint8_t</returntype>
+        </field>
+        <field>
+            <name DesignerName="FRAME_END">FRAME_END</name>
+            <returntype>B4R::uint8_t</returntype>
+        </field>
+        <field>
+            <name DesignerName="SYSTEM1_ADDRESS">SYSTEM1_ADDRESS</name>
+            <comment>NOT USED - Example defining constants to toggle onboard led
+ Addresses</comment>
+            <returntype>B4R::uint8_t</returntype>
+            <parameter>
+                <name>60</name>
+                <type>B4R::DEC</type>
+            </parameter>
+        </field>
+        <field>
+            <name DesignerName="SYSTEM_CMD_ONBOARD_LED">SYSTEM_CMD_ONBOARD_LED</name>
+            <comment>Commands</comment>
+            <returntype>B4R::uint8_t</returntype>
+            <parameter>
+                <name>1</name>
+                <type>B4R::DEC</type>
+            </parameter>
+        </field>
+        <field>
+            <name DesignerName="STATE_OFF">STATE_OFF</name>
+            <comment>States</comment>
+            <returntype>B4R::uint8_t</returntype>
+            <parameter>
+                <name>0</name>
+                <type>B4R::DEC</type>
+            </parameter>
+        </field>
+        <field>
+            <name DesignerName="STATE_ON">STATE_ON</name>
+            <returntype>B4R::uint8_t</returntype>
+            <parameter>
+                <name>1</name>
+                <type>B4R::DEC</type>
+            </parameter>
+        </field>
+    </class>
+    <version>1</version>
+</root>

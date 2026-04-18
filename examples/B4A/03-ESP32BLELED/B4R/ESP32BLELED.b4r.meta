@@ -7,6 +7,6 @@ ModuleBreakpoints2=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
 ModuleClosedNodes2=
-NavigationStack=DevLED,SetPWM,53,0,CommBLE,Process_Globals,34,1,CommBLE,BLEDispatch,104,3,CommBLE,BLEServer_Write,83,0,CommBLE,BLEServer_NewData,59,1,DevLED,WriteToBLE,107,0,Main,Process_Globals,48,5,Main,AppStart,54,6,DevLED,ProcessBLE,94,0,DevLED,Toggle,69,0
+NavigationStack=DevLED,Set,68,0,DevLED,Initialize,50,0,DevLED,Get,57,0,DevLED,Toggle,76,0,CommBLE,Write,69,6,CommBLE,Initialize,47,0,CommBLE,OnReceived,63,0,CommBLE,ProcessCommand,111,0,DevLED,WriteToBLE,115,3,DevLED,ProcesCommand,97,6
 SelectedBuild=0
 VisibleModules=1,2

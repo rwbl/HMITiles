@@ -4,109 +4,114 @@ ModulesStructureVersion=1
 Type=StaticCode
 Version=4
 @EndOfDesignText@
-#Region Module Header
 ' ================================================================
 ' File:         CommBLE.bas
-' Project:      make-homekit32
-' Brief:        Handle BLE communication. BLE sevice name HomeKit32.
-'				UART service & characteristics.
-' Date:         2025-12-06
+' Brief:        Handle BLE communication with the client. 
+' Description:	The client connects and sends 5-byte frame to set the state of the ESP32 onboard LED.
+'				BLE sevice name: ESP32BLELED.
+' Date:         2026-04-18
 ' Author:       Robert W.W. Linn (c) 2025 MIT
-' Dependencies: rWiFiManager, rBLEServer, rGlobalStoreEx
-' Description:	Communication layer for message routing via MQTT.
 ' ================================================================
-#End Region
 
 Private Sub Process_Globals
 	
-	' Devices
-	Public DEV_LED As Byte 				= 0x01
-	Public DEV_SYSTEM As Byte			= 0xFF
+	' Frame
+	' Header and footer
+	Public FRAME_LENGTH 		As Byte	= 5
+	Public FRAME_HEADER 		As Byte = 0x19
+	Public FRAME_FOOTER 		As Byte = 0x58
 	
+	' Addresses
+	Public ADR_SYSTEM			As Byte = 0x01
+	Public ADR_LED				As Byte = 0x60
+
 	' Commands
-	Public CMD_SET_STATE As Byte 		= 0x01
-	Public CMD_GET_STATE As Byte 		= 0x02
-	Public CMD_SET_COLOR As Byte 		= 0x01
-	Public CMD_GET_COLOR As Byte 		= 0x02
-	Public CMD_SET_VALUE As Byte 		= 0x03
-	Public CMD_GET_VALUE As Byte 		= 0x04
-	Public CMD_CUSTOM_ACTION As Byte	= 0x05
+	Public CMD_SET_STATE 		As Byte = 0x01
+	Public CMD_GET_STATE 		As Byte = 0x02
+	Public CMD_SET_COLOR 		As Byte = 0x01
+	Public CMD_GET_COLOR 		As Byte = 0x02
+	Public CMD_SET_VALUE 		As Byte = 0x03
+	Public CMD_GET_VALUE 		As Byte = 0x04
+	Public CMD_CUSTOM_ACTION	As Byte	= 0x05
 	
 	' BLE ESP32 Plus BLE Peripheral + GATT Server
-	Private BLE_SERVER_NAME As String 	= "ESP32BLELED"	'ignore
-	Private BLEServer As BLEServer						'ignore
-	Private MTUSize As UInt = BLEServer.MTU_SIZE_MIN	'ignore
+	Private BLE_SERVER_NAME		As String = "ESP32BLELED"
+	Private BLEServer 			As NimBLEServer
 End Sub
 
 ' Initialize
 ' Initializes BLE
 Public Sub Initialize
 	Log("[CommBLE.Initialize]")
-	BLEServer.Initialize(BLE_SERVER_NAME, "BLEServer_NewData", "BLEServer_Error", MTUSize)
-	Log("[CommBLE.Initialize] Done, mtusize=", MTUSize)
+
+    BLEServer.Initialize( _
+        BLE_SERVER_NAME, _
+        "12345678-1234-1234-1234-1234567890ab", _
+        "abcd1234-5678-1234-5678-1234567890ab", _
+        "OnConnected", _
+        "OnDisconnected", _
+        "OnReceived", _
+        True)
+
+	BLEServer.Start
+	Log("[CommBLE.Initialize] Done")
 End Sub
 
-' Handle new data received from connected client.
-' Data format: [DeviceID][Command][Payload...]
-' Parameters:
-' 	buffer - Byte array holding the data send by the client
-Private Sub BLEServer_NewData(buffer() As Byte)
-	Log("[CommBLE.BLEServer_NewData] buffer HEX=", Convert.BytesToHex(buffer))
-
-	' Check buffer lenght. Expect at least 2.
-	If buffer.Length < 2 Then Return
-	
-	' Dispatch to handler
-	BLEDispatch(buffer)
+Sub OnConnected
+	Log("[CommBLE.OnConnected] Client connected")
 End Sub
 
- 'Handle BLE server error.
-' Log the error to the B4R IDE, but could also use an LED
-' Parameters:
-'	code - BLE server error code
-Private Sub BLEServer_Error(code As Byte)
-	Log("[CommBLE.BLEServer_Error] code=",code)
-	Select code
-		Case BLEServer.WARNING_INVALID_MTU
-			Log("[CommBLE.BLEServer_Error][WARNING] Initialize MTU out of range 23-512, default is set (23).")
-		Case BLEServer.ERROR_INVALID_CHARACTERISTIC
-			Log("[CommBLE.BLEServer_Error][ERROR] Write failed: No valid characteristic.")
-		Case BLEServer.ERROR_EMPTY_DATA
-			Log("[CommBLE.BLEServer_Error][ERROR] Write failed: No data.")
-	End Select
+Sub OnDisconnected
+	Log("[CommBLE.OnDisconnected] Client disconnected")
 End Sub
 
-' Write data to the connected client.
+' Handle data received from connected client
+Sub OnReceived (frame() As Byte)
+	Log("[CommBLE.OnReceived] RX:", frame.Length, " ", Convert.BytesToHex(frame))
+	ProcessCommand(frame)
+End Sub
+
+Public Sub Write(frame() As Byte)
+	Log("[CommBLE.Write] ", Convert.BytesToHex(frame))
+	BLEServer.Write(frame)
+End Sub
+
+' ProcessCommand
+' Process the 5-byte command received from the client.
+' Data format: [HDR][ADDR][CMD][VAL][FTR]
 ' Parameters:
-' 	data - Byte array containing data fo the connected client
-Public Sub BLEServer_Write(data() As Byte)
-	If data == Null Then
-		Log("[ERROR][CommBLE.BLEServer_Write] No data.")
-		Return
+' 	frame - Byte array holding the data send by the client
+Private Sub ProcessCommand(frame() As Byte)
+	' Commands received
+	Private addr, cmd, val As Byte
+
+	If frame.Length < FRAME_LENGTH Then
+		Log("[CommBLE.ProcessCommand] Invalid frame length. Expect 5 bytes.")
 	End If
-	Log("[CommBLE.BLEServer_Write] data=", Convert.ByteConv.HexFromBytes(data))
-	BLEServer.Write(data)
+
+	Log("[CommBLE.ProcessCommand] frame=", Convert.BytesToHex(frame))
+	
+	If frame(0) == FRAME_HEADER And frame(frame.Length - 1) == FRAME_FOOTER Then
+		'hdr = frame(0)
+		addr = frame(1)
+		cmd = frame(2)
+		val = frame(3)
+		'ftr = frame(4)
+
+		' [ProcessCommand] addr=96 cmd=1 val=0
+		Log("[ProcessCommand] addr=", addr, " cmd=", cmd, " val=", val)
+		' [ProcessCommand] addr=60 cmd=01 val=00
+		Log("[CommBLE.ProcessCommand] addr=", Convert.ByteToHex(addr), " cmd=", Convert.ByteToHex(cmd), " val=", Convert.ByteToHex(val))
+		' Select the device address
+		Select addr
+			Case 0
+				' Reserved
+			Case ADR_LED
+				' Set the LED ON or OFF
+				DevLED.ProcesCommand(cmd, val)
+			Case Else
+				' Do nothing
+		End Select
+	End If
 End Sub
 
-' Dispatch BLE message to the relevant device handler.
-' [DeviceID][CommandID][Data...]
-' Notes:
-'	Buttons not used - see MenuHandler
-' Parameters:
-'	deviceid - Byte Device ID as defined in the constants.
-Private Sub BLEDispatch(payload() As Byte)
-	' Get the device id
-	Dim deviceid As Byte = payload(0)
-
-	Log("[CommBLE.BLEDispatch] deviceid=",deviceid)
-	Select deviceid
-		Case 0
-			' Reserved
-		Case DEV_LED
-			DevLED.ProcessBLE(payload)
-		Case DEV_SYSTEM
-			' DevSystem.ProcessBLE(GlobalStoreHandler.Index)
-		Case Else
-			'
-	End Select
-End Sub

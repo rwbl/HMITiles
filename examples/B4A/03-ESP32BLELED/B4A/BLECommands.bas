@@ -4,19 +4,17 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-#Region Class Header
 ' Class:        BLECommands
 ' Brief:        Registry of BLE command definitions.
-' Date:         2025-12-31
+' Date:         2026-04-18
 ' Author:       Robert W.B. Linn (c) 2025 MIT
 ' Description:  Provides TCommand definitions and utilities.
 ' Note:			B4R uses unsigned bytes (0–255)
-'				B4J uses signed bytes (–128 to +127) > use Int for DeviceID and CommandID and NOT Byte
-#End Region
+'				B4J uses signed bytes (–128 to +127) > use Int for fields Address and Command and NOT Byte.
 
 Private Sub Class_Globals
 	' Command definition
-	Type TCommand (Name As String, DeviceId As Int, CommandId As Int, Description As String, Value() As Byte)
+	Type TCommand (Name As String, Address As Int, Command As Int, Description As String, Value As Byte)
 
 	' List of commands
 	Public ListCommands As List
@@ -28,33 +26,33 @@ Public Sub Initialize
 	' Init the list
 	ListCommands.Initialize
 
-	Add("Connect",  BLEConstants.DEV_SYSTEM, BLEConstants.CMD_SET_STATE, "Connect ESP32",  Array As Byte(BLEConstants.STATE_ON))
-	Add("Disconnect",  BLEConstants.DEV_SYSTEM, BLEConstants.CMD_SET_STATE, "Disconnect ESP32",  Array As Byte(BLEConstants.STATE_OFF))
+	Add("Connect",  	"Connect ESP32", BLEConstants.ADR_SYSTEM, BLEConstants.CMD_SET_STATE,  BLEConstants.VAL_ON)
+	Add("Disconnect",	"Disonnect ESP32", BLEConstants.ADR_SYSTEM, BLEConstants.CMD_SET_STATE, BLEConstants.VAL_OFF)
 
-	Add("LED ON",  BLEConstants.DEV_LED, BLEConstants.CMD_SET_STATE, "Turn LED on",  Array As Byte(BLEConstants.STATE_ON))
-	Add("LED OFF", BLEConstants.DEV_LED, BLEConstants.CMD_SET_STATE, "Turn LED off", Array As Byte(BLEConstants.STATE_OFF))
-	Add("LED STATE", BLEConstants.DEV_LED, BLEConstants.CMD_GET_STATE, "Request LED state", Null)
+	Add("LED ON",  		"Turn LED ON",  BLEConstants.ADR_LED, BLEConstants.CMD_SET_STATE, BLEConstants.VAL_ON)
+	Add("LED OFF", 		"Turn LED OFF",  BLEConstants.ADR_LED, BLEConstants.CMD_SET_STATE, BLEConstants.VAL_OFF)
+	Add("LED STATE", 	"Request LED state", BLEConstants.ADR_LED, BLEConstants.CMD_GET_STATE, BLEConstants.VAL_NONE)
 
 	Log($"[BLECommands.Initialize] commands=${ListCommands.Size}"$)
 End Sub
 
 #Region CommandList
 ' Adds a command definition
-Public Sub Add(name As String, devid As Int, cmdid As Int, desc As String, value() As Byte)
+Public Sub Add(name As String, desc As String, adr As Int, cmd As Int, val As Byte)
 	Dim c As TCommand
 	c.Initialize
 	c.Name = name
-	c.DeviceId = devid
-	c.CommandId = cmdid
+	c.Address = adr
+	c.Command = cmd
 	c.Description = desc
-	c.Value = value
+	c.Value = val
 	ListCommands.Add(c)
 End Sub
 
 ' Get a command (must match both Device + Command)
-Public Sub Get(deviceId As Byte, commandId As Byte) As TCommand
+Public Sub Get(address As Byte, command As Byte) As TCommand
 	For Each c As TCommand In ListCommands
-		If c.DeviceId = deviceId And c.CommandId = commandId Then
+		If c.address = address And c.Command = command Then
 			Return c
 		End If
 	Next
@@ -71,22 +69,17 @@ Public Sub Find(name As String) As TCommand
 	Return Null
 End Sub
 
-' Build BLE payload
+' BuildPayload
+' Build the 5-Byte payload
 Public Sub BuildPayload(cmd As TCommand) As Byte()
 	If cmd = Null Then Return Null
 
-	Dim val() As Byte = cmd.Value
-	Dim vlen As Int = IIf(val = Null, 0, val.Length)
-
-	Dim payload(2 + vlen) As Byte
-	payload(0) = cmd.DeviceId
-	payload(1) = cmd.CommandId
-
-	If vlen > 0 Then
-		For i = 0 To vlen - 1
-			payload(2 + i) = val(i)
-		Next
-	End If
+	Dim payload(5) As Byte
+	payload(0) = BLEConstants.FRAME_HDR
+	payload(1) = cmd.Address
+	payload(2) = cmd.Command
+	payload(3) = cmd.Value
+	payload(4) = BLEConstants.FRAME_FTR
 	Return payload
 End Sub
 #End Region

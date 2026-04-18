@@ -4,25 +4,23 @@ ModulesStructureVersion=1
 Type=Class
 Version=9.85
 @EndOfDesignText@
-#Region Class Header
 ' File:			ESP32BLELED
 ' Brief:		Android client controlling an LED connected to an ESP32 via BLE using commands.
-' Date:			202601-06
+' Date:			2026-04-18
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Description:	This B4A application (app) connects as a client with an ESP32 running as Bluetooth Low Energy (BLE) server.
-'				Turn ESP32 LED ON: send 3 bytes 010101 (deviceid, commandid, state)
-'				Turn ESP32 LED OFF: send 3 bytes 010100 (deviceid, commandid, state)
-'				Request ESP32 LED STATE: send 2 bytes 0102 (deviceid, commandid), ESP32 returns 3 bytes: 010201 (deviceid, commandid, state 00 or 01).
+'				Turn ESP32 LED ON:			send 5 bytes 1960010158 (header, address, command, value. footer)
+'				Turn ESP32 LED OFF: 		send 5 bytes 1960010058
+'				Request ESP32 LED STATE: 	send 5 bytes 1960020058, ESP32 returns 5 bytes: 1901020158 (address, command, value 00 or 01).
 ' Software: 	B4A 13.40(64 bit), Java JDK 19, Android Platform Tools 36.
-' Libraries:	BleCentral 1.00, Phone 2.60, RunTimePermissions 1.20, HMITiles 1.40, ByteConverter 1.10
-#End Region
+' Libraries:	BleCentral 1.01, Phone 2.60, RunTimePermissions 1.20, HMITiles 1.40, ByteConverter 1.10
 
 #Region Shared Files
 #CustomBuildAction: folders ready, %WINDIR%\System32\Robocopy.exe,"..\..\Shared Files" "..\Files"
 #End Region
 
 Sub Class_Globals
-	Private VERSION As String	= "ESP32BLELED v20260106"
+	Private VERSION As String	= "ESP32BLELED v20260418"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -34,7 +32,7 @@ Sub Class_Globals
 	Private LabelConnected As B4XView
 
 	' BLE
-	Private BLE_MAC As String = "F8:B3:B7:7C:4E:BE"
+	Private BLE_MAC As String = "80:F3:DA:4C:36:7A"	' or "F8:B3:B7:7C:4E:BE"
 	Private Ble As BleClient
 	Private IsConnected As Boolean = False
 	Private Commands As BLECommands
@@ -62,6 +60,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 
 	' CustomView require short sleep
 	Sleep(1)
+
 	' Add the list of commands
 	' Initialize Command List
 	Commands.Initialize
@@ -112,7 +111,8 @@ Public Sub Connect
 	Ble.Connect( _
         BLE_MAC, _
         BLEConstants.SERVICE_UUID, _
-        BLEConstants.CHAR_UUID_TX)
+        BLEConstants.CHAR_UUID_TX, _
+		BLEConstants.CHAR_UUID_TX)
 End Sub
 
 ' ================================================================
@@ -125,9 +125,10 @@ Sub BLE_Connected
 	LabelConnected.Text = "Connected"
 End Sub
 
-Sub BLE_ConnectionFailed
+Sub BLE_ConnectionFailed(cause As String, msg As String)
+
 	IsConnected = False
-	TileEventViewer.Insert("[Connect] Connection failed", HMITileUtils.EVENT_LEVEL_ALARM)
+	TileEventViewer.Insert($"[Connect] Connection failed ${cause}, ${msg}"$, HMITileUtils.EVENT_LEVEL_ALARM)
 	LabelConnected.Text = "Disconnected"
 End Sub
 
@@ -176,10 +177,10 @@ Private Sub TileListCommands_ItemClick (Index As Int, Value As Object)
 	' Check if the commands list is initialized
 	If command.IsInitialized Then
 		' Handle system commands first
-		If command.DeviceId == BLEConstants.DEV_SYSTEM Then
+		If command.address == BLEConstants.ADR_SYSTEM Then
 
 			' BLE Connect - see also HandleBLEConnect
-			If command.Value(0) = BLEConstants.STATE_ON Then
+			If command.Value = BLEConstants.VAL_ON Then
 				If Not(IsConnected) Then
 					TileEventViewer.Insert($"[TileListCommands_ItemClick] Connecting... ${BLEConstants.BLE_DEVICE_NAME}"$, HMITileUtils.EVENT_LEVEL_INFO)
 					Connect
@@ -187,7 +188,7 @@ Private Sub TileListCommands_ItemClick (Index As Int, Value As Object)
 			End If
 
 			' BLE Disconnect - see also HandleBLEConnect
-			If command.Value(0) = BLEConstants.STATE_OFF Then
+			If command.Value = BLEConstants.VAL_OFF Then
 				If IsConnected Then
 					TileEventViewer.Insert($"[TileListCommands_ItemClick] Disconnecting... ${BLEConstants.BLE_DEVICE_NAME}"$, HMITileUtils.EVENT_LEVEL_INFO)
 					Ble.Write(Commands.BuildPayload(Commands.ListCommands.Get(3)))
