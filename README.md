@@ -77,7 +77,7 @@ All tiles share a **unified styling and state model**.
 | **HMITileSensor**             | Sensor tile for displaying live values with status indication.              |
 | **HMITileShape**              | Renders basic shapes (rectangles, circles, etc.) for layout and decoration. |
 | **HMITileSPPV**               | Setpoint vs. process value (SP/PV) visualization tile.                      |
-| **HMITileStatusIndicators**   | Extended selection list supporting multiple options.                        |
+| **HMITileStatusIndicators**   | 3x3 Responsive Indicator tile.                        					  |
 | **HMITileTimer**              | Up or down counter usig seconds timer.                                      |
 | **HMITileTrend**              | Trend/chart tile for plotting time-series data.                             |
 | **HMITileUtils**              | Shared helper and utility functions.                                        |
