@@ -6,7 +6,8 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.6.2] - 2026-04-18
+## [1.6.2] - 2026-04-19
+* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMISelect, HMISelectList
 * UPD: B4A Examples - Reworked BLEScanner, ESP32BLELED (replaced BLE library rBLEServer to rNimBLEServer)
 
 ## [1.6.1] - 2026-04-17
@@ -36,7 +37,7 @@ The project follows semantic versioning where possible.
 * UPD: Various minor updates all HMITiles
 
 ## [1.4.0] - 2025-12-31
-* NEW: HMI tiles - SeekBar (replacing Slider); Select; SelectList; Shape tiles (HLine, VLine, Corners)
+* NEW: HMITiles - HMITileSeekBar (replacing Slider); HMITileSelect; HMITileSelectList; HMITileShape tiles (HLine, VLine, Corners)
 * NEW: B4A examples - Overview; ESP32BLELED (control ESP32 LED via BLE, ESP32 firmware in B4R)
 * CHG: HMITiles custom views reworked and tested with B4A; Exception: HMITileRGB remains B4J-only
 * UPD: B4J examples: Overview; Water Tank Simulator; Arduino LED
