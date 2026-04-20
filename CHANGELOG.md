@@ -6,8 +6,11 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.6.2] - 2026-04-19
-* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMISelect, HMISelectList
+## [1.6.2] - 2026-04-20
+* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMITileSelect, HMITileSelectList, HMITileList, HMITileGauge, HMITileTrend
+* NEW: HMITileList - Property SelectedItemIndex to set or get the index of the item selected
+* NEW: HMITileGauge - Event Click with gauge value (float)
+* FIX: HMITileSelect, HMITileSelectList, HMITileList - Textcolor set using CSSUtils to ensure proper color on Linux
 * UPD: B4A Examples - Reworked BLEScanner, ESP32BLELED (replaced BLE library rBLEServer to rNimBLEServer)
 
 ## [1.6.1] - 2026-04-17

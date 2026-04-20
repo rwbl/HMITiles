@@ -61,7 +61,7 @@ Private Sub TileStatusIndicatorsFiltersSetProperties
 	TileStatusIndicatorsFilters.SetData(2, 3, "F-23", "Filter 3 Water Treatment II", TileStatusIndicatorsPumps.STATE_TRUE, True)
 End Sub
 
-
+' Change the state of a filter randomly OK, ERROR, DISABLED
 Private Sub TileButtonFilterChangeState_Click
 	Dim row As Int = Rnd(1,3)	' 1,2
 	Dim col As Int = Rnd(1,4)	' 1,2,3

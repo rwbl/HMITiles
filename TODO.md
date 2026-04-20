@@ -7,10 +7,14 @@
 - HMITileEventViewer - Option hide the icon at beginning of the row: EVENT_LEVEL_NONE.
 - HMITileIcon - API to change icon.
 - All classes update private/public subs, align docs.
-- Test on RPi with TouchScreen.
 - Additional Get Started examples.
 - Short developers documentation (how-to's, concept).
 - Plugin external HMITiles without changing core.
+- Test on Linux.
+- Test on Raspberry Pi with TouchScreen.
+
+## FIX: ShortList
+- HMITileSelectList - Compact mode customlistview item height same as default mode.
 
 ---
 
