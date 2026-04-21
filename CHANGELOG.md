@@ -6,11 +6,13 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [1.6.2] - 2026-04-20
-* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMITileSelect, HMITileSelectList, HMITileList, HMITileGauge, HMITileTrend
+## [1.6.2] - 2026-04-21
+* NEW: HMITileEventViewer - Method GetEvents to get list of events with map items Timestamp, Level, Event; Logging with level (int) & event (string); List item value map Timestamp, Level, Event instead string item.
 * NEW: HMITileList - Property SelectedItemIndex to set or get the index of the item selected
 * NEW: HMITileGauge - Event Click with gauge value (float)
-* FIX: HMITileSelect, HMITileSelectList, HMITileList - Textcolor set using CSSUtils to ensure proper color on Linux
+* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMITileSelect, HMITileSelectList, HMITileList, HMITileGauge, HMITileTrend, HMITileEventsViewer
+* FIX: HMITileSelect, HMITileSelectList, HMITileList - Textcolor set using CSSUtils to ensure right textcolor on Linux
+* UPD: HMITileEventViewer - List item value set map Timestamp, Level, Event instead string item.
 * UPD: B4A Examples - Reworked BLEScanner, ESP32BLELED (replaced BLE library rBLEServer to rNimBLEServer)
 
 ## [1.6.1] - 2026-04-17
