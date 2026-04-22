@@ -102,7 +102,7 @@ All tiles share a **unified styling and state model**.
 
 ## Examples Included
 
-**GetStarted**
+**GetStarted**  
 Easy-to-follow examples for every component in the library (Work in progress to complete for all HMITiles).
 
 **B4J-Overview**  
