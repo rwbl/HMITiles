@@ -10,7 +10,7 @@ The project follows semantic versioning where possible.
 * NEW: HMITileEventViewer - Method GetEvents to get list of events with map items Timestamp, Level, Event; Logging with level (int) & event (string); List item value map Timestamp, Level, Event instead string item.
 * NEW: HMITileList - Property SelectedItemIndex to set or get the index of the item selected
 * NEW: HMITileGauge - Event Click with gauge value (float)
-* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMITileSelect, HMITileSelectList, HMITileList, HMITileGauge, HMITileTrend, HMITileEventsViewer, HMITileSensor, HMITileReadout, HMITileSPPV
+* NEW: Examples GetStarted - HMITileSeekBar, HMITileStatusIndicators, HMITileSelect, HMITileSelectList, HMITileList, HMITileGauge, HMITileTrend, HMITileEventsViewer, HMITileSensor, HMITileReadout, HMITileSPPV, HMITileTimer
 * FIX: HMITileReadout - Get value if set via designer property.
 * FIX: HMITileSelect, HMITileSelectList, HMITileList - Textcolor set using CSSUtils to ensure right textcolor on Linux
 * UPD: HMITileEventViewer - List item value set map Timestamp, Level, Event instead string item.
