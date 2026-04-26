@@ -220,7 +220,7 @@ Updates are published when improvements are available.
 
 ## Acknowledgments
 
-Special thanks to Anywhere Software for providing the excellent B4X development tools.
+Special thanks to [Anywhere Software](https://www.b4x.com) for providing the excellent B4X development tools.
 
 This project also benefits greatly from the active and helpful [B4X community forum](https://www.b4x.com/android/forum/), whose shared knowledge, solutions, and ideas have been invaluable.
 
