@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileClock.bas
 ' Brief:    	CustomView HMITile showing an analog clock drawn on a B4XCanvas.
-' Date:			2026-01-04
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Hints:    	HMITile cannot be resized after form loaded.
 ' ================================================================
@@ -18,7 +18,7 @@ Version=10.3
 #DesignerProperty: Key: ShowSeconds, DisplayName: Show Seconds, FieldType: Boolean, DefaultValue: False
 
 ' Events
-#Event: Click(EventData As MouseEvent)
+#Event: Click
 
 Private Sub Class_Globals
 	Dim COLOR_HOUR_HAND As Int 		= 0xFFFFFFFF
@@ -35,8 +35,11 @@ Private Sub Class_Globals
 	Private PaneClock As B4XView
 	Private CanvasClock As B4XCanvas
 
-	' Clock options
+	' Properties Designer
 	Private mShowSeconds As Boolean
+
+	' Properties Class
+	Private mCurrentTime As Long
 	
 	' Timer
 	Private mClockTimer As Timer
@@ -63,7 +66,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mShowSeconds 	= Props.Get("ShowSeconds")
 
 	CanvasClock.Initialize(PaneClock)
-	ApplyStyle
+	ApplyStatusStyle
 
 	Base_Resize(mBase.Width, mBase.Height)
 
@@ -86,6 +89,7 @@ End Sub
 #Region ClockTimer
 Private Sub ClockTimer_Tick
     Dim now As Long = DateTime.Now
+	mCurrentTime = now
     Dim sec As Int = DateTime.GetSecond(now)
     If sec = mLastSec Then Return    ' avoid double redraw
     mLastSec = sec
@@ -143,24 +147,32 @@ Public Sub UpdateTime(newtime As Long)
 
 	CanvasClock.Invalidate
 End Sub
+
+' Get the current time as ticks
+Public Sub CurrentTime As Long
+	Return mCurrentTime
+End Sub
 #End Region
 
 ' ================================================================
-' Tile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region HMITile Styling
-' ApplyStyle
-' Apply style Normal.
-Private Sub ApplyStyle
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Apply status style to Normal.
+Private Sub ApplyStatusStyle
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
 	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
 ' =========================
-' Drawing methods
+' DRAWING METHODS
 ' =========================
+
 #Region DrawingMethods
 Private Sub DrawClockFace(cx As Float, cy As Float, r As Float)
 	' Outter circle

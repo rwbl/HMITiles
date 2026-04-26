@@ -4,6 +4,6 @@ ModuleBreakpoints0=
 ModuleBreakpoints1=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
-NavigationStack=Visual Designer,mainpage.bjl,-100,2,B4XMainPage,Class_Globals,17,0,B4XMainPage,B4XPage_Created,41,0,B4XMainPage,TileTimersSetProperties,45,0,B4XMainPage,TileTimerDown_Stop,55,0,B4XMainPage,TileTimerDown_Finished,61,0,B4XMainPage,TileTimerDown_Start,53,0,B4XMainPage,TileTimerUp_Start,63,3
+NavigationStack=B4XMainPage,TileTimerDown_Stop,55,0,B4XMainPage,TileTimerDown_Finished,61,0,B4XMainPage,TileTimerDown_Start,53,0,B4XMainPage,TileTimerUp_Start,63,3,B4XMainPage,Class_Globals,18,0,B4XMainPage,TileTimerUp_Finished,76,0,B4XMainPage,TileTimerUp_Stop,72,0,B4XMainPage,B4XPage_Created,34,0,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,TileTimersSetProperties,48,6
 SelectedBuild=0
 VisibleModules=1

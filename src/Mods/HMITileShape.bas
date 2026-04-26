@@ -21,7 +21,7 @@ Version=10.3
 ' Events
 ' No events
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Constants
 	Private SHAPE_HLINE As String 			= "HLine"
 	Private SHAPE_VLINE As String 			= "VLine"
@@ -99,6 +99,7 @@ End Sub
 ' =========================
 ' Public API
 ' =========================
+
 Public Sub setEnabled(enabled As Boolean)
 	mBase.Enabled = enabled
 	HMITileUtils.SetAlpha(mBase.enabled)

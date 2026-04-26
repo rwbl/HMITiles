@@ -10,7 +10,7 @@ Version=10.3
 ' Brief:    	Customview HMITile timer (HH:MM:SS, MM:SS, SS)
 ' Description:	Stopwatch (Counter) with up & down direction.
 '				Display formats: HH:MM:SS (Full), HH:MM (Short) or Seconds.
-' Date:			2026-04-16
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' ================================================================
 #End Region
@@ -41,7 +41,7 @@ Private Sub Class_Globals
 	' UI
 	Private LabelTitle 				As B4XView
 	Private LabelTimer 				As B4XView
-	Private LabelState 				As B4XView
+	Private LabelStatus 			As B4XView
 
 	' Timer
 	Private mTimer 					As Timer
@@ -87,7 +87,7 @@ Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'igno
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitiletimer")
 
 	' Get the designer properties
@@ -104,7 +104,7 @@ Sub AfterLoadLayout(Props As Map)
 	' Set UI
 	LabelTitle.Text	= mTitle
 	UpdateLabelTimer
-	LabelState.Text = TIMER_STATE_START   ' means "press to start"
+	LabelStatus.Text = TIMER_STATE_START   ' means "press to start"
 	
 	' Resize to get the sizing right
 	Base_Resize(mBase.Width, mBase.Height)
@@ -119,13 +119,13 @@ Public Sub Base_Resize (Width As Double, Height As Double)
 	#if B4A
 	LabelTitle.SetLayoutAnimated (0, pad, pad,           Width - pad * 2, Height * 0.25)
 	LabelTimer.SetLayoutAnimated (0, pad, Height * 0.25, Width - pad * 2, Height * 0.55)
-	LabelState.SetLayoutAnimated  (0, pad, Height * 0.75, Width - pad * 2, Height * 0.2)	
+	LabelStatus.SetLayoutAnimated  (0, pad, Height * 0.75, Width - pad * 2, Height * 0.2)	
 	#End If
 	
 	#if B4J
 	LabelTitle.SetLayoutAnimated (0, pad, pad,           Width - pad * 2, Height * 0.25)
 	LabelTimer.SetLayoutAnimated (0, pad, Height * 0.25, Width - pad * 2, Height * 0.60)
-	LabelState.SetLayoutAnimated  (0, pad, Height * 0.80, Width - pad * 2, Height * 0.15)	
+	LabelStatus.SetLayoutAnimated  (0, pad, Height * 0.80, Width - pad * 2, Height * 0.15)	
 	#End If
 End Sub
 
@@ -198,10 +198,10 @@ End Sub
 #Region Tile Styling
 ' ApplyStyle
 ' Apply style Normal.
-Public Sub ApplyStyle
+Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelTimer)
-	HMITileUtils.ApplyStateStyle(LabelState)
+	HMITileUtils.ApplyTitleStyle(LabelStatus)
 
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
@@ -264,7 +264,7 @@ Private Sub HandleTimerState
 			' Set state to start
 			mCounterValue = IIf(mMode == TIMER_MODE_COUNTDOWN, mStartValue, 0)
 			mTimer.Enabled = True
-			LabelState.Text = TIMER_STATE_STOP
+			LabelStatus.Text = TIMER_STATE_STOP
 			mState = TIMER_START
 			If SubExists(mCallBack, mEventName & "_Start") Then
 				CallSubDelayed(mCallBack, mEventName & "_Start")
@@ -274,7 +274,7 @@ Private Sub HandleTimerState
 			' Set state to stop
 			mTimer.Enabled = False
 			mCounterValue = IIf(mMode == TIMER_MODE_COUNTDOWN, 0, mStopValue)
-			LabelState.Text = TIMER_STATE_START
+			LabelStatus.Text = TIMER_STATE_START
 			mState = TIMER_STOP
 			If SubExists(mCallBack, mEventName & "_Stop") Then
 				CallSubDelayed(mCallBack, mEventName & "_Stop")
@@ -282,7 +282,7 @@ Private Sub HandleTimerState
 
 		Case TIMER_RESET
 			mCounterValue = 0
-			LabelState.Text = TIMER_STATE_RESET
+			LabelStatus.Text = TIMER_STATE_RESET
 	End Select
 	UpdateLabelTimer
 	' Log($"[HandleTimerState] state=${mState} (0=stop, 1=start)"$)
@@ -303,7 +303,7 @@ Private Sub LabelTimer_MouseClicked (EventData As MouseEvent)
 	HandleTimerState
 End Sub
 
-Private Sub LabelState_MouseClicked (EventData As MouseEvent)
+Private Sub LabelStatus_MouseClicked (EventData As MouseEvent)
 	HandleTimerState
 End Sub
 #End If
@@ -316,11 +316,7 @@ Private Sub LabelTimer_Click
 	HandleTimerState
 End Sub
 
-Private Sub LabelState_Click
+Private Sub LabelStatus_Click
 	HandleTimerState
 End Sub
 #End Region
-
-' ================================================================
-' HELPER
-' ================================================================

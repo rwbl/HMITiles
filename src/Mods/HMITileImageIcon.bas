@@ -8,8 +8,8 @@ Version=10.3
 ' ================================================================
 ' File:    		HMITileImageIcon.bas
 ' Brief:   		CustomView HMITile with Image (100%).
-' Date:			2025-12-30
-' Author:		Robert W.B. Linn (c) 2025 MIT
+' Date:			2026-04-23
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Image must be located in File.DirApp (B4J) or File.DirAssets (B4A).
 '				Resize modes: StringItems(Array("FIT", "FILL", "FILL_NO_DISTORTIONS", "FILL_WIDTH", "FILL_HEIGHT", "NONE"))
 File.DirAssets
@@ -26,9 +26,9 @@ File.DirAssets
 #DesignerProperty: Key: ImageName, DisplayName: Image Name, FieldType: String, DefaultValue: , Description: Name of the image located in the app folder (B4J) or assets folder (B4A).
 #DesignerProperty: Key: ResizeMode, DisplayName: Resize Mode, FieldType: String, DefaultValue: FIT, List: FIT|FILL|FILL_NO_DISTORTIONS|FILL_WIDTH|FILL_HEIGHT|NONE, Description: Set the resize mode.
 #DesignerProperty: Key: Rounded, DisplayName: Rounded, FieldType: Boolean, DefaultValue: False, Description: Set the image rounded.
-#DesignerProperty: Key: TypeStyle, DisplayName: Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Status, DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
-Sub Class_Globals
+Private Sub Class_Globals
 	Private mEventName As String	'ignore
 	Private mCallBack As Object		'ignore
 
@@ -44,11 +44,13 @@ Sub Class_Globals
 	' Views from HMITileImageIcon.bjl
 	Private B4XImageViewHMITile As B4XImageView
 
-	' Designer value
+	' Properties Designer 
 	Private mImageName As String
 	Private mResizeMode As String
 	Private mRounded As String
-	Private mTypeStyle As String
+	Private mStatus As String
+
+	' Properties Class
 End Sub
 
 Public Sub Initialize(Callback As Object, EventName As String)
@@ -64,17 +66,17 @@ Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitileimageicon")
 	mImageName 	= Props.Get("ImageName")
 	mResizeMode	= Props.Get("ResizeMode")
 	mRounded 	= Props.Get("Rounded")
-	mTypeStyle	= Props.Get("TypeStyle")
+	mStatus	= Props.Get("Status")
 
 	setResizeMode(mResizeMode)
 	setRounded(mRounded)
 
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -100,6 +102,7 @@ End Sub
 ' ===================================================================
 ' Public API
 ' ===================================================================
+
 Public Sub setImage(image As String)
 	If image = "" Then Return
 	mImageName = image
@@ -137,12 +140,35 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+' Set the tile status to normal.
+Public Sub SetStatusNormal(text As String)
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' Set the tile status to warning.
+Public Sub SetStatusWarning(text As String)
+	setStatus(HMITileUtils.STATUS_WARNING)
+End Sub
+
+' Set the tile status to alarm.
+Public Sub SetStatusAlarm(text As String)
+	setStatus(HMITileUtils.STATUS_ALARM)
+End Sub
+
+' Set the tile status to disabled.
+Public Sub SetStatusDisabled(text As String)
+	setStatus(HMITileUtils.STATUS_DISABLED)
+End Sub
+
+' Applies one of the tile status.
+' tilestate - Use STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
+' Parameters:
+'	value String 
+Public Sub setStatus(value As String)
+	ApplyStatusStyle(value)
+End Sub
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 Public Sub setRounded(state As Boolean)
@@ -162,23 +188,25 @@ Public Sub getResizeMode As Boolean
 End Sub
 
 ' ================================================================
-' Tile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region Tile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(HMITilestate As String)
-	Dim state As Int = HMITileUtils.StateStyleToState(HMITilestate)
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select
 

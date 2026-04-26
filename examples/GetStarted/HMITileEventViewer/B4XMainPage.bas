@@ -8,7 +8,7 @@ Version=9.85
 ' File:			HMITileEventViewer
 ' Project:		HMITiles B4X library
 ' Brief:		Get started with HMITileEventViewer.
-' Description:	Shows several event viewers.
+' Description:	Shows an event viewer with sample events.
 ' Date:			2026-04-21
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' ================================================================

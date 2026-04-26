@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileSelect.bas
 ' Brief:    	CustomView HMITile to select items by rolling over list of items using up/down.
-' Date:			2025-12-31
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Layout:
 '				+------------------+
@@ -27,7 +27,7 @@ Version=10.3
 ' Events
 #Event: ValueChanged (Value As Object)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	#If B4J
 	'Private fx As JFX
 	#End If
@@ -49,8 +49,11 @@ Sub Class_Globals
 	Private LabelUp As B4XView
 	Private LabelDown As B4XView
 
-	' Properties
+	' Properties Designer
+	Private mTitle As String
 	Private mShowTitle As Boolean
+
+	' Properties Class
 	Private mItems As List
 	Private mSelectedIndex As Int = -1
 End Sub
@@ -70,12 +73,13 @@ Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
 	mBase.LoadLayout("hmitileselect")
 
 	' Assign designer properties
-	LabelTitle.Text = Props.Get("Title")
+	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mShowTitle 		= Props.Get("ShowTitle")
 
 	' Resize properly
@@ -213,7 +217,7 @@ End Sub
 #Region TileStyling
 ' ApplyStyle
 ' Apply style Normal.
-Public Sub ApplyStyle
+Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelSelected)
 	HMITileUtils.ApplyFontAwesomeStyle(LabelUp)
@@ -221,7 +225,7 @@ Public Sub ApplyStyle
 
 	PaneSelect.SetColorAndBorder(HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND, _
 								 0dip, _ 
-								 HMITileUtils.COLOR_STATE_OFF_BORDER, _ 
+								 HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								 0dip)
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.

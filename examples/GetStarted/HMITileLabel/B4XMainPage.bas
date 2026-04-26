@@ -6,15 +6,18 @@ Version=9.85
 @EndOfDesignText@
 ' ================================================================
 ' File:			HMITileLabel
-' Brief:		Example B4J program for the HMITiles B4X library.
-' Description:	Show usage of the HMITileLabel.
-' Date:			2025-01-02
+' Brief:		Get started with HMITileLabel.
+' Description:	Shows various label examples with different states.
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' ================================================================
 
 Sub Class_Globals
 	Private xui As XUI
 	Private Root As B4XView
+	Private TileLabelAlarm As HMITileLabel
+	Private TileLabelNormal As HMITileLabel
+	Private TileLabelWarning As HMITileLabel
 End Sub
 
 Public Sub Initialize
@@ -24,7 +27,7 @@ End Sub
 Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("MainPage")
-	B4XPages.SetTitle(Me, "HMITiles Library Get Started - HMITileLabel")
+	B4XPages.SetTitle(Me, "HMITileLabel")
 	
 	' ===================================================
 	' HMITiles
@@ -47,8 +50,4 @@ End Sub
 
 Private Sub TileLabelAlarm_Click
 	Log($"[TileLabelAlarm_Click]"$)
-End Sub
-
-Private Sub TileLabelDimmed_Click
-	Log($"[TileLabelDimmed_Click]"$)
 End Sub

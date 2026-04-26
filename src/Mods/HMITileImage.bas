@@ -10,7 +10,7 @@ Version=10.3
 ' Brief:   		CustomView HMITile with Title (25%) + Image (75%).
 ' Description:	Image must be located in File.DirApp (B4J) or File.DirAssets (B4A).
 '				Default size set to 120x120px.
-' Date:			2025-12-30
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Layout:
 '				+------------------+
@@ -24,11 +24,11 @@ Version=10.3
 #End Region
 
 ' Designer properties
-#DesignerProperty: Key: TitleText, DisplayName: Title, FieldType: String, DefaultValue: Image
-#DesignerProperty: Key: ImageName, DisplayName: Image Name, FieldType: String, DefaultValue: , Description: Name of the image located in the app folder.
-#DesignerProperty: Key: TypeStyle, DisplayName: Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Title,		DisplayName: Title, FieldType: String, DefaultValue: Image
+#DesignerProperty: Key: ImageName,	DisplayName: Image Name, FieldType: String, DefaultValue: , Description: Name of the image located in the app folder.
+#DesignerProperty: Key: Status, 	DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
-Sub Class_Globals
+Private Sub Class_Globals
 	Private mEventName As String	'ignore
 	Private mCallBack As Object		'ignore
 
@@ -42,9 +42,12 @@ Sub Class_Globals
 	Private LabelTitle As B4XView
 	Private B4XImageViewHMITile As B4XImageView
 
-	' Designer value
+	' Properties Designer
+	Private mTitle As String
 	Private mImageName As String
-	Private mTypeStyle As String
+	Private mStatus As String
+	
+	' Properties Class
 End Sub
 
 Public Sub Initialize(Callback As Object, EventName As String)
@@ -60,14 +63,15 @@ Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitileimage")
 
-	LabelTitle.Text = Props.Get("TitleText")
-	mImageName 	= Props.Get("ImageName")
-	mTypeStyle	= Props.Get("TypeStyle")
+	mTitle 			= Props.Get("Title")
+	LabelTitle.Text = mTitle
+	mImageName 		= Props.Get("ImageName")
+	mStatus			= Props.Get("Status")
 
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -107,6 +111,7 @@ End Sub
 ' ===================================================================
 ' Public API
 ' ===================================================================
+
 Public Sub setTitle(title As String)
 	LabelTitle.Text = title
 End Sub
@@ -145,37 +150,62 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+' Set the tile status to normal.
+Public Sub StatusNormal
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' Set the tile status to warning.
+Public Sub SetStatusWarning
+	setStatus(HMITileUtils.STATUS_WARNING)
+End Sub
+
+' Set the tile status to alarm.
+Public Sub SetStatusAlarm
+	setStatus(HMITileUtils.STATUS_ALARM)
+End Sub
+
+' Set the tile status to disabled.
+Public Sub SetStatusDisabled
+	setStatus(HMITileUtils.STATUS_DISABLED)
+End Sub
+
+' Applies one of the tile status.
+' tilestate - Use STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
+' Parameters:
+'	value String 
+Private Sub setStatus(value As String)
+	ApplyStatusStyle(value)
+End Sub
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 ' ================================================================
-' HMITile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region HMITile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 
-	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select
 

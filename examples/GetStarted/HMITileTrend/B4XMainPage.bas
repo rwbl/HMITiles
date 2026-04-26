@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			HMITileTrend
 ' Project:		HMITiles B4X library
-' Brief:		Get started with HMITileTrend
+' Brief:		Get started with HMITileTrend.
 ' Description:	Shows HMITrend (120x120px).
 ' Date:			2026-04-20
 ' Author:		Robert W.B. Linn (c) 2026 MIT
@@ -30,7 +30,7 @@ End Sub
 Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("mainpage")
-	B4XPages.SetTitle(Me, "TileTrend")
+	B4XPages.SetTitle(Me, "HMITileTrend")
 	
 	LabelLegend.Text = $"HMITiles Get Started${CRLF}Recommended tile size 120x120px."$
 	

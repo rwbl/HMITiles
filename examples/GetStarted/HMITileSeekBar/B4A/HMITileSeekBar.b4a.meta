@@ -7,6 +7,6 @@ ModuleBreakpoints2=
 ModuleClosedNodes0=1,2,6
 ModuleClosedNodes1=
 ModuleClosedNodes2=1
-NavigationStack=B4XMainPage,Initialize,17,0,B4XMainPage,Class_Globals,9,0,B4XMainPage,B4XPage_Created,23,6,HMITileUtils,Process_Globals,329,0,HMITileSeekBar,Class_Globals,91,0,HMITileSeekBar,DesignerCreateView,163,0,Visual Designer,MainPage.bal,-100,6,HMITileSeekBar,Base_Resize,223,1,HMITileSeekBar,Update,224,6,HMITileUtils,SetCLVBackgroundTransparent,545,0
+NavigationStack=B4XMainPage,Initialize,17,0,B4XMainPage,Class_Globals,9,0,B4XMainPage,B4XPage_Created,23,6,HMITileUtils,Process_Globals,349,0,Visual Designer,MainPage.bal,-100,6,HMITileUtils,SetCLVBackgroundTransparent,562,0,HMITileUtils,StatusToInt,547,0
 SelectedBuild=0
 VisibleModules=1

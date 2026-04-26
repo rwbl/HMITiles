@@ -7,7 +7,7 @@ Version=10.3
 #Region Class Header
 ' ================================================================
 ' File:			HMITileSPPV.bas
-' Brief:    	CustomView HMITile with a title, process value (PV) and setpoint (SP).
+' Brief:    	CustomView HMITile with a title, process value (PV) and set point (SP).
 ' Description:	HMITileSPPV displays PV as the dominant value, SP as a secondary value, and exposes interaction only on demand.
 '           	Supports Normal, Warning, Alarm styles.
 '				Editmode to set the setpoint by clicking on the tile. Click again turns editmode off.
@@ -19,8 +19,11 @@ Version=10.3
 '					This separates configuration from runtime state, which is a best practice in HMI / DCS projects.
 '				Events: 
 '				- ValueChanged and SetPointChanged.
-' Date:			2025-12-24
-' Author:		Robert W.B. Linn (c) 2025 MIT
+'				Naming:
+'				For labels use: Process Value and Set Point
+'				For variables use: ProcessValue and SetPoint (CamelCase)
+' Date:			2026-04-22
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+---------------------+
 '				│        TITLE        │ < Medium, Normal
@@ -86,7 +89,6 @@ Private Sub Class_Globals
 	Private LabelDeviation As B4XView
 	
 	' Properties Designer
-	Private mTypeStyle As String
 	Private mPV As Float
 	Private mSP As Float
 	Private mStepSize As Float
@@ -97,6 +99,7 @@ Private Sub Class_Globals
 	Private mShowDeviation As Boolean
 	Private mDeviation As Float
 	Private mEditMode As Boolean
+	Private mStatus As String
 End Sub
 
 Public Sub Initialize (Callback As Object, EventName As String)
@@ -134,9 +137,9 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mDigits					= Props.GetDefault("Digits", 0)
 	mEditMode				= Props.GetDefault("EditMode", True)
 	setEditMode(mEditMode)
-	mTypeStyle				= HMITileUtils.STATE_NORMAL
+	mStatus					= HMITileUtils.STATUS_NORMAL
 
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -160,6 +163,7 @@ End Sub
 ' ================================================================
 
 #Region API
+' Get or set the title
 Public Sub setTitle(text As String)
 	LabelTitle.Text = text
 End Sub
@@ -167,10 +171,11 @@ Public Sub getTitle As String
 	Return LabelTitle.Text
 End Sub
 
+' Get or set the Process Value (PV)
 Public Sub setPV(value As Float)
 	Try
 		mPV = value
-		LabelPV.Text = NumberFormat(mPV, 1, mDigits)
+		LabelPV.Text = NumberFormat(mPV, 0, mDigits)
 		UpdateDeviation
 		If SubExists(mCallBack, mEventName & "_ValueChanged") Then
 			CallSub2(mCallBack, mEventName & "_ValueChanged", value)
@@ -183,12 +188,14 @@ Public Sub getPV As Float
 	Return mPV
 End Sub
 
+' Get or set the Set Point (SP).
+' If SP < Min then SP = min. If SP > Max then SP = Max.
 Public Sub setSP(value As Float)
 	If value < mMin Then value = mMin
 	If value > mMax Then value = mMax
 	Try
 		mSP = value
-		LabelSP.Text = NumberFormat(mSP, 1, mDigits)
+		LabelSP.Text = NumberFormat(mSP, 0, mDigits)
 		UpdateDeviation
 		If SubExists(mCallBack, mEventName & "_SetPointChanged") Then
 			CallSub2(mCallBack, mEventName & "_SetPointChanged", value)
@@ -201,7 +208,7 @@ Public Sub getSP As Float
 	Return mSP
 End Sub
 
-' Set the values for the SP and PV.
+' Set the values for the Set Point (SP) and Process Value (PV).
 Public Sub SetSPPV(valuesp As Float, valuepv As Float)
 	setSP(valuesp)
 	setPV(valuepv)
@@ -210,18 +217,18 @@ End Sub
 ' Deviation
 ' Deviation = PV - SP
 ' Result:
-' 0: On setpoint
-' Positive: Process above setpoint
-' Negative: Process below setpoint
+' 0: No deviation Process Value  is On Set Point Value
+' Positive: Process Value above Set Point
+' Negative: Process Value below Set Point
 Public Sub Deviation As Float
 	mDeviation = 0
 	Try
 		mDeviation = mPV - mSP
 		If mDeviationLimit > 0 Then
 			If Abs(mDeviation) >= mDeviationLimit Then
-				SetStyleAlarm
+				StatusAlarm
 			Else
-				SetStyleNormal
+				StatusNormal
 			End If
 		End If
 	Catch
@@ -230,10 +237,12 @@ Public Sub Deviation As Float
 	Return mDeviation
 End Sub
 
+' Update the deviation label
 Private Sub UpdateDeviation
 	LabelDeviation.Text = $"${DEVIATION_CHARACTER} ${NumberFormat(Deviation, 1, mDigits)}"$
 End Sub
 
+' Get or set the option to show the deviation label
 Public Sub setShowDeviation(state As Boolean)
 	mShowDeviation = state
 	LabelDeviation.Visible = mShowDeviation
@@ -242,13 +251,15 @@ Public Sub getShowDeviation As Boolean
 	Return mShowDeviation
 End Sub
 
+' Get or set the the deviation limit
 Public Sub setDeviationLimit(value As Double)
 	mDeviationLimit = value
 End Sub
-Public Sub getDeviationAlarm As Double
+Public Sub getDeviationLimit As Double
 	Return mDeviationLimit
 End Sub
 
+' Get or set the value number of digits
 Public Sub setDigits(value As Int)
 	If value < 0 Then value = 0
 	mDigits = value
@@ -257,6 +268,7 @@ Public Sub getDigits As Int
 	Return mDigits
 End Sub
 
+' Get or set the min Set Point value
 Public Sub setMin(value As Float)
 	mMin = value
 End Sub
@@ -264,6 +276,7 @@ Public Sub getMin As Float
 	Return mMin
 End Sub
 
+' Get or set the max Set Point value
 Public Sub setMax(value As Float)
 	mMax = value
 End Sub
@@ -271,6 +284,7 @@ Public Sub getMax As Float
 	Return mMax
 End Sub
 
+' Get or set the Set Point step size
 Public Sub setStepSize(value As Float)
 	mStepSize = value
 End Sub
@@ -278,6 +292,7 @@ Public Sub getStepSize As Float
 	Return mStepSize
 End Sub
 
+' Get or set the tile to enabled
 Public Sub setEnabled(enabled As Boolean)
 	mBase.Enabled = enabled
 	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
@@ -286,27 +301,8 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub SetStyleNormal
-	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
-End Sub
-
-Public Sub SetStyleWarning
-	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
-End Sub
-
-Public Sub SetStyleAlarm
-	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
-End Sub
-
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
-End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
-End Sub
-
-' Option to set edit mode - panels (icons enabled.
+' Get or set the Set Point edit mode.
+' If edit mode, the Set Point can be changed and the plus/minus icons are visible.
 Public Sub setEditMode(state As Boolean)
 	mEditMode = state
 	LabelMinus.Visible 	= mEditMode
@@ -316,17 +312,47 @@ Public Sub getEditMode As Boolean
 	Return mEditMode
 End Sub
 
+' Decrease the Set Point with the step size value.
 Public Sub StepMinus
 	Dim v As Float = LabelSP.Text
 	v = v - mStepSize
 	setSP(v)
 End Sub
 
+' Increasethe Set Point with the step size value.
 Public Sub StepPlus
 	Dim v As Float = LabelSP.Text
 	v = v + mStepSize
 	setSP(v)
 End Sub
+
+' --- Convenience helpers ---
+Public Sub StatusNormal
+	setStatus(HMITileUtils.STATUS_NORMAL)
+End Sub
+
+Public Sub StatusWarning
+	setStatus(HMITileUtils.STATUS_WARNING)
+End Sub
+
+Public Sub StatusAlarm
+	setStatus(HMITileUtils.STATUS_ALARM)
+End Sub
+
+Public Sub StatusDisabled
+	setStatus(HMITileUtils.STATUS_DISABLED)
+End Sub
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	mStatus = value
+	ApplyStatusStyle(value)
+End Sub
+
+Public Sub getStatus As String
+	Return mStatus
+End Sub
+
 #End Region
 
 ' ================================================================
@@ -337,7 +363,8 @@ End Sub
 ' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
 ' Parameters:
 '	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+Public Sub ApplyStatusStyle(status As String)
+
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelPV)
 	HMITileUtils.ApplyLabelStyle(LabelSP)
@@ -345,9 +372,8 @@ Public Sub ApplyStyle(tilestate As String)
 	HMITileUtils.ApplyFontAwesomeStyle(LabelPlus)
 	HMITileUtils.ApplySubInfoStyle(LabelDeviation)
 
-	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			LabelPV.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			LabelSP.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
@@ -356,7 +382,7 @@ Public Sub ApplyStyle(tilestate As String)
 			LabelDeviation.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 			
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			LabelPV.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			LabelSP.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
@@ -365,7 +391,7 @@ Public Sub ApplyStyle(tilestate As String)
 			LabelDeviation.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			LabelPV.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			LabelSP.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
@@ -374,7 +400,7 @@ Public Sub ApplyStyle(tilestate As String)
 			LabelDeviation.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			LabelPV.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			LabelSP.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT

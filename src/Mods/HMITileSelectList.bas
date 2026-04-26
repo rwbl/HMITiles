@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileSelectList.bas
 ' Brief:    	CustomView HMITile to select items from customlistview with primary labels.
-' Date:			2026-01-24
+' Date:			2026-04-20
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+------------------+
@@ -33,7 +33,7 @@ Version=10.3
 
 Private Sub Class_Globals
 	#If B4J
-	'Private fx As JFX
+	Private fx As JFX
 	#End If
 	
 	' Events
@@ -75,7 +75,7 @@ Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ign
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
 	mBase.LoadLayout("hmitileselectlist")
 
@@ -201,9 +201,9 @@ Public Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.SetCLVBackgroundTransparent(ClvSelect)
 	ClvSelect.sv.SetColorAndBorder(HMITileUtils.COLOR_BACKGROUND_SCREEN, _
-								 1dip, _ 
-								 HMITileUtils.COLOR_STATE_OFF_BORDER, _ 
-								 0dip)
+								   1dip, _ 
+								   HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
+								   0dip)
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
 	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
@@ -273,7 +273,6 @@ Public Sub Size As Int
 End Sub
 #End Region
 
-
 #Region ClvSelectCreateItem
 ' Create list item.
 ' Parameters:
@@ -300,15 +299,24 @@ Private Sub ClvSelectCreateItem(primaryitem As String) As Panel
 	Dim primaryitemheight As Int	= pnl.Height
 
 	' Set colors
-	pnl.Color = HMITileUtils.LIST_COLOR_BG_BASE
+	pnl.Color 						= HMITileUtils.LIST_COLOR_BG_BASE	' 0xFFF5F5F5   ' light neutral gray
 
 	' Create primary item (top)
 	Dim lblprimaryitem As B4XView	= XUIViewsUtils.CreateLabel
 	lblprimaryitem.Font 			= xui.CreateDefaultFont(primarytextsize)
-	lblprimaryitem.Color			= HMITileUtils.LIST_COLOR_BG_BASE
-	lblprimaryitem.Text				= primaryitem
-	lblprimaryitem.TextColor		= HMITileUtils.LIST_COLOR_TEXT
+
+	lblprimaryitem.Text				= primaryitem						'
 	lblprimaryitem.SetTextAlignment("TOP", "LEFT")
+
+	' For B4J use CSSUtils to set textcolor properly on both windows / linux
+	HMITileUtils.SetTextColorCrossPlatform(lblprimaryitem, $"#${HMITileUtils.ColorToHexRGB(HMITileUtils.LIST_COLOR_TEXT)}"$)
+'	' Do not use property label.textcolor
+'	#If B4J
+'	CSSUtils.SetStyleProperty(lblprimaryitem, "-fx-text-fill", "Black")
+'	#Else
+'	lblprimaryitem.TextColor		= HMITileUtils.LIST_COLOR_TEXT
+'	#End If
+
 	pnl.AddView(lblprimaryitem, rowpadding, 0, pnl.Width, primaryitemheight)
 	Return pnl
 End Sub
@@ -329,7 +337,7 @@ Private Sub ClvSelect_ItemClick (Index As Int, Value As Object)
 	' Reset background color for selected command
 	ClvSelect.GetPanel(mSelectedItemIndex).Color = HMITileUtils.LIST_COLOR_BG_BASE
 	' Set command selected color
-	ClvSelect.GetPanel(Index).Color = HMITileUtils.COLOR_BACKGROUND_SELECTED
+	ClvSelect.GetPanel(Index).Color = HMITileUtils.COLOR_BACKGROUND_SELECTED			' 0xFFD0D0D0   ' light gray highlight
 	' Update selected item index
 	mSelectedItemIndex = Index
 	' Set the item selected

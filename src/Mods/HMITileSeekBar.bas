@@ -7,13 +7,13 @@ Version=10.3
 ' ================================================================
 ' File:			HMITileSeekBar
 ' Brief:		Custom SeekBar with optional tickmarks (horizontal/vertical).
-' Date:			2026-04-15
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Description:	This seekbar is primarily designed for horizontal orientation.
 '				Important: 
-'				- The bar width/hight and the ticks size/position depends on the thumb radius. Set as required.
+'				- The bar width/hight and the ticks size/position depends on the thumb radius pressed. Set as required.
 '				- The title & value are set according to the default size 120px (see HMITileUtils).
-'				  This apllies esp. for the orientation vertical if the hight > 120px.
+'				  This applies esp. for the orientation vertical if the hight > 120px.
 ' Credits:		Based upon the B4XSeekbar from the XUIViews library. Thanks for sharing.
 ' ================================================================
 
@@ -174,27 +174,28 @@ Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'igno
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
-' ------------------------------------------------
+' 
 Public Sub Base_Resize(Width As Double, Height As Double)
 
 	If Not(LabelTitle.IsInitialized) Then
 		Log($"[HMITileSeekBar.BaseResize] Seekbar not ready."$)
 		Return
 	End If
+	
 	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
 	Dim newheight As Double = Height
-	Dim unittop As Double	= Height * 0.80
+	Dim unittop As Double	= Height * 0.80	' always 0.8
 
 	'								 d  l             t              w                h
 	#If B4A
 	' Need to set the height based on the default tile size
 	If Height > HMITileUtils.TILE_DEFAULT_SIZE Then
 		newheight = HMITileUtils.TILE_DEFAULT_SIZE
-		unittop = Height * 0.9
+		unittop = IIf(mVertical, Height * 0.9, Height * 0.8)
 	End If
-	LabelTitle.SetLayoutAnimated	(0, 0,            pad,              Width, newheight * 0.3)
-	LabelValue.SetLayoutAnimated	(0, 0,            newheight * 0.3, Width, newheight * 0.3)
-	LabelUnit.SetLayoutAnimated		(0, 0,            unittop,          Width, newheight * 0.2)
+	LabelTitle.SetLayoutAnimated	(0, 0,            pad,              Width,	newheight * 0.3)
+	LabelValue.SetLayoutAnimated	(0, 0,            newheight * 0.3,	Width,	newheight * 0.4)
+	LabelUnit.SetLayoutAnimated		(0, 0,            unittop,          Width,	newheight * 0.3)
 	#End If
 
 	#If B4J
@@ -227,9 +228,7 @@ Public Sub Update
 	' ----------------------------------------------------------------
 	If Not(mVertical) Then 
 		mSize = mBase.Width - 2 * mThumbRadiusPressed
-		#if b4a
-		mSize = mBase.Width - 4 * mThumbRadiusPressed
-		#End If
+
 		' Check if size > 0
 		If mSize <= 0 Then Return
 		If mShowValue Then
@@ -242,14 +241,8 @@ Public Sub Update
 
 		' Draw left/back track x1,y1,x2,y2,color,strokewidth
 		x1 = mThumbRadiusPressed
-'		#if B4A
-'		x1 = mThumbRadiusPressed * 2
-'		#End If
 		y1 = y 
 		x2 = w
-'		#if B4A
-'		x2 = x2 - (mThumbRadiusPressed * 2)
-'		#End If
 		y2 = y
 		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorBar, mActiveBarWidth)
 
@@ -270,7 +263,6 @@ Public Sub Update
 		If mShowTicks And mTickCount > 1 Then
 			For i = 0 To mTickCount - 1
 				Dim xTick As Float = mThumbRadiusPressed + i * mSize / (mTickCount - 1)
-				
 				' Tick line
 				x1 = xTick
 				If mShowValue Then
@@ -280,6 +272,10 @@ Public Sub Update
 				End If
 				x2 = xTick
 				y2 = y1 + mActiveBarWidth
+				#if B4A
+				y2 = y2 + 6dip
+				#End If
+
 				If i = 0 Or i = mTickCount - 1 Then
 					y1 = y1 - (mActiveBarWidth / 2)
 				End If
@@ -294,12 +290,12 @@ Public Sub Update
 				#End If
 				Dim tickVal As Int = mMinValue + i * (mMaxValue - mMinValue) / (mTickCount - 1)
 				x1 = xTick
-				#if B4A
-				y1 = y2	+ fnt.Size + 6dip				
-				#End If
-				#if B4J
-				y1 = y2	+ fnt.Size ' y + 16dip + 6dip				
-				#End If
+				y1 = y2	+ mThumbRadius * 2
+
+				' Just to show how to left align the last value but not looking good				
+				'If i == mTickCount - 1 Then
+				'	x1 = x1 - (fnt.size * tickVal.As(String).Length) / 2
+				'End If
 				CanvasSeekBar.DrawText(tickVal, x1, y1, fnt, mTickValueColor, "CENTER")
 			Next
 		End If

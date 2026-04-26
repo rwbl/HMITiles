@@ -7,8 +7,8 @@ Version=9.85
 ' ================================================================
 ' File:			HMITileSPPV
 ' Project:		HMITiles B4X library
-' Brief:		Get started with HMITileSPPV
-' Description:	Shows several SPPV.
+' Brief:		Get started with HMITileSPPV.
+' Description:	Shows several SPPV tiles.
 ' Date:			2026-04-22
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' ================================================================

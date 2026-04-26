@@ -4,6 +4,6 @@ ModuleBreakpoints0=
 ModuleBreakpoints1=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
-NavigationStack=B4XMainPage,TileSelectSetProperties,46,0,B4XMainPage,Initialize,23,0,B4XMainPage,Class_Globals,16,0,B4XMainPage,TileSelectListSetProperties,56,0,B4XMainPage,TileSelect_ValueChanged,72,6,B4XMainPage,TileSelectList_ItemClick,77,2,B4XMainPage,TileSelectListLong_ItemClick,82,0,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,TileSelectListLongSetProperties,58,6,B4XMainPage,B4XPage_Created,25,6
+NavigationStack=HMITileSelectList,setSelectedItem,152,0,HMITileSelectList,ApplyStyle,199,0,HMITileSelectList,Insert,246,0,HMITileSelectList,Size,268,0,HMITileUtils,Process_Globals,271,0,HMITileSelectList,Class_Globals,28,0,HMITileSelectList,ClvSelect_ItemClick,327,1,HMITileSelectList,ClvSelectCreateItem,304,6,Visual Designer,mainpage.bjl,-100,4
 SelectedBuild=0
 VisibleModules=1

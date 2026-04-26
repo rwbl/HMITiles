@@ -13,7 +13,7 @@ Version=10.3
 '				The object could like a device, motor, pump, filter etc.
 '				Implements industry-standard grayscale coloring for True (Light Gray), False (Dark Gray), and Disabled (Medium Gray) states to reduce operator fatigue.
 '				HMITileUtils.TILE_DEFAULT_SIZE constant (120px) it's a critical "Safety Guardrail" that prevents the UI from breaking when the user resizes the window too small.
-' Date:			2026-04-17
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Notes:		-Responsive Layout: Uses a Base_Resize logic with Floor calculations and "Edge-Stretching" to eliminate 1-pixel rounding gaps between indicators.
 '				-Coordinate Mapping: Converts 1-based Row/Col inputs To 0-based Array indices using the formula: idx = (row - 1) * COLS + (col - 1).
@@ -50,13 +50,13 @@ Private Sub Class_Globals
 	Public ROWS 					As Byte = 3
 	Public COLS 					As Byte = 3
 
-	' State Type
-	Type IndicatorData (Index As Int, State As Int, Text As String, Description As String)
+	' Status Type
+	Type IndicatorData (Index As Int, Status As Int, Text As String, Description As String)
 
-	' States
-	Public STATE_TRUE 				As Byte = 0
-	Public STATE_FALSE 				As Byte = 1
-	Public STATE_DISABLED 			As Byte = 2
+	' Status
+	Public STATUS_TRUE 				As Byte = 0
+	Public STATUS_FALSE 			As Byte = 1
+	Public STATUS_DISABLED 			As Byte = 2
 
 	' Properties
 	Private mTitle					As String
@@ -73,7 +73,6 @@ End Sub
 Private Sub Initialize(Callback As Object, EventName As String)	'ignore
 	mEventName = EventName
 	mCallBack = Callback
-	Log(mEventName)
 End Sub
 
 Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
@@ -86,7 +85,7 @@ Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'igno
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilestatusindicators")
 
 	' Get & set designer properties
@@ -156,7 +155,7 @@ Private Sub CreateStatusIndicators
 		Dim data As IndicatorData
 		data.Initialize
 		data.Index = i
-		data.State = STATE_DISABLED
+		data.Status = STATUS_DISABLED
 		data.Text = ""
 		data.Description = ""
 		LabelStatusIndicators(i).Tag = data
@@ -182,7 +181,7 @@ End Sub
 
 ' SetData
 ' Set the typed data Text, Description, State.
-Public Sub SetData(row As Byte, col As Byte, text As String, description As String, state As Int, show As Boolean)
+Public Sub SetData(row As Byte, col As Byte, text As String, description As String, status As Int, show As Boolean)
 	' Check
 	If row < 1 Or row > ROWS Or col < 1 Or col > COLS Then Return
 
@@ -192,7 +191,7 @@ Public Sub SetData(row As Byte, col As Byte, text As String, description As Stri
 	' Get data from tag	
 	Dim data As IndicatorData = LabelStatusIndicators(idx).Tag
 	' Set data from parameter
-	data.State = state
+	data.Status = status
 	data.Text = text
 	data.Description = description
 	' Update tag
@@ -200,18 +199,18 @@ Public Sub SetData(row As Byte, col As Byte, text As String, description As Stri
 
 	' Set UI
 	If show Then
-		SetState(row, col, state)
+		SetStatus(row, col, status)
 		SetText(row, col, text)
 	End If
 End Sub
 
-' SetState
-' Set the state of an indicator to false, true, disabled.
+' SetStatus
+' Set the status of an indicator to false, true, disabled.
 ' Parameters:
 ' row - 1-3
 ' col - 1-3
 ' state - 0 (false), 1( true), 2 (disabled)
-Public Sub SetState(row As Byte, col As Byte, state As Int)
+Public Sub SetStatus(row As Byte, col As Byte, status As Int)
 	' Check
 	If row < 1 Or row > ROWS Or col < 1 Or col > COLS Then Return
 
@@ -219,21 +218,21 @@ Public Sub SetState(row As Byte, col As Byte, state As Int)
 	Dim idx As Int = (row - 1) * COLS + (col - 1)
 	
 	Dim data As IndicatorData = LabelStatusIndicators(idx).Tag
-	data.State = state
+	data.Status = status
 	LabelStatusIndicators(idx).Tag = data
-	Select state
-		Case STATE_FALSE
+	Select status
+		Case STATUS_FALSE
 			LabelStatusIndicators(idx).Color = mColorFalse
 			LabelStatusIndicators(idx).TextColor = mTextColorFalse
-		Case STATE_TRUE
+		Case STATUS_TRUE
 			LabelStatusIndicators(idx).Color = mColorTrue
 			LabelStatusIndicators(idx).TextColor = mTextColorTrue
-		Case STATE_DISABLED
+		Case STATUS_DISABLED
 			LabelStatusIndicators(idx).Color = mColorDisabled
 			LabelStatusIndicators(idx).TextColor = mTextColorDisabled
 	End Select
 End Sub
-Public Sub GetState(row As Byte, col As Byte) As Int
+Public Sub GetStatus(row As Byte, col As Byte) As Int
 	If row < 1 Or row > ROWS Or col < 1 Or col > COLS Then Return -1
 
 	' Use COLS (3) to jump full rows
@@ -241,15 +240,15 @@ Public Sub GetState(row As Byte, col As Byte) As Int
 	Return LabelStatusIndicators(idx).Tag
 End Sub
 
-' GetStateText
-' Get the indicator state text using the defaults defined in HMIUtils.
-Public Sub GetStateText(state As Int) As String
+' GetStatusText
+' Get the indicator status text using the defaults defined in HMIUtils.
+Public Sub GetStatusText(state As Int) As String
 	Select state
-		Case STATE_FALSE
+		Case STATUS_FALSE
 			Return HMITileUtils.TEXT_INDICATOR_FALSE
-		Case STATE_TRUE
+		Case STATUS_TRUE
 			Return HMITileUtils.TEXT_INDICATOR_TRUE
-		Case STATE_DISABLED
+		Case STATUS_DISABLED
 			Return HMITileUtils.TEXT_INDICATOR_DISABLED
 		Case Else
 			Return ""

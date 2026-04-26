@@ -115,8 +115,6 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' ================================================================
 	' BUTTONS
 	' ================================================================
-	TileButtonOpenPort.StateText = IIf(False, "Open", "Closed")
-	TileButtonLEDOnOff.StateText = IIf(False, "ON", "OFF")
 
 	' ================================================================
 	' SELECT LIST
@@ -136,7 +134,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	TileSelectCommand.Selected = Commands(0)
 	
 	' ReadOut
-	TileReadoutLEDState.Value = TileButtonLEDOnOff.StateText
+	TileReadoutLEDState.Value = TileButtonLEDOnOff.Value
 End Sub
 
 ' ================================================================
@@ -148,9 +146,7 @@ Private Sub TileButtonOpenPort_Click
 		Return
 	End If
 
-	TileButtonOpenPort.SetState(TileButtonOpenPort.State)
-	TileButtonOpenPort.StateText = IIf(TileButtonOpenPort.State, "Open", "Closed")
-	' TileEvents.Insert($"[TileButtonOpenPort_Click] port=${PortSelected}, state=${TileButtonOpenPort.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileButtonOpenPort.Value = Not(TileButtonOpenPort.Value)
 
 	If AStream.IsInitialized Then
 		AStream.Close
@@ -158,7 +154,7 @@ Private Sub TileButtonOpenPort_Click
 		IsPortOpen = False
 	End If
 	
-	If TileButtonOpenPort.State Then
+	If TileButtonOpenPort.Value Then
 		Try
 			SerialLine.Open(PortSelected)
 			SerialLine.SetParams(BAUDRATE, 8, 1, 0)
@@ -176,11 +172,10 @@ Private Sub TileButtonLEDOnOff_Click
 	If Not(IsPortOpen) Then Return
 	Dim data(1) As Byte
 	
-	TileButtonLEDOnOff.SetState(TileButtonLEDOnOff.State)
-	TileButtonLEDOnOff.StateText = IIf(TileButtonLEDOnOff.State, "ON", "OFF")
-	TileEvents.Insert($"[TileButtonLEDOnOff] state=${TileButtonLEDOnOff.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileButtonLEDOnOff.Value = Not(TileButtonLEDOnOff.Value)
+	TileEvents.Insert($"[TileButtonLEDOnOff] value=${TileButtonLEDOnOff.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	
-	If TileButtonLEDOnOff.State Then
+	If TileButtonLEDOnOff.Value Then
 		data(0) = CMD_LED_ON
 	Else
 		data(0) = CMD_LED_OFF

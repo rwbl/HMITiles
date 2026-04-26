@@ -32,7 +32,7 @@ End Sub
 Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("mainpage")
-	B4XPages.SetTitle(Me, "HMITileSelectAndSelectList")
+	B4XPages.SetTitle(Me, "HMITileSelect and HMITileSelectList")
 	
 	LabelLegend.Text = $"HMITiles Get Started${CRLF}Recommended tile size 120x120px, Select list long 120x240px. Item index starts with 0."$
 	

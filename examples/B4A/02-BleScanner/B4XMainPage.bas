@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			Scanner
 ' Brief:		Example using the BLE Scanner.
-' Date:			2026-04-18
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' Description:	Scan (AllowDuplicates set to false) for BLE devices and list their name and id (MAC address).
 ' Based on:		B4A forumm example www.b4x.com/android/forum/threads/b4x-ble-2-bluetooth-low-energy.59937/ (thanks for sharing)
@@ -21,8 +21,8 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=BLEExample.zip
 
 Sub Class_Globals
-	Private VERSION As String	= "BleScanner v20260418"
-	Private INFO As String	= "HMITiles Example (c) Robert W.B. Linn 2026 - MIT"
+	Private VERSION As String = "BleScanner v20260423"
+	Private INFO 	As String = "HMITiles Example (c) Robert W.B. Linn 2026 - MIT"
 
 	' UI
 	Private xui As XUI
@@ -127,9 +127,9 @@ End Sub
 ' HMITILES
 ' --------------------------------------------------------------
 Private Sub TileButtonScanning_Click
+	TileButtonScanning.Value = Not(TileButtonScanning.Value)
 	If IsScanning Then 
 		StopScan
-		TileButtonScanning.StateText = "Start"
 	Else
 		#if B4A
 			'Don't forget to add permission to manifest
@@ -150,7 +150,6 @@ Private Sub TileButtonScanning_Click
 			Next
 		#end if
 		StartScan
-		TileButtonScanning.StateText = "Stop"
 	End If
 End Sub
 

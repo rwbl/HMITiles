@@ -4,7 +4,7 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-Sub Class_Globals
+Private Sub Class_Globals
 	Private Root As B4XView 'ignore
 	Private xui As XUI 'ignore
 	Private TileNavButtonBack As HMITileNavButton

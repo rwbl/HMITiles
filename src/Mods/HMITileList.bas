@@ -4,13 +4,12 @@ ModulesStructureVersion=1
 Type=Class
 Version=10.3
 @EndOfDesignText@
-#Region Class Header
 ' ================================================================
 ' File:     	HMITileList.bas
 ' Brief:    	CustomView HMITile with a title, customlistview with primary & secondary label.
-' Date:			2025-12-30
+' Date:			2026-04-20
 ' Author:		Robert W.B. Linn (c) 2025 MIT
-' Layout:
+' Layout:		Title + List Items with primary & secondary label.
 '				+------------------+
 '				|      Label       |   
 '				|+----------------+|   
@@ -22,11 +21,13 @@ Version=10.3
 '				|| Secondary Label||   
 '				|+----------------+|   
 '				+------------------+
+' Notes:		- Text color for the items primary & secondary labels (Item B4XView):
+'				  For B4J use CSSUtils to set textcolor properly on both windows / linux.
+'				- Compact mode changes the text size for the item primary & secondary labels.
 ' ================================================================
-#End Region
 
 ' Designer Properties
-#DesignerProperty: Key: TitleText,		DisplayName: Title, FieldType: String, DefaultValue: List
+#DesignerProperty: Key: Title,			DisplayName: Title, FieldType: String, DefaultValue: List
 #DesignerProperty: Key: ShowTitle, 		DisplayName: Show Title, FieldType: Boolean, DefaultValue: True, Description: Show title text.
 #DesignerProperty: Key: ShowSelected, 	DisplayName: Show Selected, FieldType: Boolean, DefaultValue: False, Description: Highlight selected row.
 #DesignerProperty: Key: CompactMode,	DisplayName: Compact Mode, FieldType: Boolean, DefaultValue: False, Description: Show items compact mode.
@@ -34,7 +35,7 @@ Version=10.3
 ' Events
 #Event: ItemClick (Index As Int, Value As Object)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	#If B4J
 	Private fx As JFX
 	#End If
@@ -54,13 +55,16 @@ Sub Class_Globals
 	Private ClvList As CustomListView
 	Private PaneList As B4XView
 
-	' Properties
+	' Properties Designer
+	Private mTitle As String
 	Private mShowTitle As Boolean
 	Private mShowSelected As Boolean
 	Private mCompactMode As Boolean
 
+	' Properties Class
+
 	' CLV
-	Private mCommandSelected As Int = -1		' Keep track of the command selected
+	Private mSelectedItemIndex As Int = -1		' Keep track of the command selected
 End Sub
 
 Public Sub Initialize (Callback As Object, EventName As String)
@@ -68,7 +72,7 @@ Public Sub Initialize (Callback As Object, EventName As String)
 	mCallBack = Callback
 End Sub
 
-Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
+Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
 	mBase = Base
 	mLbl = Lbl
 	Tag = mBase.Tag
@@ -77,12 +81,13 @@ Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
 	mBase.LoadLayout("hmitilelist")
 
 	' Assign designer properties
-	LabelTitle.Text = Props.Get("TitleText")
+	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mShowTitle 		= Props.Get("ShowTitle")
 	mShowSelected 	= Props.Get("ShowSelected")
 	mCompactMode	= Props.Get("CompactMode")
@@ -104,11 +109,14 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 	End If
 
 	PaneList.SetLayoutAnimated		(0, 0, 0, Width, Height)
+	
+	' Title
 	LabelTitle.Visible = mShowTitle
 	If mShowTitle Then
 		LabelTitle.SetLayoutAnimated(0, 0, 0, PaneList.Width, HMITileUtils.EVENT_TITLE_HEIGHT)
 	End If
 
+	' PaneList
 	' Resize the base panel with CLV.GetBase.SetLayoutAnimated.
 	l = pad
 	t = pad
@@ -124,16 +132,21 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 	ClvList.Base_Resize (ClvList.GetBase.Width, ClvList.GetBase.Height)
 End Sub
 
-#Region Properties
+' ================================================================
+' PUBLIC API
+' ================================================================
+
+#Region PublicAPI
 ' Title
 ' Get/Set HMITile title.
 ' Parameters:
 '	text String - HMITile title.
 Public Sub setTitle(text As String)
-	LabelTitle.Text = text
+	mTitle = text
+	LabelTitle.Text = mTitle
 End Sub
 Public Sub getTitle As String
-	Return LabelTitle.Text
+	Return mTitle
 End Sub
 
 Public Sub setShowSelected(state As Boolean)
@@ -165,13 +178,13 @@ End Sub
 #Region HMITile Styling
 ' ApplyStyle
 ' Apply style Normal
-Public Sub ApplyStyle
+Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	PaneList.Color = HMITileUtils.COLOR_BACKGROUND_DEFAULT
 	HMITileUtils.SetCLVBackgroundTransparent(ClvList)
 	ClvList.sv.SetColorAndBorder(HMITileUtils.COLOR_BACKGROUND_DEFAULT, _
 								 1dip, _ 
-								 HMITileUtils.COLOR_STATE_OFF_BORDER, _ 
+								 HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								 0dip)
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
@@ -224,6 +237,24 @@ End Sub
 Public Sub Clear
 	ClvList.Clear
 End Sub
+
+' SelectedItemIndex
+' Get or set the selected item index
+' Parameters:
+'	index Int - Index of the item 0 - list.size - 1
+' Returns:
+'	n/a
+Public Sub setSelectedItemIndex(index As Int)
+	mSelectedItemIndex = index
+	If ClvList.Size > 0 Then
+		ClvList.JumpToItem(index)
+		ClvList_ItemClick(index, ClvList.GetValue(index))
+		ClvList.AsView.RequestFocus
+	End If
+End Sub
+Public Sub getSelectedItemIndex As Int
+	Return mSelectedItemIndex
+End Sub
 #End Region
 
 #Region ClvListCreateItem
@@ -253,29 +284,28 @@ Private Sub ClvListCreateItem(primaryitem As String, secondaryitem As String) As
 	Dim primaryitemheight As Int	= IIf(secondaryitem.Length > 0, pnl.Height/2, pnl.Height)
 
 	' Set colors
-	pnl.Color = HMITileUtils.LIST_COLOR_BG_BASE
+	pnl.Color 						= HMITileUtils.LIST_COLOR_BG_BASE
 
 	' Create primary item (top)
 	Dim lblprimaryitem As B4XView	= XUIViewsUtils.CreateLabel
 	lblprimaryitem.Font 			= xui.CreateDefaultFont(primarytextsize)
-	lblprimaryitem.Color			= HMITileUtils.LIST_COLOR_BG_BASE
 	lblprimaryitem.Text				= primaryitem
-	lblprimaryitem.TextColor		= HMITileUtils.LIST_COLOR_TEXT
 	lblprimaryitem.SetTextAlignment("TOP", "LEFT")
+	HMITileUtils.SetTextColorCrossPlatform(lblprimaryitem, $"#${HMITileUtils.ColorToHexRGB(HMITileUtils.LIST_COLOR_TEXT)}"$)
+
 	pnl.AddView(lblprimaryitem, rowpadding, 0, pnl.Width, primaryitemheight)
-	'pnl.AddView(lblprimaryitem, rowpadding, 0, pnl.Width - (rowpadding * 2), primaryitemheight)
 
 	' Check if there is a secondary item
 	If secondaryitem.Length > 0 Then
 		' Create secondary item (bottom)
 		Dim lblsecondaryitem As B4XView	= XUIViewsUtils.CreateLabel
 		lblsecondaryitem.Font 			= xui.CreateDefaultFont(secondarytextsize)
-		lblsecondaryitem.Color 			= HMITileUtils.LIST_COLOR_BG_BASE
 		lblsecondaryitem.Text 			= secondaryitem
-		lblsecondaryitem.TextColor 		= HMITileUtils.LIST_COLOR_TEXT
 		lblsecondaryitem.SetTextAlignment("BOTTOM", "LEFT")
+
+		' For B4J use CSSUtils to set textcolor properly on both windows / linux
+		HMITileUtils.SetTextColorCrossPlatform(lblsecondaryitem, $"#${HMITileUtils.ColorToHexRGB(HMITileUtils.LIST_COLOR_TEXT)}"$)
 		pnl.AddView(lblsecondaryitem, rowpadding, rowheight/2, pnl.Width, pnl.height/2)
-		' pnl.AddView(lblsecondaryitem, rowpadding, rowheight/2, pnl.Width - (rowpadding * 2), pnl.height/2)
 	End If
 
 	Return pnl
@@ -290,17 +320,17 @@ End Sub
 '	value String - Item content
 '	level Int - Event level
 Private Sub ClvList_ItemClick (Index As Int, Value As Object)
-	'Log($"[ClvList_ItemClick ] index=${Index}, value=${Value}"$)
+	' Log($"[ClvList_ItemClick ] index=${Index}, value=${Value}"$)
 
 	If mShowSelected Then
 		' Check if already a command is selected
-		If mCommandSelected == -1 Then mCommandSelected = Index
+		If mSelectedItemIndex == -1 Then mSelectedItemIndex = Index
 		' Reset background color for selected command
-		ClvList.GetPanel(mCommandSelected).Color = HMITileUtils.LIST_COLOR_BG_BASE
+		ClvList.GetPanel(mSelectedItemIndex).Color = HMITileUtils.LIST_COLOR_BG_BASE
 		' Set command selected color
 		ClvList.GetPanel(Index).Color = HMITileUtils.COLOR_BACKGROUND_SELECTED
-		' Update selected command index
-		mCommandSelected = Index
+		' Update selected index
+		mSelectedItemIndex = Index
 	End If
 	
 	' Call event if exists

@@ -20,7 +20,7 @@ Version=9.85
 #End Region
 
 Private Sub Class_Globals
-	Private VERSION As String	= "HMITiles Development v20260418"
+	Private VERSION As String	= "HMITiles Development v20260424"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -91,32 +91,43 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' Ensure to set sleep prior calling customviews
 	Sleep(1)
 
-	' Label Fontawesome
-	TileLabelFontAwesome.SetFontAwesome(True)
-	TileLabelFontAwesome.Text = Chr(0xF256)
-	
-	' Digital Clock
-	TileDigitalClock.ShowSeconds = True
-	
 	' Eventviewer
 	TileEventViewer.CompactMode = False
 	TileEventViewer.TimeStamp = False
 	TileEventViewer.Insert(VERSION, HMITileUtils.EVENT_LEVEL_INFO)
 
+	' Label Fontawesome
+	TileLabelFontAwesome.SetFontAwesome(True)
+	TileLabelFontAwesome.Text = Chr(0xF256)
+
+	' Digital Clock
+	TileDigitalClock.ShowSeconds = True
+	
 	' OnOff Button
-	TileButtonOnOff.State = True
+	TileButtonOnOff.Value = True
 	TileButtonOnOff_Click
 	
 	' Toggle Button
-	TileButtonToggle.SetStateFontFontAwesome
-	TileButtonToggle.State = True
+	TileButtonToggle.ValueFontFontAwesome
+	TileButtonToggle.OnText = HMITileUtils.ICON_ON
+	TileButtonToggle.OffText = HMITileUtils.ICON_OFF
+	TileButtonToggle.Value = False
 	TileButtonToggle_Click
 
+	' Toggle Button Alarm
+	TileButtonAlarm.Value = False	
+	TileButtonAlarm_Click
+
 	' Button FA
-	TileButtonFA.SetStateFontFontAwesome
-	TileButtonFA.StateText = Chr(0xF061)
-	TileButtonFA2.SetStateFontFontAwesome
-	TileButtonFA2.StateText = Chr(0xF021)
+	TileButtonFA.ValueFontFontAwesome
+	TileButtonFA.OnText = Chr(0xF061)
+	TileButtonFA.OffText = Chr(0xF061)
+	TileButtonFA.Value = True
+
+	TileButtonFA2.ValueFontFontAwesome
+	TileButtonFA2.OnText = HMITileUtils.ICON_REFRESH
+	TileButtonFA2.OffText = HMITileUtils.ICON_REFRESH
+	TileButtonFA2.Value = True
 
 	' Readout
 	TileReadOut.Value = 67
@@ -135,6 +146,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	
 	' List
 	TileListAddItems
+	TileList.SelectedItemIndex = 2
 	
 	' SPPV
 	TileSPPV1.DeviationLimit = 10
@@ -157,10 +169,10 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	
 	' StatusIndicators
 	' Total 9 status indicators - 
-	TileStatusIndicators.SetData(1, 1, "P1", "Pump 1 Feed C-1101", TileStatusIndicators.STATE_FALSE, True)
-	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.STATE_DISABLED, True)
-	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.STATE_TRUE, True)
-	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.STATE_FALSE, True)
+	TileStatusIndicators.SetData(1, 1, "P1", "Pump 1 Feed C-1101", TileStatusIndicators.Status_FALSE, True)
+	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.Status_DISABLED, True)
+	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.Status_TRUE, True)
+	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.Status_FALSE, True)
 End Sub
 
 ' ================================================================
@@ -175,34 +187,32 @@ End Sub
 ' ================================================================
 
 Private Sub TileButtonOnOff_Click
-	'TileButtonOnOff.SetState(TileButtonOnOff.State)
-	TileButtonOnOff.State = Not(TileButtonOnOff.State)
-	TileButtonOnOff.StateText = IIf(TileButtonOnOff.State, "ON", "OFF")
-	TileEventViewer.Insert($"[TileButtonOnOff] state=${TileButtonOnOff.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	TileEventViewer.Insert($"[TileButtonOnOff] ${TileEventViewer.StateSummary}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileButtonOnOff.Value = Not(TileButtonOnOff.Value)
+	TileEventViewer.Insert($"[TileButtonOnOff] value=${TileButtonOnOff.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileEventViewer.Insert($"[TileButtonOnOff] ${TileEventViewer.StatusSummary}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] slidermax=${TileSeekBarIndicator.MaxValue}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileSeekBar.ShowValue = Not(TileSeekBar.ShowValue)
 End Sub
 
 ' Button with fontawesome looks like a toggle switch.
 Private Sub TileButtonToggle_Click
-	TileButtonToggle.State = Not(TileButtonToggle.State)
-	TileButtonToggle.StateText = IIf(TileButtonToggle.State, Chr(0xF205), Chr(0xF204)) ' FA toggle-on / toggle-off
-	TileEventViewer.Insert($"[TileButtonToggle] state=${TileButtonToggle.State}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileButtonToggle.Value = Not(TileButtonToggle.Value)
+	TileEventViewer.Insert($"[TileButtonToggle] value=${TileButtonToggle.value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	
-	If TileButtonToggle.State Then
+	If TileButtonToggle.Value Then
 		TileTrend.Clear
 		TileEventViewer.Insert($"[TileButtonToggle] TileTrend cleared (#${TileTrend.Size})"$, HMITileUtils.EVENT_LEVEL_WARNING)
 	End If
 End Sub
 
 Private Sub TileButtonAlarm_Click
-	If TileButtonAlarm.State Then
-		TileButtonAlarm.SetNormal("Cleared")
+	TileButtonAlarm.Value = Not(TileButtonAlarm.Value)
+	If TileButtonAlarm.Value Then
+		TileButtonAlarm.StatusAlarm
 	Else
-		TileButtonAlarm.SetAlarm("ALARM")
+		TileButtonAlarm.StatusNormal
 	End If
-	TileEventViewer.Insert($"[TileButtonAlarm] state=${TileButtonAlarm.State}"$, HMITileUtils.EVENT_LEVEL_ALARM)
+	TileEventViewer.Insert($"[TileButtonAlarm] value=${TileButtonAlarm.Value}"$, HMITileUtils.EVENT_LEVEL_ALARM)
 End Sub
 
 Private Sub TileButtonFA_Click
@@ -235,25 +245,25 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	TileTrend.Add(value)
 
 	If value > 90 Then
-		TileReadOut.SetStyleAlarm
-		TileLevel.SetStyleAlarm
-		TileGauge.SetStyleAlarm
-		TileSensor.SetStyleAlarm
+		TileReadOut.StatusAlarm
+		TileLevel.StatusAlarm
+		TileGauge.StatusAlarm
+		TileSensor.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else if value > 70 Then
-		TileReadOut.SetStyleWarning
-		TileLevel.SetStyleWarning
-		TileGauge.SetStyleWarning
-		TileSensor.SetStyleWarning
+		TileReadOut.StatusWarning
+		TileLevel.StatusWarning
+		TileGauge.StatusWarning
+		TileSensor.StatusWarning
 		level = HMITileUtils.EVENT_LEVEL_WARNING
 	Else if value == 0 Then
-		TileLevel.SetStyleAlarm
+		TileLevel.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else
-		TileReadOut.SetStyleNormal
-		TileLevel.SetStyleNormal
-		TileGauge.SetStyleNormal
-		TileSensor.SetStyleNormal
+		TileReadOut.StatusNormal
+		TileLevel.StatusNormal
+		TileGauge.StatusNormal
+		TileSensor.StatusNormal
 		level = HMITileUtils.EVENT_LEVEL_INFO
 	End If
 	
@@ -266,6 +276,7 @@ End Sub
 
 Private Sub TileEventViewer_ItemClick (Index As Int, Value As Object)
 	Log($"[TileEventViewer_ItemClick] index=${Index}, value=${Value}"$)
+	' Log(TileEventViewer.GetEvents)
 End Sub
 
 ' ================================================================
@@ -285,8 +296,8 @@ Private Sub TileListAddItems
 	TileList.Add($"${"item"} ${i}"$, "", i)
 End Sub
 
-Private Sub TileListCommands_ItemClick (Index As Int, Value As Object)
-	TileEventViewer.Insert($"[TileListCommands_ItemClick] index=${Index}, value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+Private Sub TileList_ItemClick (Index As Int, Value As Object)
+	TileEventViewer.Insert($"[TileList_ItemClick] index=${Index}, value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub
 
 ' ================================================================
@@ -316,11 +327,11 @@ Private Sub TileSPPV2_ValueChanged(Value As Float)
 	TileEventViewer.Insert($"[TileSPPV2_ValueChanged] value=${Value}, setpoint=${TileSPPV2.SP}, deviation=${TileSPPV2.Deviation}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	' Set alarm depending deviaton
 	If Abs(TileSPPV2.Deviation) > 3 Then
-		TileSPPV2.SetStyleAlarm
+		TileSPPV2.StatusAlarm
 	Else If Abs(TileSPPV2.Deviation) > 1.5 Then
-		TileSPPV2.SetStyleWarning
+		TileSPPV2.StatusWarning
 	Else
-		TileSPPV2.SetStyleNormal
+		TileSPPV2.StatusNormal
 	End If
 End Sub
 
@@ -341,7 +352,7 @@ Private Sub TileSelect_ValueChanged (Value As Object)
 End Sub
 
 ' ================================================================
-' SELECT
+' TIMER
 ' ================================================================
 
 Private Sub TileTimer_Start
@@ -360,9 +371,27 @@ End Sub
 ' ================================================================
 ' STATUSINDICATORS
 ' ================================================================
+
 Private Sub TileStatusIndicators_Click(data As IndicatorData)
 	Dim indicator As HMITileStatusIndicators = Sender
 	TileEventViewer.Insert($"[TileStatusIndicators] ${data}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	Dim sf As Object = xui.Msgbox2Async($"${indicator.GetStateText(data.State)}${CRLF}${data.description}"$, $"Status ${data.text}"$, "OK", "", "", Null)
+	Dim sf As Object = xui.Msgbox2Async( _ 
+		$"${data.description}${CRLF}Status:${CRLF}${indicator.GetStatusText(data.Status)}"$, $"Indicator ${data.text}"$, "OK", "", "", Null)
 	Wait For (sf) Msgbox_Result (Result As Int)
+End Sub
+
+' ================================================================
+' GAUGE
+' ================================================================
+
+Private Sub TileGauge_Click(value As Float)
+	TileEventViewer.Insert($"[TileGauge] value=${value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' READOUT
+' ================================================================
+
+Private Sub TileReadOut_Click
+	TileEventViewer.Insert($"[TileReadOut] value=${TileReadOut.value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub

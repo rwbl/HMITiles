@@ -31,7 +31,7 @@ Version=13.4
 	#IncludeTitle: True
 #End Region
 
-'#BridgeLogger: True
+#BridgeLogger: True
 
 Sub Process_Globals
 	Public ActionBarHomeClicked As Boolean

@@ -9,7 +9,7 @@ Version=10.3
 ' File: 		HMITileLevel.bas
 ' Brief:		CustomView HMITile with a level bar 0-100%.
 '				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2025-12-29
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Layout:
 '				+------------------+
@@ -22,10 +22,10 @@ Version=10.3
 #End Region
 
 ' Designer properties
-#DesignerProperty: Key: Title,		DisplayName: Title, FieldType: String, DefaultValue: Level
-#DesignerProperty: Key: Value, 		DisplayName: Value, FieldType: Float, DefaultValue: 0
-#DesignerProperty: Key: Unit,  		DisplayName: Unit,  FieldType: String, DefaultValue: 
-#DesignerProperty: Key: TypeStyle, 	DisplayName: HMITile Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Title,		DisplayName: Title, 	FieldType: String,	DefaultValue: Level
+#DesignerProperty: Key: Value, 		DisplayName: Value, 	FieldType: Float, 	DefaultValue: 0
+#DesignerProperty: Key: Unit,  		DisplayName: Unit,  	FieldType: String, 	DefaultValue: 
+#DesignerProperty: Key: Status, 	DisplayName: Status,	FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
 ' Events
 #Event: Click (Value As Float)
@@ -40,17 +40,19 @@ Private Sub Class_Globals
 	Private xui As XUI
 	Public Tag As Object
 
-	' Views inside HMITileSensor.bjl
+	' Views
 	Private LabelTitle As B4XView
 	Private PaneBar As B4XView
 	Private PaneFill As B4XView
 	Private LabelValue As B4XView
 
-	' Designer values
+	' Properties Designer
+	Private mTitle As String
 	Private mValue As Float
-	Private mUnitText As String
-	Private mTypeStyle As String
+	Private mUnit As String
+	Private mStatus As String
 
+	' Properties Class
 	Private mDigits As Int = 0
 End Sub
 
@@ -71,13 +73,15 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilelevel")
 	
 	' Store designer properties
-	LabelTitle.Text = Props.Get("Title")
-	LabelValue.Text = Props.Get("Value")
+	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mValue			= Props.Get("Value")
-	mUnitText		= Props.Get("Unit")
-	mTypeStyle		= Props.Get("TypeStyle")
+	LabelValue.Text = mValue
+	mUnit			= Props.Get("Unit")
+	mStatus			= Props.Get("Status")
 
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
+	
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -100,11 +104,14 @@ Private Sub UpdateLevel
 		Return
 	End If
 
-	Dim l As Int	= mBase.width / 4
-	Dim t As Int	= LabelTitle.Top + LabelTitle.Height ' + pad
-	Dim w As Int	= mBase.width / 2
-	Dim h As Int	= (mBase.height * 0.50) - HMITileUtils.PADDING
-	
+	' Left, Top, Width, Height
+	Dim l As Int			= mBase.width / 4
+	Dim t As Int			= LabelTitle.Top + LabelTitle.Height ' + pad
+	Dim w As Int			= mBase.width / 2
+	Dim hfactor As Float	= 0.45
+	Dim h As Int			= (mBase.height * hfactor) - HMITileUtils.PADDING
+
+	' Only pos values are supported	
 	Dim pct As Float = 0
 	If mValue < 0 Then
 		mValue = 0
@@ -126,7 +133,7 @@ Private Sub UpdateLevel
 	l	= l
 	t	= LabelTitle.Top + LabelTitle.Height
 	w	= w
-	h	= (mBase.height * 0.50) - h
+	h	= (mBase.height * hfactor) - h
 	PaneBar.SetLayoutAnimated(0, l, t, w, h)
 	' Log($"[HMITileLevel.UpdateLevel] Bar: l=${l},t=${t},w=${w},h=${h},th=${t+h},fh=${fillheight}"$)
 End Sub
@@ -147,7 +154,7 @@ Public Sub setValue(value As Float)
 	If LabelValue.IsInitialized Then
 		mValue = value
 		UpdateLevel
-		LabelValue.Text = $"${NumberFormat(mValue, 1, mDigits)}${IIf(mUnitText.Length > 0, $" ${mUnitText}"$, "")}"$
+		LabelValue.Text = $"${NumberFormat(mValue, 1, mDigits)}${IIf(mUnit.Length > 0, $" ${mUnit}"$, "")}"$
 	End If
 End Sub
 Public Sub getValue As Float
@@ -155,8 +162,8 @@ Public Sub getValue As Float
 End Sub
 
 Public Sub setUnit(unit As String)
-	mUnitText = unit
-	LabelValue.Text = $"${mValue}${IIf(mUnitText.Length > 0, $" ${mUnitText}"$, "")}"$
+	mUnit = unit
+	LabelValue.Text = $"${mValue}${IIf(mUnit.Length > 0, $" ${mUnit}"$, "")}"$
 End Sub
 Public Sub getUnit As String
 	Return LabelValue.Text
@@ -170,57 +177,65 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub SetStyleNormal
-	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
+' --- Convenience helpers ---
+Public Sub StatusNormal
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
 
-Public Sub SetStyleWarning
-	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
+Public Sub StatusWarning
+	setStatus(HMITileUtils.STATUS_WARNING)
 End Sub
 
-Public Sub SetStyleAlarm
-	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
+Public Sub StatusAlarm
+	setStatus(HMITileUtils.STATUS_ALARM)
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+Public Sub StatusDisabled
+	setStatus(HMITileUtils.STATUS_DISABLED)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	mStatus = value
+	ApplyStatusStyle(value)
+End Sub
+
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 ' ================================================================
-' TILE STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region HMITile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatustyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
 
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelValue)
 
-	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 			
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND		

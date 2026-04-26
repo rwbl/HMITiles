@@ -15,7 +15,7 @@ Version=10.3
 '				- Span (total sweep) → how wide the gauge Is
 '				- Value fraction → how much of that span Is filled
 '				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2025-12-25
+' Date:			2026-04-20
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Layout:
 '				+------------------+
@@ -34,7 +34,7 @@ Version=10.3
 #DesignerProperty: Key: Max, 		DisplayName: Max, FieldType: Float, DefaultValue: 100
 #DesignerProperty: Key: Unit,  		DisplayName: Unit,  FieldType: String, DefaultValue: 
 #DesignerProperty: Key: Digits, 	DisplayName: Digits, FieldType: Int, DefaultValue: 0
-#DesignerProperty: Key: TypeStyle, 	DisplayName: Tile Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Status, 	DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
 ' Events
 #Event: Click (Value As Float)
@@ -58,13 +58,14 @@ Private Sub Class_Globals
 	Private LabelTitle As B4XView
 	Private LabelValue As B4XView
 
-	' Designer values
+	' Designer Properties
+	Private mTitle As String
 	Private mValue As Float
-	Private mDigits As Int
 	Private mMin As Float
 	Private mMax As Float
 	Private mUnitText As String
-	Private mTypeStyle As String
+	Private mDigits As Int
+	Private mStatus As String
 	
 	' Gauge
 	Private Cx, Cy As Float
@@ -88,19 +89,21 @@ End Sub
 Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilegauge")
 
-	' Store designer properties
-	LabelTitle.Text = Props.Get("Title")
+	' Properties Designer
+	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mValue			= Props.Get("Value")
 	mMin			= Props.GetDefault("Min", 0)
 	mMax			= Props.GetDefault("Max", 100)
 	mUnitText		= Props.Get("Unit")
 	mDigits			= Props.GetDefault("Digits", 0)
-	mTypeStyle		= Props.Get("TypeStyle")
+	mStatus			= Props.Get("Status")
 	
 	' First resize
 	Base_Resize(mBase.Width, mBase.Height)
+
 	' Then apply style because the gauge inner circle must be masked based on style (normal,warning,alarm,disabled)
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
@@ -225,56 +228,63 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub SetStyleNormal
-	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
+' --- Convenience helpers ---
+Public Sub StatusNormal
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
 
-Public Sub SetStyleWarning
-	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
+Public Sub StatusWarning
+	setStatus(HMITileUtils.STATUS_WARNING)
 End Sub
 
-Public Sub SetStyleAlarm
-	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
+Public Sub StatusAlarm
+	setStatus(HMITileUtils.STATUS_ALARM)
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+Public Sub StatusDisabled
+	setStatus(HMITileUtils.STATUS_DISABLED)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	ApplyStatusStyle(value)
+End Sub
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 ' ================================================================
-' TILE STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelValue)
 
-	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			LabelValue.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND		
@@ -293,9 +303,23 @@ End Sub
 ' EVENTS
 ' ================================================================
 #Region Events
-'Private Sub Click
-'	If SubExists(mCallBack, mEventName & "_Click") Then
-'		CallSub2(mCallBack, mEventName & "_Click", mValue)
-'	End If
-'End Sub
+#If B4J
+Private Sub PaneGauge_MouseClicked (EventData As MouseEvent)
+	Click
+End Sub
+#End If
+
+#if B4A
+Private Sub PaneGauge_Click
+	Click	
+End Sub
+#End If
+
+Private Sub Click
+	If SubExists(mCallBack, mEventName & "_Click") Then
+		CallSub2(mCallBack, mEventName & "_Click", mValue)
+	End If
+End Sub
 #End Region
+
+

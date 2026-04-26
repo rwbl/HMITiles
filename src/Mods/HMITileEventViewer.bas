@@ -9,7 +9,7 @@ Version=10.3
 ' File:     HMITileEventViewer.bas
 ' Brief:    HMITile with a title, customlistview and trash icon (clear all event messages).
 '			The customlistview contains an event list with each line being an event (Or "event message")
-' Date:		2026-01-07
+' Date:		2026-04-21
 ' Author:	Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '			+------------------+
@@ -28,9 +28,9 @@ Version=10.3
 #End Region
 
 ' Designer Properties
-#DesignerProperty: Key: TitleText, 		DisplayName: Title, FieldType: String, DefaultValue: Event Viewer
+#DesignerProperty: Key: Title, 			DisplayName: Title, FieldType: String, DefaultValue: Event Viewer
 #DesignerProperty: Key: TimeStamp, 		DisplayName: Timestamp, FieldType: Boolean, DefaultValue: True, Description: Add timestamp as event message prefix. 
-#DesignerProperty: Key: MaxItems, 		DisplayName: Max Items, FieldType: Int, DefaultValue: 50, Description: Maximum number of event messages.
+#DesignerProperty: Key: MaxEvents, 		DisplayName: Max Events, FieldType: Int, DefaultValue: 50, Description: Maximum number of event messages.
 #DesignerProperty: Key: ShowTitle, 		DisplayName: Show Title, FieldType: Boolean, DefaultValue: True, Description: Show title text.
 #DesignerProperty: Key: ShowTrash, 		DisplayName: Show Trash Icon, FieldType: Boolean, DefaultValue: True, Description: Show trash icon at bottom right.
 #DesignerProperty: Key: CompactMode,	DisplayName: Compact Mode, FieldType: Boolean, DefaultValue: False, Description: Show items compact mode.
@@ -60,16 +60,18 @@ Private Sub Class_Globals
 	Public ClvEvents As CustomListView		' Can be accesses from object
 	Private LabelTrash As B4XView
 	
-	' Properties
+	' Properties Designer
+	Private mTitle As String
 	Private mTimeStamp As Boolean
 	Private mMaxEvents As Int
 	Private mShowTitle As Boolean
 	Private mShowTrash As Boolean
 	Private mCompactMode As Boolean
 	Private mLogging As Boolean
-	Private mRowHeight As Double	
+
+	' Properties Class
+	Private mRowHeight As Double
 	
-	' List
 	Private Events As List
 End Sub
 
@@ -88,15 +90,16 @@ Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ign
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Private Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' First resize the base before loading the layout else customlistview not properly shown.
 	'Base_Resize(mBase.Width, mBase.Height)
 
 	' Layout with label & clv
 	mBase.LoadLayout("hmitileeventviewer")
 
-	' Assign designer properties
-	LabelTitle.Text = Props.Get("TitleText")
+	' Properties Designer
+	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mTimeStamp		= Props.Get("TimeStamp")
 	mMaxEvents		= Props.Get("MaxItems")
 	mShowTitle		= Props.GetDefault("ShowTitle", True)
@@ -231,14 +234,14 @@ End Sub
 ' ================================================================
 #Region HMITile Styling
 ' ApplyStyle
-' Apply styles Normal
-Public Sub ApplyStyle
+' Apply style Normal
+Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	PaneEventViewer.Color = HMITileUtils.COLOR_BACKGROUND_DEFAULT
 	HMITileUtils.SetCLVBackgroundTransparent(ClvEvents)
 	ClvEvents.sv.SetColorAndBorder(HMITileUtils.COLOR_BACKGROUND_DEFAULT, _
 								   1dip, _ 
-								   HMITileUtils.COLOR_STATE_OFF_BORDER, _ 
+								   HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								   0dip)
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
@@ -252,20 +255,29 @@ End Sub
 #Region Items
 ' Insert
 ' Insert new event item at first position:
-' Newest on top, Most relevant information visible without scrolling.
+' Newest on top, most relevant information visible without scrolling.
+' Event list inserted map at first position with keys timestamp, level event.
+' The clvlist item contains the map.
 ' This is aligned with industrial HMI practice.
 ' Parameters:
 '	item String - Item to create.
 '	level Int - Event level
 ' Returns:
 '	n/a
-Public Sub Insert(item As String, level As Int)
+Public Sub Insert(event As String, level As Int)
 	If Not(ClvEvents.IsInitialized) Then Return
+	' Insert event in the class event list - do this first because of map with keys. Always add timestamp.
+	Dim m As Map = CreateMap("timestamp":FormatTimestamp(DateTime.Now), "level":level,"event":event)
+	Events.InsertAt(0, m)
 	If mTimeStamp Then
-		item = $"${FormatTimestamp(DateTime.Now)} - ${item}"$
+		event = $"${FormatTimestamp(DateTime.Now)} - ${event}"$
 	End If
-	ClvEvents.InsertAt(0, ClvEventsCreateItem(item, level), item)
-	Events.InsertAt(0, CreateMap("level":level,"event":item))
+	ClvEvents.InsertAt(0, ClvEventsCreateItem(event, level), m)
+	' Log the items if property set
+	If mLogging Then
+		Log($"timestamp=${m.get("timestamp")} level=${m.Get("level")} event=${m.Get("event")}"$)
+	End If
+	' Check maxevents reached > remove last event
 	If ClvEvents.Size > mMaxEvents Then
 		ClvEvents.RemoveAt(ClvEvents.Size - 1)
 		Events.RemoveAt(ClvEvents.Size - 1)
@@ -274,21 +286,31 @@ End Sub
 
 ' Add
 ' Add new event item at last position and scroll to last position.
+' Event list added map with keys timestamp, level event.
+' The clvlist item contains the map.
 ' Not recommended - use Insert.
 ' Parameters:
 '	item String - Item to create.
 '	level Int - Eventlevel
 ' Returns:
 '	n/a
-Public Sub Add(item As String, level As Int)
+Public Sub Add(event As String, level As Int)
 	If Not(ClvEvents.IsInitialized) Then Return
+	' Insert event in the class event list - do this first because of map with keys. Always add timestamp.
+	Dim m As Map = CreateMap("timestamp":FormatTimestamp(DateTime.Now), "level":level,"event":event)
+	Events.add(m)
 	If mTimeStamp Then
-		item = $"${FormatTimestamp(DateTime.Now)} - ${item}"$
+		event = $"${FormatTimestamp(DateTime.Now)} - ${event}"$
 	End If
-	ClvEvents.Add(ClvEventsCreateItem(item, level), item)
-	Events.Add(CreateMap("level":level,"event":item))
+	ClvEvents.add(ClvEventsCreateItem(event, level), m)
+	' Log the items if property set
+	If mLogging Then
+		Log($"m.get("timestamp") level=${m.Get("level")} event=${m.Get("event")}"$)
+	End If
+	' Check maxevents reached > remover first event
 	If ClvEvents.Size > mMaxEvents Then
 		ClvEvents.RemoveAt(0)
+		Events.RemoveAt(0)
 	End If
 	ClvEvents.JumpToItem(ClvEvents.Size - 1)
 End Sub
@@ -299,12 +321,12 @@ Public Sub Clear
 	ClvEvents.Clear
 End Sub
 
-' StateSummary
-' Map with event state summary:
+' StatusSummary
+' Map with event status summary:
 ' {"normal": 2, "warning": 1, "alarm": 3 }
 ' Returns
 '	map 
-Public Sub StateSummary As Map
+Public Sub StatusSummary As Map
 	Dim result As Map
 	result.Initialize
 	Dim normalcount As Int = 0
@@ -314,11 +336,11 @@ Public Sub StateSummary As Map
 	For Each event As Map In Events
 		Dim level As Int = event.Get("level")
 		Select level 
-			Case HMITileUtils.STATE_NORMAL
+			Case HMITileUtils.EVENT_LEVEL_INFO
 				normalcount = normalcount + 1
-			Case HMITileUtils.STATE_WARNING
+			Case HMITileUtils.EVENT_LEVEL_WARNING
 				warningcount = warningcount + 1
-			Case HMITileUtils.STATE_ALARM
+			Case HMITileUtils.EVENT_LEVEL_ALARM
 				alarmcount = alarmcount + 1
 		End Select
 	Next
@@ -327,11 +349,21 @@ Public Sub StateSummary As Map
 						"alarm": alarmcount) 
 	Return result
 End Sub
+
+' GetEvents
+' Get the list of events.
+' List entry is a map with keys "level":int,"event":string.
+' Returns
+'	list
+Public Sub GetEvents As List
+	Return Events
+End Sub
 #End Region
 
 ' ================================================================
 ' CLV
 ' ================================================================
+
 #Region ClvEventsCreateItem
 ' Create event item.
 ' Parameters:
@@ -360,19 +392,17 @@ Private Sub ClvEventsCreateItem(item As String, level As Int) As Panel
 	Dim icontext As String
 
 	Select level
-		Case HMITileUtils.STATE_NORMAL         ' Info
+		Case HMITileUtils.EVENT_LEVEL_INFO
 			iconColor = HMITileUtils.EVENT_COLOR_TEXT
 			icontext = HMITileUtils.EVENT_ICON_INFO
-		Case HMITileUtils.STATE_WARNING        ' Warning / Amber
+
+		Case HMITileUtils.EVENT_LEVEL_WARNING        
 			iconColor = HMITileUtils.EVENT_COLOR_ICON_WARNING
 			icontext = HMITileUtils.EVENT_ICON_WARNING
-		Case HMITileUtils.STATE_ALARM          ' Alarm / Red
+
+		Case HMITileUtils.EVENT_LEVEL_ALARM          
 			iconColor = HMITileUtils.EVENT_COLOR_ICON_ALARM
 			icontext = HMITileUtils.EVENT_ICON_ALARM
-		Case HMITileUtils.STATE_DISABLED       ' Disabled
-			bgColor = HMITileUtils.EVENT_COLOR_BG_DISABLED
-			txtColor = HMITileUtils.EVENT_COLOR_ICON_DISABLED
-			icontext = HMITileUtils.EVENT_ICON_DISABLED
 	End Select
 	pnl.Color = bgColor
 	
@@ -397,9 +427,6 @@ Private Sub ClvEventsCreateItem(item As String, level As Int) As Panel
 	lblitem.Text = item
 	lblitem.SetTextAlignment("CENTER", "LEFT")
 	lblitem.TextColor = txtColor
-	If mLogging Then
-		Log(item)
-	End If
 
 	#if B4A
 	l = lblicontextsize + (rowpadding * 4)	
@@ -426,6 +453,7 @@ End Sub
 ' ================================================================
 ' EVENTS
 ' ================================================================
+
 #Region Events
 ' ClvEvents_ItemClick
 ' Call event callback if exists.
@@ -460,6 +488,7 @@ End Sub
 ' ================================================================
 ' B4X - use click only
 ' ================================================================
+
 ' LabelTrash_MouseClicked 
 ' Clear all events from the list.
 Private Sub LabelTrash_Click

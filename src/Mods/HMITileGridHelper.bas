@@ -25,7 +25,7 @@ Version=10.3
 '   ' On resize: HMITileGridHelper.Resize
 ' ===================================================================
 
-Sub Class_Globals
+Private Sub Class_Globals
 	Private xui As XUI
 	Private mParent As B4XView        ' the view the grid is attached to (root)
 	Private gridPanel As B4XView     ' panel that hosts the canvas

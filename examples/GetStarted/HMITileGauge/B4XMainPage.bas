@@ -30,7 +30,7 @@ End Sub
 Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("mainpage")
-	B4XPages.SetTitle(Me, "TileGauge")
+	B4XPages.SetTitle(Me, "HMITileGauge")
 	
 	LabelLegend.Text = $"HMITiles Get Started${CRLF}Recommended tile size 120x120px."$
 	

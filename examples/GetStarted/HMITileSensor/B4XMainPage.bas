@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			HMITileSensor
 ' Project:		HMITiles B4X library
-' Brief:		Get started with HMITileSensor
+' Brief:		Get started with HMITileSensor.
 ' Description:	Shows several sensors.
 ' Date:			2026-04-21
 ' Author:		Robert W.B. Linn (c) 2026 MIT
@@ -57,8 +57,8 @@ Private Sub TileSensorsSetProperties
 	' Set the unit
 	TileSensor2.Unit = "°C"
 
-	' Set type style to alarm
-	TileSensor3.SetStyleAlarm
+	' Set status to alarm
+	TileSensor3.StatusAlarm
 End Sub
 
 

@@ -41,7 +41,7 @@ Version=10.3
 ' Events
 #Event: ValueChanged (m As Map)
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Events
 	Private mEventName As String
 	Private mCallBack As Object
@@ -86,7 +86,7 @@ Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Sub AfterLoadLayout(Props As Map)	'ignore
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilergb")
 
 	LabelTitle.Text		= Props.Get("Title")

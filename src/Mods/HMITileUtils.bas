@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileUtils.bas
 ' Brief:		Common constants and helper subs used by the customview HMITiles.
-' Date:			2026-04-17
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Central styling module for HMITiles library.
 '     			- Base colors (neutral blue-green scale)
@@ -95,13 +95,13 @@ Private Sub Process_Globals
 	Public Const COLOR_STATUS_FORBIDDEN         As Int = 0xFF7F0000
 
 	' ================================================================
-	' TILE STATES (NORMAL ON/OFF)
+	' TILE STATUS (NORMAL ON/OFF)
 	' ================================================================
-	Public Const COLOR_STATE_ON_BACKGROUND      As Int = 0xFF103030						' 20% darker then off state
-	Public Const COLOR_STATE_OFF_BACKGROUND     As Int = COLOR_BACKGROUND_DEFAULT   	' same as default tile
-	Public Const COLOR_STATE_ON_BORDER          As Int = 0xFF202020
-	Public Const COLOR_STATE_OFF_BORDER         As Int = 0xFF888888
-	Public Const COLOR_STATE_TEXT               As Int = 0xFF202020   					' dark text for readability
+	Public Const COLOR_STATUS_ON_BACKGROUND      As Int = 0xFF103030						' 20% darker then off state
+	Public Const COLOR_STATUS_OFF_BACKGROUND     As Int = COLOR_BACKGROUND_DEFAULT   	' same as default tile
+	Public Const COLOR_STATUS_ON_BORDER          As Int = 0xFF202020
+	Public Const COLOR_STATUS_OFF_BORDER         As Int = 0xFF888888
+	Public Const COLOR_STATUS_TEXT               As Int = 0xFF202020   					' dark text for readability
 	
 	' ================================================================
 	' TEXT COLORS
@@ -114,16 +114,12 @@ Private Sub Process_Globals
 	Public Const COLOR_TEXT_ERROR               As Int = 0xFFFFFFFF   					' white
 
 	' ================================================================
-	' TILE STATES
+	' TILE STATUS
 	' ================================================================
-	Public Const STATE_NORMAL              		As Int = 0
-	Public Const STATE_WARNING             		As Int = 1
-	Public Const STATE_ALARM               		As Int = 2
-	Public Const STATE_DISABLED            		As Int = 3
-	Public Const TYPESTYLE_NORMAL          		As String = "Normal"
-	Public Const TYPESTYLE_WARNING             	As String = "Warning"
-	Public Const TYPESTYLE_ALARM               	As String = "Alarm"
-	Public Const TYPESTYLE_DISABLED            	As String = "Disabled"
+	Public Const STATUS_NORMAL          		As String = "Normal"					' Changed to string from int 0-4
+	Public Const STATUS_WARNING             	As String = "Warning"
+	Public Const STATUS_ALARM            		As String = "Alarm"
+	Public Const STATUS_DISABLED            	As String = "Disabled"
 
 	' ================================================================
 	' TILE COLORS PER STATE
@@ -218,9 +214,9 @@ Private Sub Process_Globals
 
 	' === EVENT LEVELS ===
 	' These map to the existing STATE_* levels
-	Public Const EVENT_LEVEL_INFO     				As Int = STATE_NORMAL
-	Public Const EVENT_LEVEL_WARNING  				As Int = STATE_WARNING
-	Public Const EVENT_LEVEL_ALARM    				As Int = STATE_ALARM
+	Public Const EVENT_LEVEL_INFO     				As Int = 0
+	Public Const EVENT_LEVEL_WARNING  				As Int = 1
+	Public Const EVENT_LEVEL_ALARM    				As Int = 2
 
 	' === EVENT LEVEL ICONS ===
 	' Colors
@@ -343,6 +339,17 @@ Private Sub Process_Globals
 	Public Const TEXT_INDICATOR_DISABLED			As String = "Disabled"
 
 	' ================================================================
+	' FONTAWESOME ICONS
+	' ================================================================
+	Public ICON_ON 									As String = Chr(0xF205)
+	Public ICON_OFF 								As String = Chr(0xF204)
+	Public ICON_REFRESH 							As String = Chr(0xF021)
+	Public ICON_STOP_HAND							As String = Chr(0xF256)
+	Public ICON_STOP								As String = Chr(0xF04D)
+	Public ICON_STOP_CIRCLE							As String = Chr(0xF28D)
+	Public ICON_WAIT								As String = Chr(0xF252)
+
+	' ================================================================
 	' HELPERS
 	' ================================================================
 	' Byte converter - very useful
@@ -354,43 +361,28 @@ End Sub
 ' HELPER: APPLY STYLES
 ' ================================================================
 
-' ApplyHMITileTitleStyle
+' ApplyTileStyle
 ' For all HMITiles the title style are consistent
 ' Parameters:
-'	view B4XView - Title label
-Public Sub ApplyStyleTitle(HMITilepane As B4XView, titlelabel As B4XView, HMITilestate As String)
-	titlelabel.TextColor = COLOR_TEXT_SECONDARY
-	titlelabel.TextSize = TEXT_SIZE_TITLE
+'	
+Public Sub ApplyTileStyle(tilepane As B4XView, status As String)
+	Select status
+		Case STATUS_NORMAL
+			tilepane.Color = COLOR_TILE_NORMAL_BACKGROUND
 
-	Dim state As Int = StateStyleToState(HMITilestate)
-	Select state
-		Case STATE_NORMAL
-			HMITilepane.Color = COLOR_TILE_NORMAL_BACKGROUND
+		Case STATUS_WARNING
+			tilepane.Color = COLOR_TILE_WARNING_BACKGROUND
 
-		Case STATE_WARNING
-			HMITilepane.Color = COLOR_TILE_WARNING_BACKGROUND
+		Case STATUS_ALARM
+			tilepane.Color = COLOR_TILE_ALARM_BACKGROUND
 
-		Case STATE_ALARM
-			HMITilepane.Color = COLOR_TILE_ALARM_BACKGROUND
-
-		Case STATE_DISABLED
-			HMITilepane.Color = COLOR_TILE_DISABLED_BACKGROUND
+		Case STATUS_DISABLED
+			tilepane.Color = COLOR_TILE_DISABLED_BACKGROUND
 	End Select
-	
-	HMITilepane.SetColorAndBorder(HMITilepane.Color, _
-								  BORDER_WIDTH, _
-								  COLOR_STATE_ON_BORDER, _
-								  BORDER_RADIUS)
-End Sub
-
-Public Sub ApplyStyleStateOnOff(HMITilepane As B4XView, statelabel As B4XView, state As Boolean)
-	If state Then
-		statelabel.TextColor = COLOR_TEXT_PRIMARY
-		HMITilepane.SetColorAndBorder(COLOR_STATE_ON_BACKGROUND, 0, 0, BORDER_RADIUS)
-	Else
-		statelabel.TextColor = COLOR_TEXT_SECONDARY
-		HMITilepane.SetColorAndBorder(COLOR_STATE_OFF_BACKGROUND, 0, 0, BORDER_RADIUS)
-	End If
+	tilepane.SetColorAndBorder(tilepane.Color, _
+								BORDER_WIDTH, _
+								COLOR_STATUS_ON_BORDER, _
+								BORDER_RADIUS)
 End Sub
 
 Public Sub ApplyTitleStyle(lbl As B4XView)
@@ -418,6 +410,16 @@ Public Sub ApplyValueStyle(lbl As B4XView)
 		lbl.Font = xui.CreateDefaultBoldFont(TEXT_SIZE_STATE)
 		lbl.TextColor = COLOR_TEXT_PRIMARY
 		#End If
+	End If
+End Sub
+
+Public Sub ApplyValueStyleOnOff(HMITilepane As B4XView, statuslabel As B4XView, status As Boolean)
+	If status Then
+		statuslabel.TextColor = COLOR_TEXT_PRIMARY
+		HMITilepane.SetColorAndBorder(COLOR_STATUS_ON_BACKGROUND, 0, 0, BORDER_RADIUS)
+	Else
+		statuslabel.TextColor = COLOR_TEXT_SECONDARY
+		HMITilepane.SetColorAndBorder(COLOR_STATUS_OFF_BACKGROUND, 0, 0, BORDER_RADIUS)
 	End If
 End Sub
 
@@ -490,20 +492,6 @@ Public Sub ApplyFontAwesomeStyle(lbl As B4XView)
 	End If
 End Sub
 
-Public Sub ApplyStateStyle(lbl As B4XView)
-	If lbl.IsInitialized Then
-		#if B4J
-		lbl.TextSize = TEXT_SIZE_TITLE
-		lbl.TextColor = COLOR_TEXT_PRIMARY
-		SetStyleBold(lbl, True)
-		#end if
-		#if B4A
-		lbl.Font = xui.CreateDefaultBoldFont(TEXT_SIZE_TITLE)
-		lbl.TextColor = COLOR_TEXT_PRIMARY
-		#End If
-	End If
-End Sub
-
 #if B4J
 Public Sub SetStyleBold(node As Node, value As Boolean)
 	If value Then
@@ -546,23 +534,25 @@ Public Sub SetAllTilesBackgroundColor(clr As Int)
 	COLOR_TILE_NORMAL_BACKGROUND = clr
 End Sub
 
-Public Sub StateStyleToState(state As String) As Int
+' StatusToInt
+' Convert status text to its int value
+' Parameters:
+'	status - String like Normal, Warning, Alarm, Disabled
+' Returns:
+'	status as int value 0-4 or -1 if unknown
+Public Sub StatusToInt(status As String) As Int
 	Dim result As Int
-	Select state
-		Case "Normal"
-			result = STATE_NORMAL
-		Case "Warning"
-			result = STATE_WARNING
-		Case "Error"
-			result = STATE_ALARM
-		Case "Alarm"
-			result = STATE_ALARM
-		Case "Dimmed"
-			result = STATE_DISABLED
-		Case "Disabled"
-			result = STATE_DISABLED
+	Select status
+		Case STATUS_NORMAL
+			result = 0
+		Case STATUS_WARNING
+			result = 1
+		Case STATUS_ALARM
+			result = 2
+		Case STATUS_DISABLED
+			result = 3
 		Case Else
-			result = STATE_NORMAL
+			result = -1
 	End Select
 	Return result
 End Sub
@@ -801,8 +791,9 @@ End Sub
 ' HELPER CONVERSIONS
 ' ================================================================
 
-'Convert a color hex string to int.
-'The hex string must be 8. If length 6 then FF is set as prefix.
+' HexToColor
+' Convert a color hex string to int.
+' The hex string must be 8. If length 6 then FF is set as prefix.
 Public Sub HexToColor(hex As String) As Int	'ignore
 	Dim bc As ByteConverter
 	If hex.StartsWith("#") Then
@@ -828,10 +819,23 @@ Public Sub ColorToHexRGB(clr As Int) As String
 End Sub
 
 #if B4J
-Public Sub ColorXUIToFX(value As Int) As Paint
+Public Sub ColorToPaint(value As Int) As Paint
 	Return fx.Colors.From32Bit(xui.Color_White)
 End Sub
 #end if
+
+' SetTextColorCrossPlatform
+' Set B4XView textcolor using CSSUtils.
+' Example:
+' SetTextColorCrossPlatform(lblprimaryitem, "#202020")
+' SetTextColorCrossPlatform(lblprimaryitem, $"#${ColorToHexRGB(0xFFFF0000)}"$)
+Public Sub SetTextColorCrossPlatform(v As B4XView, colorHex As String)
+    #If B4J
+	CSSUtils.SetStyleProperty(v, "-fx-text-fill", colorHex)
+    #Else
+    v.TextColor = HexToColor(colorHex)
+    #End If
+End Sub
 
 ' Set text color safely (null-safe)
 Public Sub SetTextColor(lbl As B4XView, col As Int)
@@ -869,4 +873,3 @@ Public Sub ByteToUnsigned(b As Byte) As Int
 	Return Bit.And(0xFF, b)
 End Sub
 #End Region
-

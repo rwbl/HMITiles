@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			WaterTankSimulator
 ' Brief:		An interactive water tank PID simulator demonstrating selective HMITiles.
-' Date:			2026-01-09
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	WaterTankSimulator is a lightweight B4J demo application that simulates a controlled water tank process with input flow, tank level, and output flow.
 '				It showcases the practical use of HMITiles (SP/PV tiles, mini trends, and readouts).
@@ -44,7 +44,7 @@ Sub Class_Globals
 	' ================================================================
 	' APPLICATION METADATA
 	' ================================================================
-	Private VERSION As String	= "Water Tank Simulator v20260109"
+	Private VERSION As String	= "Water Tank Simulator v20260423"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2016 Robert W.B. Linn - MIT"$
 
 	' ================================================================
@@ -190,8 +190,8 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' SIMULATOR CONTROL BUTTON
 	' ================================================================
 	TileButtonOnOff.Title = "Simulator"
-	TileButtonOnOff.State = True
-	TileButtonOnOff_Click	' Apply initial state
+	TileButtonOnOff.Value = False
+	TileButtonOnOff_Click
 
 	' ================================================================
 	' INITIALIZE HISTORY BUFFERS
@@ -344,13 +344,18 @@ End Sub
 ' ================================================================
 ' SIMULATOR CONTROL BUTTON
 ' ================================================================
+
+' Show the action, not the state
+'| Current state | Button text |
+'| ------------- | ----------- |
+'| OFF / Stopped | **START**   |
+'| ON / Running  | **STOP**    |
 Private Sub TileButtonOnOff_Click
-	TileButtonOnOff.SetState(TileButtonOnOff.State)
-	TileButtonOnOff.StateText = IIf(TileButtonOnOff.State, "ON", "OFF")
-	TileEvents.Insert($"[TileButtonOnOff] state=${TileButtonOnOff.State}"$, HMITileUtils.EVENT_LEVEL_WARNING)
+	TileButtonOnOff.Value = Not(TileButtonOnOff.Value)
+	TileEvents.Insert($"[TileButtonOnOff] value=${TileButtonOnOff.value}"$, HMITileUtils.EVENT_LEVEL_WARNING)
 
 	' Start/stop simulation scan
-	TimerSimulator.Enabled = TileButtonOnOff.State
+	TimerSimulator.Enabled = TileButtonOnOff.Value
 End Sub
 
 ' ================================================================
@@ -373,7 +378,7 @@ End Sub
 
 Private Sub TileSPPVTankLevel_ValueChanged(Value As Float)
 	' Deviation alarm based on absolute deviation
-	If Abs(TileSPPVTankLevel.Deviation) > TileSPPVTankLevel.DeviationAlarm Then
+	If Abs(TileSPPVTankLevel.Deviation) > TileSPPVTankLevel.DeviationLimit Then
 		TileEvents.Insert($"[TileSPPVTankLevel_ValueChanged] value=${Value}"$, _
 			HMITileUtils.EVENT_LEVEL_ALARM)
 	End If

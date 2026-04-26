@@ -8,6 +8,4 @@ What's Inside
 
 Simply browse the subfolders to see a specific tile in action and copy the implementation logic into your own project.
 
-Work in progress to complete for all HMITiles.
-
 ---

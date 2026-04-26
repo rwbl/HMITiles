@@ -7,6 +7,6 @@ ModuleBreakpoints2=
 ModuleClosedNodes0=1,2,6
 ModuleClosedNodes1=
 ModuleClosedNodes2=1
-NavigationStack=B4XMainPage,B4XPage_Created,30,6,HMITileUtils,ByteToUnsigned,878,0,HMITileUtils,CopyLabelProps,848,0,HMITileUtils,ColorToHexARGB,815,0,B4XMainPage,Class_Globals,15,0,HMITileUtils,SetTextColorCrossPlatform,838,6,HMITileUtils,HexToColor,799,0,HMITileUtils,SetComfortState,798,0,Visual Designer,mainpage.bal,-100,6,HMITileUtils,ColorToHexRGB,821,0
+NavigationStack=B4XMainPage,B4XPage_Created,30,6,HMITileUtils,ByteToUnsigned,878,0,HMITileUtils,CopyLabelProps,848,0,HMITileUtils,ColorToHexARGB,815,0,B4XMainPage,Class_Globals,15,0,HMITileUtils,SetTextColorCrossPlatform,838,6,HMITileUtils,HexToColor,799,0,HMITileUtils,SetComfortState,798,0,HMITileUtils,ColorToHexRGB,821,0,Visual Designer,mainpage.bal,-100,6
 SelectedBuild=0
 VisibleModules=1

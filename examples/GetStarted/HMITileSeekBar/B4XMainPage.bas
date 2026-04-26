@@ -7,9 +7,9 @@ Version=9.85
 ' ================================================================
 ' File:			HMITileSeekBar
 ' Project:		HMITiles B4X library
-' Brief:		Get started with the HMITileSeekBar.
+' Brief:		Get started with HMITileSeekBar.
 ' Description:	Show usage of the HMITileSeekBar.
-' Date:			2026-04-19
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' ================================================================
 
@@ -28,7 +28,7 @@ End Sub
 Private Sub B4XPage_Created (Root1 As B4XView)
 	Root = Root1
 	Root.LoadLayout("MainPage")
-	B4XPages.SetTitle(Me, "HMITiles Library Get Started - HMITileSeekBar")
+	B4XPages.SetTitle(Me, "HMITileSeekBar")
 	
 	' ===================================================
 	' HMITiles

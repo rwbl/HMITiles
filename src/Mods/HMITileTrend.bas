@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:			HMITileTrend.bas
 ' Brief:    	CustomView HMITile with a title & mini trend chart (sparkline).
-' Date:			2025-12-25
+' Date:			2026-04-23
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Description:	HMITileTrend displays a mini trend line.
 '				Mini trends are used to answer:
@@ -71,13 +71,16 @@ Private Sub Class_Globals
 	Private LabelTitle As B4XView
 	Private PaneChart As B4XView
 
-	' Properties Designer
+	' Deisgner Properties
 	Private mTitle As String
 	Private mUnit As String
 	Private mShowBorder As Boolean
 	Private mAutoScale As Boolean
 	Private mScaleMin As Float
 	Private mScaleMax As Float
+
+	' Designer Class
+	Private mStatus As String
 	
 	' Chart
 	Private mChartCanvas As B4XCanvas
@@ -112,7 +115,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mScaleMax		= Props.GetDefault("ScaleMax", 100)
 	LabelTitle.Text = mTitle
 
-	ApplyStyle(HMITileUtils.STATE_NORMAL)
+	ApplyStatusStyle(HMITileUtils.STATUS_NORMAL)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -320,15 +323,44 @@ Public Sub getUnit As String
 	Return mUnit
 End Sub
 
+' --- Convenience helpers ---
+Public Sub StatusNormal(text As String)
+	setStatus(HMITileUtils.STATUS_NORMAL)
+End Sub
+
+Public Sub StatusWarning(text As String)
+	setStatus(HMITileUtils.STATUS_WARNING)
+End Sub
+
+Public Sub StatusAlarm(text As String)
+	setStatus(HMITileUtils.STATUS_ALARM)
+End Sub
+
+Public Sub StatusDisabled(text As String)
+	setStatus(HMITileUtils.STATUS_DISABLED)
+End Sub
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	ApplyStatusStyle(value)
+End Sub
+
+Public Sub getStatus As String
+	Return mStatus
+End Sub
+
 ' ================================================================
-' TILE STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region Tile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatustyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	' Trend
 	PaneChart.Color = HMITileUtils.COLOR_BACKGROUND_SCREEN

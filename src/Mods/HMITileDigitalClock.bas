@@ -9,7 +9,7 @@ Version=10.3
 ' File:     	HMITileDigitalClock.bas
 ' Brief:    	Customview digital clock HMITile (HH:MM or HH:MM:SS)
 ' Description:	Based on the HMITileLabel, but with label update via timer every second.
-' Date:			2026-01-04
+' Date:			2026-04-24
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' ================================================================
 #End Region
@@ -33,10 +33,14 @@ Private Sub Class_Globals
 
 	Private LabelText As B4XView
 
-	Private mClockTimer As Timer
-	Private mClockBlink As Boolean
+	' Properties Designer
 	Private mShowSeconds As Boolean
 	Private mBlinkColon As Boolean
+
+	' Properties Class
+	Private mClockTimer As Timer
+	Private mClockBlink As Boolean
+	Private mCurrentTime As Long
 End Sub
 
 Private Sub Initialize(Callback As Object, EventName As String)	'ignore
@@ -55,16 +59,18 @@ Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'igno
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Sub AfterLoadLayout(Props As Map)
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilelabel")
 
+	LabelText.Text = ""
+	
 	' Get the designer properties
-	mShowSeconds = Props.Get("ShowSeconds")
-	mBlinkColon = Props.Get("BlinkColon")
+	mShowSeconds	= Props.Get("ShowSeconds")
+	mBlinkColon		= Props.Get("BlinkColon")
 
 	' Resize to get the sizing right
 	Base_Resize(mBase.Width, mBase.Height)
-	ApplyStyle
+	ApplyStatusStyle
 	
 	StartClock
 End Sub
@@ -105,6 +111,11 @@ Public Sub getBlinkColon As Boolean
 	Return mBlinkColon
 End Sub
 
+' Get the current time as ticks
+Public Sub CurrentTime As Long
+	Return mCurrentTime
+End Sub
+
 ' Get or set the clock enabled
 Public Sub setEnabled(enabled As Boolean)
 	mBase.Enabled = enabled
@@ -116,12 +127,13 @@ End Sub
 #End Region
 
 ' ================================================================
-' Tile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region Tile Styling
-' ApplyStyle
-' Apply style Normal.
-Public Sub ApplyStyle
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Apply status style to Normal.
+Private Sub ApplyStatusStyle
 	HMITileUtils.ApplyValueStyle(LabelText)
 	
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
@@ -137,6 +149,7 @@ End Sub
 
 Private Sub UpdateClock
 	Dim now As Long = DateTime.Now
+	mCurrentTime = now
 	Dim h As Int = DateTime.GetHour(now)
 	Dim m As Int = DateTime.GetMinute(now)
 	Dim s As Int = DateTime.GetSecond(now)

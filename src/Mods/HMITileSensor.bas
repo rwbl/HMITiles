@@ -24,11 +24,11 @@ Version=10.3
 #End Region
 
 ' Designer properties
-#DesignerProperty: Key: TitleText, DisplayName: Title, FieldType: String, DefaultValue: Sensor
-#DesignerProperty: Key: ValueText, DisplayName: Value, FieldType: String, DefaultValue: --
-#DesignerProperty: Key: UnitText,  DisplayName: Unit,  FieldType: String, DefaultValue: 
-#DesignerProperty: Key: Icon,      DisplayName: Icon (FontAwesome), FieldType: String, DefaultValue: , Description: Set "F043" or "f043" (without 0x) or real character.
-#DesignerProperty: Key: TypeStyle, DisplayName: Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Title,	DisplayName: Title, FieldType: String, DefaultValue: Sensor
+#DesignerProperty: Key: Value,	DisplayName: Value, FieldType: String, DefaultValue: --
+#DesignerProperty: Key: Unit,	DisplayName: Unit,  FieldType: String, DefaultValue: 
+#DesignerProperty: Key: Icon,	DisplayName: Icon (FontAwesome), FieldType: String, DefaultValue: , Description: Set "F043" or "f043" (without 0x) or real character.
+#DesignerProperty: Key: Status, DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
 ' Events
 #Event: Click
@@ -52,10 +52,10 @@ Private Sub Class_Globals
 	Private LabelValue As B4XView
 
 	' Properties Designer
-	Private mValueText As String
+	Private mTitle As String
 	Private mValue As String
-	Private mUnitText As String
-	Private mTypeStyle As String
+	Private mUnit As String
+	Private mStatus As String
 	
 	' Properties (Class)
 End Sub
@@ -78,22 +78,22 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilesensor")
 
 	' Store designer properties
-	LabelTitle.Text = Props.Get("TitleText")
-	LabelIcon.Text  = Props.Get("Icon")
+	mTitle				= Props.Get("Title")
+	LabelTitle.Text 	= mTitle
+	LabelIcon.Text  	= Props.Get("Icon")
 	' Check to remove 0x tn case icon starts with
 	If LabelIcon.Text.ToLowerCase.Contains("0x") Then
 		LabelIcon.Text = LabelIcon.Text.ToLowerCase.Replace("0x","")
 	End If
-	LabelValue.Text = Props.Get("ValueText")
-	mValueText		= Props.Get("ValueText")
-	mValue 			= mValueText
-	mUnitText		= Props.Get("UnitText")
-	mTypeStyle		= Props.Get("TypeStyle")
+	mValue				= Props.Get("Value")
+	mUnit				= Props.Get("Unit")
+	setValue(mValue)
+	mStatus				= Props.Get("Status")
 
 	' Ensure the font is set to FA
 	setIcon(LabelIcon.Text)
 
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 
@@ -153,73 +153,79 @@ End Sub
 ' Value
 Public Sub setValue(value As String)
 	mValue = value
-	mValueText = mValue & mUnitText
-	LabelValue.Text = mValueText
+	LabelValue.Text = mValue & mUnit
 End Sub
 Public Sub getValue As String
 	Return mValue
 End Sub
 
 Public Sub setUnit(unit As String)
-	mUnitText = unit
-	mValueText = mValue & mUnitText
-	LabelValue.Text =  mValueText
+	mUnit = unit
+	LabelValue.Text =  mValue & mUnit
 End Sub
 Public Sub getUnit As String
-	Return mUnitText
+	Return mUnit
 End Sub
 
-Public Sub SetStyleNormal
-	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
+' --- Convenience helpers ---
+Public Sub StatusNormal
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
 
-Public Sub SetStyleWarning
-	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
+Public Sub StatusWarning
+	setStatus(HMITileUtils.STATUS_WARNING)
 End Sub
 
-Public Sub SetStyleAlarm
-	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
+Public Sub StatusAlarm
+	setStatus(HMITileUtils.STATUS_ALARM)
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+Public Sub StatusDisabled
+	setStatus(HMITileUtils.STATUS_DISABLED)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	mStatus = value
+	ApplyStatusStyle(value)
+End Sub
+
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 ' ================================================================
-' Tile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region HMITile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatustyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	LabelIcon.TextSize = HMITileUtils.TEXT_SIZE_ICON
 	LabelIcon.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
 	HMITileUtils.ApplyValueStyle(LabelValue)
 
-	Dim state As Int = HMITileUtils.StateStyleToState(tilestate)
 	Dim clr As Int = HMITileUtils.COLOR_TEXT_PRIMARY
-	' --- Apply State Colors ---
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			clr = HMITileUtils.COLOR_TEXT_PRIMARY
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			clr = HMITileUtils.COLOR_TILE_WARNING_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			clr = HMITileUtils.COLOR_TILE_ALARM_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			clr = HMITileUtils.COLOR_TILE_DISABLED_TEXT
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select

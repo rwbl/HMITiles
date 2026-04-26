@@ -55,8 +55,8 @@ Private Sub TileReadoutsSetProperties
 	' Set the unit
 	TileReadout2.Unit = "°C"
 
-	' Set type style to alarm
-	TileReadout3.SetStyleAlarm
+	' Set status to alarm
+	TileReadout3.StatusAlarm
 End Sub
 
 

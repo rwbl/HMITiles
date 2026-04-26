@@ -78,7 +78,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	LabelText.Text	= Props.Get("Text")
 	mSelectType 	= Props.Get("SelectType")
 
-	ApplyStyle(HMITileUtils.TYPESTYLE_NORMAL)
+	ApplyStyle(HMITileUtils.STATUS_NORMAL)
 	Base_Resize(mBase.Width, mBase.Height)
 End Sub
 

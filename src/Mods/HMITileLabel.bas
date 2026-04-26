@@ -33,13 +33,13 @@ Version=10.3
 #End Region
 
 ' Views
-#DesignerProperty: Key: LabelText, DisplayName: Text, FieldType: String, DefaultValue: Label
-#DesignerProperty: Key: TypeStyle, DisplayName: Type Style, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Text, DisplayName: Text, FieldType: String, DefaultValue: Label
+#DesignerProperty: Key: Status, DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 
 ' Events
 #Event: Click
 
-Sub Class_Globals
+Private Sub Class_Globals
 	' Base
 	Public mBase As B4XView
 	Public mLbl As B4XView
@@ -53,11 +53,11 @@ Sub Class_Globals
 	Private xui As XUI 'ignore
 	Private LabelText As B4XView
 
-	' Properties (designer)
-	Private mTypeStyle As String
-	
-	' Properties (class)
-	Private mState As Boolean = False
+	' Properties Designer
+	Private mText As String
+	Private mStatus As String
+
+	' properties Class
 End Sub
 
 Public Sub Initialize (Callback As Object, EventName As String)
@@ -75,12 +75,14 @@ Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
-Sub AfterLoadLayout(Props As Map)	'ignore
+Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBase.LoadLayout("hmitilelabel")
-	LabelText.Text = Props.Get("LabelText")
-	mTypeStyle = Props.Get("TypeStyle")
+	
+	mText			= Props.Get("Text")
+	LabelText.Text	= mText
+	mStatus 		= Props.Get("Status")
 	Base_Resize(mBase.Width, mBase.Height)
-	ApplyStyle(mTypeStyle)
+	ApplyStatusStyle(mStatus)
 End Sub
 
 Private Sub Base_Resize (Width As Double, Height As Double)
@@ -110,14 +112,6 @@ Public Sub getEnabled As Boolean
 	Return mBase.Enabled
 End Sub
 
-Public Sub setState(state As Boolean)
-	mState = state
-	HMITileUtils.ApplyStyleStateOnOff(mBase, LabelText, state)
-End Sub
-Public Sub getState As Boolean
-	Return mState
-End Sub
-
 ' Set the font of the label to fontawesome.
 Public Sub SetFontAwesome(large As Boolean)
 	If large Then
@@ -132,59 +126,61 @@ Public Sub SetFontDefault
 	LabelText.Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_STATE)
 End Sub
 
-Public Sub SetNormal(text As String)
-	setText(text)
-	setTypeStyle(HMITileUtils.TYPESTYLE_NORMAL)
+' --- Convenience helpers ---
+Public Sub StatusNormal(text As String)
+	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
 
-Public Sub SetWarning(text As String)
-	setText(text)
-	setTypeStyle(HMITileUtils.TYPESTYLE_WARNING)
+Public Sub StatusWarning(text As String)
+	setStatus(HMITileUtils.STATUS_WARNING)
 End Sub
 
-Public Sub SetAlarm(text As String)
-	setText(text)
-	setTypeStyle(HMITileUtils.TYPESTYLE_ALARM)
+Public Sub StatusAlarm(text As String)
+	setStatus(HMITileUtils.STATUS_ALARM)
 End Sub
 
-Public Sub setTypeStyle(value As String)
-	mTypeStyle = value
-	ApplyStyle(mTypeStyle)
+Public Sub StatusDisabled(text As String)
+	setStatus(HMITileUtils.STATUS_DISABLED)
 End Sub
-Public Sub getTypeStyle As String
-	Return mTypeStyle
+
+' --- Core property ---
+Public Sub setStatus(value As String)
+	ApplyStatusStyle(value)
+End Sub
+Public Sub getStatus As String
+	Return mStatus
 End Sub
 
 ' ================================================================
-' HMITile STYLING
+' TILE STATUSSTYLE
 ' ================================================================
-#Region HMITile Styling
-' ApplyStyle
-' Apply one of the 4 styles Normal, Warning, Alarm, Disabled
+
+#Region StatusStyle
+' ApplyStatusStyle
+' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
 ' Parameters:
-'	tilestate String - Use HMITileUtils constants STATE_NORMAL, STATE_WARNING, STATE_ALARM, STATE_DISABLED
-Public Sub ApplyStyle(tilestate As String)
-
-	Dim state As String = HMITileUtils.StateStyleToState(tilestate)
-
+'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
+Private Sub ApplyStatusStyle(status As String)
+	mStatus = status
+	
 	' Default text properties
 	LabelText.TextSize = HMITileUtils.TEXT_SIZE_TITLE
 	LabelText.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
-	' --- Apply State Colors ---
-	Select state
-		Case HMITileUtils.STATE_NORMAL
+
+	Select status
+		Case HMITileUtils.STATUS_NORMAL
 			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 			LabelText.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
 
-		Case HMITileUtils.STATE_WARNING
+		Case HMITileUtils.STATUS_WARNING
 			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 			LabelText.TextColor = HMITileUtils.COLOR_TEXT_WARNING
 
-		Case HMITileUtils.STATE_ALARM
+		Case HMITileUtils.STATUS_ALARM
 			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 			LabelText.TextColor = HMITileUtils.COLOR_TEXT_ERROR
 
-		Case HMITileUtils.STATE_DISABLED
+		Case HMITileUtils.STATUS_DISABLED
 			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 			LabelText.TextColor = HMITileUtils.COLOR_TEXT_DISABLED
 	End Select
