@@ -91,9 +91,11 @@ All tiles share a **unified styling and state model**.
 
 ## Screenshots
 
-![Overview Dashboard](images/overview_dashboard.png "Overview Dashboard")
-![Water Tank Simulator](images/water_tank_simulator.png "Water Tank Simulator")
-![ESP32 BLE LED](images/esp32_ble_led.png "ESP32 BLE LED")
+![Overview Dashboard](images/overview_dashboard.png "Overview Dashboard") 
+
+![Water Tank Simulator](images/water_tank_simulator.png "Water Tank Simulator") 
+
+![ESP32 BLE LED](images/esp32_ble_led.png "ESP32 BLE LED") 
 
 ---
 
@@ -162,7 +164,7 @@ HMITiles are standard **B4X CustomViews** and can be placed directly in the Desi
 
 ### 4. Initialize in Code
 
-```b4x
+```
 Sub Class_Globals
     Private HMITileButtonOnOff As HMITileButton
 End Sub
@@ -176,7 +178,9 @@ End Sub
 ---
 
 ### 5. Handle Click Event
-```Private Sub HMITileButtonOnOff_Click
+
+```
+Private Sub HMITileButtonOnOff_Click
     HMITileButtonOnOff.SetState(HMITileButtonOnOff.State)
     HMITileButtonOnOff.StateText = IIf(HMITileButtonOnOff.State, "ON", "OFF")
 End Sub
