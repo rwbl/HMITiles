@@ -166,12 +166,26 @@ HMITiles are standard **B4X CustomViews** and can be placed directly in the Desi
 
 ```
 Sub Class_Globals
-    Private HMITileButtonOnOff As HMITileButton
+	Private xui As XUI
+	Private Root As B4XView
+	Private TileButtonOnOff As HMITileButton
+End Sub
+
+Public Sub Initialize
+	B4XPages.GetManager.LogEvents = True
 End Sub
 
 Private Sub B4XPage_Created (Root1 As B4XView)
-    HMITileButtonOnOff.State = False
-    HMITileButtonOnOff.StateText = "OFF"
+	Root = Root1
+	Root.LoadLayout("MainPage")
+	B4XPages.SetTitle(Me, "HMITileButton")
+	
+	' HMITiles
+	' Sleep must be set to enable customviews load designer layouts
+	Sleep(1)	
+	
+	' Button On Off
+	TileButtonOnOff.Value = False
 End Sub
 ```
 
@@ -180,9 +194,17 @@ End Sub
 ### 5. Handle Click Event
 
 ```
-Private Sub HMITileButtonOnOff_Click
-    HMITileButtonOnOff.SetState(HMITileButtonOnOff.State)
-    HMITileButtonOnOff.StateText = IIf(HMITileButtonOnOff.State, "ON", "OFF")
+Private Sub TileButtonOnOff_Click
+	' Reverse the button state
+	TileButtonOnOff.Value = Not(TileButtonOnOff.Value)
+	' Take action according button state:
+	If TileButtonOnOff.Value Then
+		' Do something
+	Else
+		' Do something else
+	End If
+	' Log to the B4J IDE
+	Log($"[TileButtonOnOff] value=${TileButtonOnOff.value}"$)
 End Sub
 ```
 
