@@ -102,7 +102,7 @@ Version=10.3
 
 #DesignerProperty: Key: Title,  	DisplayName: Title,  FieldType: String, DefaultValue: Title
 ' Functional state
-#DesignerProperty: Key: Value,  	DisplayName: Value,  FieldType: Boolean, DefaultValue: True
+#DesignerProperty: Key: Value,  	DisplayName: Value,  FieldType: Boolean, DefaultValue: False
 ' Semantic / visual state
 #DesignerProperty: Key: Status, 	DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
 #DesignerProperty: Key: OnText, 	DisplayName: On Text, FieldType: String, DefaultValue: On

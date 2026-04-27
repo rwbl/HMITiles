@@ -10,7 +10,7 @@ Version=10.3
 ' Brief:    	Customview HMITile timer (HH:MM:SS, MM:SS, SS)
 ' Description:	Stopwatch (Counter) with up & down direction.
 '				Display formats: HH:MM:SS (Full), HH:MM (Short) or Seconds.
-' Date:			2026-04-23
+' Date:			2026-04-26
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' ================================================================
 #End Region
@@ -20,7 +20,7 @@ Version=10.3
 #DesignerProperty: Key: DisplayFormat, DisplayName: Display Format, FieldType: String, List: HH:MM:SS|HH:MM|Seconds, DefaultValue: HH:MM:SS, Description: Counter display format
 #DesignerProperty: Key: Mode, DisplayName: Mode, FieldType: String, List: UP|DOWN, DefaultValue: DOWN, Description: Mode counting up or down 
 #DesignerProperty: Key: StartValue, DisplayName: Start Value, FieldType: Int, DefaultValue: 5, Description: Timer start value in seconds. If count up, start value must be greater stop value.
-#DesignerProperty: Key: StopValue, DisplayName: Stop Value, FieldType: Int, DefaultValue: 0, Description: Timer stop value in seconds.  If count down, start value must be greater stop value.
+#DesignerProperty: Key: StopValue, DisplayName: Stop Value, FieldType: Int, DefaultValue: 0, Description: Timer stop value in seconds. If count down, start value must be greater stop value.
 
 ' Events
 #Event: Start
@@ -189,6 +189,14 @@ Public Sub setDisplayFormat(format As String)
 End Sub
 Public Sub getDisplayFormat As String
 	Return mDisplayFormat
+End Sub
+
+' Get or set the label timer text size
+Public Sub setTimerTextSize(value As Double)
+	LabelTimer.TextSize = value
+End Sub
+Public Sub getTimerTextSize As Double
+	Return LabelTimer.TextSize
 End Sub
 #End Region
 

@@ -7,6 +7,6 @@ ModuleBreakpoints2=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
 ModuleClosedNodes2=
-NavigationStack=B4XMainPage,TileSPPV2_SetPointChanged,234,0,B4XMainPage,TileSelect_ValueChanged,266,0,B4XMainPage,TileRGBHorizontal_ValueChanged,153,0,B4XMainPage,TileSeekBar_ValueChanged,166,2,B4XMainPage,TileEventViewer_ItemClick,201,0,B4XMainPage,TileListAddItems,204,0,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,B4XPage_Created,52,5,B4XPage2,Class_Globals,0,0,B4XMainPage,Class_Globals,16,2
+NavigationStack=B4XMainPage,TileSPPV2_SetPointChanged,234,0,B4XMainPage,TileSelect_ValueChanged,266,0,B4XMainPage,TileRGBHorizontal_ValueChanged,153,0,B4XMainPage,TileSeekBar_ValueChanged,166,2,B4XMainPage,TileEventViewer_ItemClick,201,0,B4XMainPage,TileListAddItems,204,0,B4XMainPage,B4XPage_Created,52,5,B4XPage2,Class_Globals,0,0,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,Class_Globals,16,3
 SelectedBuild=0
 VisibleModules=1,2

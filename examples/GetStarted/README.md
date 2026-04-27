@@ -9,3 +9,12 @@ What's Inside
 Simply browse the subfolders to see a specific tile in action and copy the implementation logic into your own project.
 
 ---
+
+## Platform Notes
+
+Most examples are available for **B4J**.  
+Selected examples are also provided for **B4A**, but coverage is not yet complete.
+
+Additional B4A examples may be added over time.
+
+---

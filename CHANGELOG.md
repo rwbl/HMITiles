@@ -6,20 +6,29 @@ The project follows semantic versioning where possible.
 
 ---
 
+## [1.8.0] - 2026-04-27
+- NEW: HMITileCustom - Create custom tile by adding views to an empty tile
+- NEW: HMITileLevelIndicator - Generic visual level indicator (circle) 0-100%
+- NEW: Examples GetStarted - HMITileCustom (create own tile); Advanced Customization (first example; in progress)
+- UPD: HMITileStatusIndicators - Border color set to HMITile background color
+- UPD: Examples - Minor changes.
+
 ## [1.7.0] - 2026-04-26
-- NEW: Examples GetStarted - For all HMITiles examples created
-- NEW: HMITileEventViewer - Method GetEvents to get list of events with map items Timestamp, Level, Event; Logging with level (int) & event (string); List item value map Timestamp, Level, Event instead string item.
-- NEW: HMITileList - Property SelectedItemIndex to set or get the index of the item selected
-- NEW: HMITileGauge - Event Click with gauge value (float)
-- NEW: HMITileTimer - Property TimerTextSize to set or get the text size of the timer label. Use f.e. with Linux because different rendering
-- UPD: All HMITiles - Changed property State to Value = functional (ON/OFF, number, text); Status = semantic/visual (Normal, Warning, Alarm, Disabled)
-- UPD: All HMITiles - Fixed bugs found whilst developing these examples; added several HMITile API methods.
-- UPD: All Examples - Apply property change to Value and Status
-- UPD: B4A Examples - Reworked BLEScanner, ESP32BLELED (replaced BLE library rBLEServer to rNimBLEServer)
-- UPD: HMITileEventViewer - List item value set map Timestamp, Level, Event instead string item
-- UPD: HMITileImage - Improved resize mode (less blur)
-- FIX: HMITileReadout - Get value if set via designer property
-- FIX: HMITileSelect, HMITileSelectList, HMITileList - Textcolor set using CSSUtils to ensure right textcolor on Linux
+- NEW: Examples GetStarted - Examples created for all HMITiles components
+- NEW: HMITileEventViewer - Method `GetEvents` returns a list of events (Map: Timestamp, Level, Event); logging supports level (Int) and event (String)
+- NEW: HMITileList - Property `SelectedItemIndex` to set and get the selected item index
+- NEW: HMITileGauge - Click event with gauge value (Float)
+- NEW: HMITileTimer - Property `TimerTextSize` to set and get the timer label text size (useful for Linux rendering differences)
+- UPD: All HMITiles - Reworked property model:  
+  `Value` = functional (ON/OFF, number, text)  
+  `Status` = semantic/visual (Normal, Warning, Alarm, Disabled)
+- UPD: All HMITiles - Various bug fixes and API improvements
+- UPD: All Examples - Updated to use `Value` and `Status` properties
+- UPD: B4A Examples - Reworked BLEScanner and ESP32BLELED (replaced BLE library `rBLEServer` with `rNimBLEServer`)
+- UPD: HMITileEventViewer - List item values now stored as Map (Timestamp, Level, Event) instead of String
+- UPD: HMITileImage - Improved resize mode (reduced blur)
+- FIX: HMITileReadout - Correctly returns value when set via Designer property
+- FIX: HMITileSelect, HMITileSelectList, HMITileList - Text color set using CSSUtils to ensure correct rendering on Linux
 
 ## [1.6.1] - 2026-04-17
 - NEW: HMITileTimer - Counter UP or DOWN

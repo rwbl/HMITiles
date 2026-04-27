@@ -4,6 +4,6 @@ ModuleBreakpoints0=
 ModuleBreakpoints1=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
-NavigationStack=Main,AppStart,13,5,B4XMainPage,Initialize,115,0,B4XMainPage,SimulatorStep,223,5,B4XMainPage,TileSPPVTankLevel_ValueChanged,368,6,B4XMainPage,B4XPage_Created,187,6,B4XMainPage,Class_Globals,109,4,B4XMainPage,TimerSimulator_Tick,203,0,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,TileButtonOnOff_Click,346,6,B4XMainPage,PID_Control,342,4
+NavigationStack=Main,AppStart,13,5,B4XMainPage,Initialize,115,0,B4XMainPage,TileSPPVTankLevel_ValueChanged,368,6,B4XMainPage,TimerSimulator_Tick,203,0,B4XMainPage,TileButtonOnOff_Click,356,6,B4XMainPage,PID_Control,299,4,B4XMainPage,B4XPage_Created,124,6,B4XMainPage,Class_Globals,62,4,Visual Designer,mainpage.bjl,-100,6,B4XMainPage,SimulatorStep,252,6
 SelectedBuild=0
 VisibleModules=1

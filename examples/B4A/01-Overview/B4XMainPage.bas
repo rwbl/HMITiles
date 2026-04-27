@@ -20,7 +20,7 @@ Version=9.85
 #End Region
 
 Private Sub Class_Globals
-	Private VERSION As String	= "Overview v20260423"
+	Private VERSION As String	= "HMITiles Overview v20260427"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -47,15 +47,17 @@ Private Sub Class_Globals
 	Private TileSelectList As HMITileSelectList
 	Private TileTrend As HMITileTrend
 	Private TileGauge As HMITileGauge
+	Private TileLevelIndicator As HMITileLevelIndicator
 	Private TileDigitalClock As HMITileDigitalClock
 	Private TileSensor As HMITileSensor
 	Private TileButtonFA As HMITileButton
 	Private TileButtonFA2 As HMITileButton
 	Private TileStatusIndicators As HMITileStatusIndicators
+	Private TileTimer As HMITileTimer
+	Private TileCustom As HMITileCustom
 	
 	' Pages
 	Private Page2 As B4XPage2
-	Private TileTimer As HMITileTimer
 End Sub
 
 Public Sub Initialize
@@ -87,50 +89,57 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	B4XPages.GetNativeParent(Me).Resizable = False
 	#End If
 	LabelAbout.Text = ABOUT
+	LabelAbout.TextColor = HMITileUtils.COLOR_TEXT_WARNING
 
 	' Ensure to set sleep prior calling customviews
 	Sleep(1)
 
-	' Label Fontawesome
-	TileLabelFontAwesome.SetFontAwesome(True)
-	TileLabelFontAwesome.Text = Chr(0xF256)
-	
-	' Digital Clock
-	TileDigitalClock.ShowSeconds = True
-	
 	' Eventviewer
 	TileEventViewer.CompactMode = False
 	TileEventViewer.TimeStamp = False
 	TileEventViewer.Insert(VERSION, HMITileUtils.EVENT_LEVEL_INFO)
 
+	' Label Fontawesome
+	TileLabelFontAwesome.SetFontAwesome(True)
+	TileLabelFontAwesome.Text = Chr(0xF256)
+
+	' Digital Clock
+	TileDigitalClock.ShowSeconds = True
+	
 	' OnOff Button
 	TileButtonOnOff.Value = True
 	TileButtonOnOff_Click
-
-	' Alarm Button
-	TileButtonAlarm.Value = False
-	TileButtonAlarm_Click
 	
 	' Toggle Button
 	TileButtonToggle.ValueFontFontAwesome
-	TileButtonFA.OnText = HMITileUtils.ICON_ON
-	TileButtonFA.OffText = HMITileUtils.ICON_OFF
-	TileButtonToggle.Value = True
+	TileButtonToggle.OnText = HMITileUtils.ICON_ON
+	TileButtonToggle.OffText = HMITileUtils.ICON_OFF
+	TileButtonToggle.Value = False
 	TileButtonToggle_Click
+
+	' Toggle Button Alarm
+	TileButtonAlarm.Value = False	
+	TileButtonAlarm_Click
 
 	' Button FA
 	TileButtonFA.ValueFontFontAwesome
 	TileButtonFA.OnText = Chr(0xF061)
 	TileButtonFA.OffText = Chr(0xF061)
+	TileButtonFA.Value = True
+
 	TileButtonFA2.ValueFontFontAwesome
-	TileButtonFA2.OnText = Chr(0xF021)
-	TileButtonFA2.OffText = Chr(0xF021)
+	TileButtonFA2.OnText = HMITileUtils.ICON_REFRESH
+	TileButtonFA2.OffText = HMITileUtils.ICON_REFRESH
+	TileButtonFA2.Value = True
 
 	' Readout
 	TileReadOut.Value = 67
 	
-	' LevelIndicator
+	' Level Indicators
+	TileGauge.Value = 40
 	TileLevel.Value = 25
+	TileLevelIndicator.Value = 67
+	' TileLevelIndicator.LevelColor = xui.color_blue
 
 	' SeekBars 
 	TileSeekBarIndicator.Vertical = True
@@ -143,6 +152,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	
 	' List
 	TileListAddItems
+	TileList.SelectedItemIndex = 2
 	
 	' SPPV
 	TileSPPV1.DeviationLimit = 10
@@ -165,10 +175,16 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	
 	' StatusIndicators
 	' Total 9 status indicators - 
-	TileStatusIndicators.SetData(1, 1, "P1", "Pump 1 Feed C-1101", TileStatusIndicators.STATUS_FALSE, True)
-	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.STATUS_DISABLED, True)
-	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.STATUS_TRUE, True)
-	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.STATUS_FALSE, True)
+	TileStatusIndicators.SetData(1, 1, "P1", "Pump 1 Feed C-1101", TileStatusIndicators.Status_FALSE, True)
+	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.Status_DISABLED, True)
+	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.Status_TRUE, True)
+	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.Status_FALSE, True)
+	
+	' Timer
+	TileTimer.TimerTextSize = 22
+	
+	' Custom Tile
+	TileCustomCreate
 End Sub
 
 ' ================================================================
@@ -184,7 +200,7 @@ End Sub
 
 Private Sub TileButtonOnOff_Click
 	TileButtonOnOff.Value = Not(TileButtonOnOff.Value)
-	TileEventViewer.Insert($"[TileButtonOnOff] state=${TileButtonOnOff.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileEventViewer.Insert($"[TileButtonOnOff] value=${TileButtonOnOff.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] ${TileEventViewer.StatusSummary}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] slidermax=${TileSeekBarIndicator.MaxValue}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileSeekBar.ShowValue = Not(TileSeekBar.ShowValue)
@@ -193,7 +209,7 @@ End Sub
 ' Button with fontawesome looks like a toggle switch.
 Private Sub TileButtonToggle_Click
 	TileButtonToggle.Value = Not(TileButtonToggle.Value)
-	TileEventViewer.Insert($"[TileButtonToggle] state=${TileButtonToggle.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileEventViewer.Insert($"[TileButtonToggle] value=${TileButtonToggle.value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	
 	If TileButtonToggle.Value Then
 		TileTrend.Clear
@@ -235,6 +251,7 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	TileReadOut.Value = value
 	TileLevel.Value = value
 	TileGauge.Value = value
+	TileLevelIndicator.Value = value
 	TileSensor.Value = value
 	TileSeekBarIndicator.Value = value
 	TileSeekBarIndicator2.Value = value
@@ -243,12 +260,14 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	If value > 90 Then
 		TileReadOut.StatusAlarm
 		TileLevel.StatusAlarm
+		TileLevelIndicator.StatusAlarm
 		TileGauge.StatusAlarm
 		TileSensor.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else if value > 70 Then
 		TileReadOut.StatusWarning
 		TileLevel.StatusWarning
+		TileLevelIndicator.StatusWarning
 		TileGauge.StatusWarning
 		TileSensor.StatusWarning
 		level = HMITileUtils.EVENT_LEVEL_WARNING
@@ -258,6 +277,7 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	Else
 		TileReadOut.StatusNormal
 		TileLevel.StatusNormal
+		TileLevelIndicator.StatusNormal
 		TileGauge.StatusNormal
 		TileSensor.StatusNormal
 		level = HMITileUtils.EVENT_LEVEL_INFO
@@ -272,6 +292,7 @@ End Sub
 
 Private Sub TileEventViewer_ItemClick (Index As Int, Value As Object)
 	Log($"[TileEventViewer_ItemClick] index=${Index}, value=${Value}"$)
+	' Log(TileEventViewer.GetEvents)
 End Sub
 
 ' ================================================================
@@ -291,8 +312,8 @@ Private Sub TileListAddItems
 	TileList.Add($"${"item"} ${i}"$, "", i)
 End Sub
 
-Private Sub TileListCommands_ItemClick (Index As Int, Value As Object)
-	TileEventViewer.Insert($"[TileListCommands_ItemClick] index=${Index}, value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+Private Sub TileList_ItemClick (Index As Int, Value As Object)
+	TileEventViewer.Insert($"[TileList_ItemClick] index=${Index}, value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub
 
 ' ================================================================
@@ -347,7 +368,7 @@ Private Sub TileSelect_ValueChanged (Value As Object)
 End Sub
 
 ' ================================================================
-' SELECT
+' TIMER
 ' ================================================================
 
 Private Sub TileTimer_Start
@@ -366,9 +387,66 @@ End Sub
 ' ================================================================
 ' STATUSINDICATORS
 ' ================================================================
+
 Private Sub TileStatusIndicators_Click(data As IndicatorData)
 	Dim indicator As HMITileStatusIndicators = Sender
 	TileEventViewer.Insert($"[TileStatusIndicators] ${data}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	Dim sf As Object = xui.Msgbox2Async($"${indicator.GetStatusText(data.Status)}${CRLF}${data.description}"$, $"Status ${data.text}"$, "OK", "", "", Null)
+	Dim sf As Object = xui.Msgbox2Async( _ 
+		$"${data.description}${CRLF}Status:${CRLF}${indicator.GetStatusText(data.Status)}"$, $"Indicator ${data.text}"$, "OK", "", "", Null)
 	Wait For (sf) Msgbox_Result (Result As Int)
+End Sub
+
+' ================================================================
+' GAUGE
+' ================================================================
+
+Private Sub TileGauge_Click (Value As Float)
+	TileEventViewer.Insert($"[TileGauge] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' READOUT
+' ================================================================
+
+Private Sub TileReadOut_Click
+	TileEventViewer.Insert($"[TileReadOut] value=${TileReadOut.value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' LEVELINDICATOR
+' ================================================================
+
+Private Sub TileLevelIndicator_Click (Value As Float)
+	TileEventViewer.Insert($"[TileLevelIndicator] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' TileCustom
+' ================================================================
+
+' Create customized tile starting with empty pane.
+' Added are 4 labels (B4XViews) top-down.
+Private Sub TileCustomCreate
+	Dim left As Double 
+	Dim top As Double
+	Dim width As Double
+	Dim height As Double
+	Dim heightfactor As Double = 0.25
+
+	' Create 4 labels
+	Dim lbls(4) As B4XView
+	Dim titles() As String = Array As String("Custom Tile", "Info 1", "Info 2", "Footer")
+	For i = 0 To 3
+		lbls(i)		= XUIViewsUtils.CreateLabel
+		lbls(i).Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_LABEL)
+		lbls(i).SetTextAlignment("CENTER", "CENTER")
+		lbls(i).TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
+		lbls(i).Text = $"${titles(i)}"$
+		left = HMITileUtils.PADDING
+		top = (i * heightfactor) * TileCustom.mBase.Height
+		width = TileCustom.mBase.Width - (HMITileUtils.PADDING * 2)
+		height = TileCustom.mBase.Height * heightfactor
+		' Add label to the base
+		TileCustom.mBase.AddView(lbls(i), left, top, width, height)
+	Next
 End Sub

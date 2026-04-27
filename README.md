@@ -64,6 +64,7 @@ All tiles share a **unified styling and state model**.
 | ----------------------------- | --------------------------------------------------------------------------- |
 | **HMITileButton**             | Configurable button tile with styling, icons, and click handling.           |
 | **HMITileClock**              | Analog clock tile with customizable hands and appearance.                   |
+| **HMITileCustom**             | Create own custom tile with views.                                          |
 | **HMITileDigitalClock**       | Digital clock tile with flexible time and date formats.                     |
 | **HMITileEventViewer**        | Scrollable event/log viewer for real-time messages.                         |
 | **HMITileGauge**              | Circular or linear gauge for visualizing numeric values.                    |
@@ -72,6 +73,7 @@ All tiles share a **unified styling and state model**.
 | **HMITileImageIcon**          | Image-based icon tile with basic interaction support.                       |
 | **HMITileLabel**              | Text label tile with styling and alignment options.                         |
 | **HMITileLevel**              | Level indicator (e.g., tank/bar) showing percentage or value.               |
+| **HMITileLevelIndicator**     | generic visual level with a circle showing level percentage 0-100%.         |
 | **HMITileList**               | List display tile for dynamic or selectable items.                          |
 | **HMITileNavButton**          | Navigation button tile for switching views or pages.                        |
 | **HMITileReadout**            | Numeric or text readout tile for process or system values.                  |
@@ -91,11 +93,13 @@ All tiles share a **unified styling and state model**.
 
 ## Screenshots
 
-![Overview Dashboard](images/overview_dashboard.png "Overview Dashboard") 
+![Overview](images/overview_b4j.png "Overview Dashboard") 
 
-![Water Tank Simulator](images/water_tank_simulator.png "Water Tank Simulator") 
+![Water Tank Simulator](images/water_tank_simulator_b4j.png "Water Tank Simulator") 
 
 ![ESP32 BLE LED](images/esp32_ble_led.png "ESP32 BLE LED") 
+
+![HomeKit32](images/homekit32.png "HomeKit32") 
 
 ---
 

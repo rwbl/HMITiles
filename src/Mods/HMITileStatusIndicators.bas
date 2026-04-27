@@ -8,13 +8,13 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileStatusIndicators.bas
 ' Brief:    	Customview 3x3 Responsive HMI Indicator Tile
+' Date:			2026-04-27
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Display 3x3 matrix with squares.
 '				Each square represents the status of an object.
 '				The object could like a device, motor, pump, filter etc.
 '				Implements industry-standard grayscale coloring for True (Light Gray), False (Dark Gray), and Disabled (Medium Gray) states to reduce operator fatigue.
 '				HMITileUtils.TILE_DEFAULT_SIZE constant (120px) it's a critical "Safety Guardrail" that prevents the UI from breaking when the user resizes the window too small.
-' Date:			2026-04-23
-' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Notes:		-Responsive Layout: Uses a Base_Resize logic with Floor calculations and "Edge-Stretching" to eliminate 1-pixel rounding gaps between indicators.
 '				-Coordinate Mapping: Converts 1-based Row/Col inputs To 0-based Array indices using the formula: idx = (row - 1) * COLS + (col - 1).
 '				-Implements industry-standard grayscale coloring For True (Light Gray), False (Dark Gray), And Disabled (Medium Gray) states To reduce operator fatigue.
@@ -161,7 +161,8 @@ Private Sub CreateStatusIndicators
 		LabelStatusIndicators(i).Tag = data
 		LabelStatusIndicators(i).Text = data.Text
 		LabelStatusIndicators(i).SetTextAlignment("CENTER", "CENTER")
-		LabelStatusIndicators(i).SetColorAndBorder(mColorDisabled, 1dip, HMITileUtils.COLOR_BORDER_DEFAULT, 0)
+		LabelStatusIndicators(i).SetColorAndBorder(mColorDisabled, 1dip, HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND, 0)
+		' LabelStatusIndicators(i).SetColorAndBorder(mColorDisabled, 1dip, HMITileUtils.COLOR_BORDER_DEFAULT, 0)
 		LabelStatusIndicators(i).TextColor = mTextColorDisabled
 	Next
 End Sub
@@ -306,6 +307,7 @@ End Sub
 ' ================================================================
 ' Tile STYLING
 ' ================================================================
+
 #Region Tile Styling
 ' ApplyStyle
 ' Apply style Normal.
@@ -313,6 +315,7 @@ Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 
 	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
 	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
@@ -347,4 +350,3 @@ End Sub
 ' ================================================================
 ' HELPER
 ' ================================================================
-

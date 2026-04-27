@@ -20,7 +20,7 @@ Version=9.85
 #End Region
 
 Private Sub Class_Globals
-	Private VERSION As String	= "Overview v20260426"
+	Private VERSION As String	= "HMITiles Overview v20260427"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -47,15 +47,17 @@ Private Sub Class_Globals
 	Private TileSelectList As HMITileSelectList
 	Private TileTrend As HMITileTrend
 	Private TileGauge As HMITileGauge
+	Private TileLevelIndicator As HMITileLevelIndicator
 	Private TileDigitalClock As HMITileDigitalClock
 	Private TileSensor As HMITileSensor
 	Private TileButtonFA As HMITileButton
 	Private TileButtonFA2 As HMITileButton
 	Private TileStatusIndicators As HMITileStatusIndicators
+	Private TileTimer As HMITileTimer
+	Private TileCustom As HMITileCustom
 	
 	' Pages
 	Private Page2 As B4XPage2
-	Private TileTimer As HMITileTimer
 End Sub
 
 Public Sub Initialize
@@ -87,6 +89,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	B4XPages.GetNativeParent(Me).Resizable = False
 	#End If
 	LabelAbout.Text = ABOUT
+	LabelAbout.TextColor = HMITileUtils.COLOR_TEXT_WARNING
 
 	' Ensure to set sleep prior calling customviews
 	Sleep(1)
@@ -132,8 +135,11 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' Readout
 	TileReadOut.Value = 67
 	
-	' LevelIndicator
+	' Level Indicators
+	TileGauge.Value = 40
 	TileLevel.Value = 25
+	TileLevelIndicator.Value = 67
+	' TileLevelIndicator.LevelColor = xui.color_blue
 
 	' SeekBars 
 	TileSeekBarIndicator.Vertical = True
@@ -173,6 +179,12 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	TileStatusIndicators.SetData(1, 3, "P3", "Pump 3 Slurry C-1101", TileStatusIndicators.Status_DISABLED, True)
 	TileStatusIndicators.SetData(2, 1, "F4", "Filter 4 Water Treatment I", TileStatusIndicators.Status_TRUE, True)
 	TileStatusIndicators.SetData(3, 3, "F9", "Filter 9 Water Treatment II ", TileStatusIndicators.Status_FALSE, True)
+	
+	' Timer
+	TileTimer.TimerTextSize = 22
+	
+	' Custom Tile
+	TileCustomCreate
 End Sub
 
 ' ================================================================
@@ -239,6 +251,7 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	TileReadOut.Value = value
 	TileLevel.Value = value
 	TileGauge.Value = value
+	TileLevelIndicator.Value = value
 	TileSensor.Value = value
 	TileSeekBarIndicator.Value = value
 	TileSeekBarIndicator2.Value = value
@@ -247,12 +260,14 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	If value > 90 Then
 		TileReadOut.StatusAlarm
 		TileLevel.StatusAlarm
+		TileLevelIndicator.StatusAlarm
 		TileGauge.StatusAlarm
 		TileSensor.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else if value > 70 Then
 		TileReadOut.StatusWarning
 		TileLevel.StatusWarning
+		TileLevelIndicator.StatusWarning
 		TileGauge.StatusWarning
 		TileSensor.StatusWarning
 		level = HMITileUtils.EVENT_LEVEL_WARNING
@@ -262,6 +277,7 @@ Private Sub TileSeekBar_ValueChanged (value As Int)
 	Else
 		TileReadOut.StatusNormal
 		TileLevel.StatusNormal
+		TileLevelIndicator.StatusNormal
 		TileGauge.StatusNormal
 		TileSensor.StatusNormal
 		level = HMITileUtils.EVENT_LEVEL_INFO
@@ -384,8 +400,8 @@ End Sub
 ' GAUGE
 ' ================================================================
 
-Private Sub TileGauge_Click(value As Float)
-	TileEventViewer.Insert($"[TileGauge] value=${value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+Private Sub TileGauge_Click (Value As Float)
+	TileEventViewer.Insert($"[TileGauge] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub
 
 ' ================================================================
@@ -394,4 +410,43 @@ End Sub
 
 Private Sub TileReadOut_Click
 	TileEventViewer.Insert($"[TileReadOut] value=${TileReadOut.value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' LEVELINDICATOR
+' ================================================================
+
+Private Sub TileLevelIndicator_Click (Value As Float)
+	TileEventViewer.Insert($"[TileLevelIndicator] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' TileCustom
+' ================================================================
+
+' Create customized tile starting with empty pane.
+' Added are 4 labels (B4XViews) top-down.
+Private Sub TileCustomCreate
+	Dim left As Double 
+	Dim top As Double
+	Dim width As Double
+	Dim height As Double
+	Dim heightfactor As Double = 0.25
+
+	' Create 4 labels
+	Dim lbls(4) As B4XView
+	Dim titles() As String = Array As String("Custom Tile", "Info 1", "Info 2", "Footer")
+	For i = 0 To 3
+		lbls(i)		= XUIViewsUtils.CreateLabel
+		lbls(i).Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_LABEL)
+		lbls(i).SetTextAlignment("CENTER", "CENTER")
+		lbls(i).TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
+		lbls(i).Text = $"${titles(i)}"$
+		left = HMITileUtils.PADDING
+		top = (i * heightfactor) * TileCustom.mBase.Height
+		width = TileCustom.mBase.Width - (HMITileUtils.PADDING * 2)
+		height = TileCustom.mBase.Height * heightfactor
+		' Add label to the base
+		TileCustom.mBase.AddView(lbls(i), left, top, width, height)
+	Next
 End Sub

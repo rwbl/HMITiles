@@ -97,7 +97,7 @@ Private Sub Process_Globals
 	' ================================================================
 	' TILE STATUS (NORMAL ON/OFF)
 	' ================================================================
-	Public Const COLOR_STATUS_ON_BACKGROUND      As Int = 0xFF103030						' 20% darker then off state
+	Public Const COLOR_STATUS_ON_BACKGROUND      As Int = 0xFF103030					' 20% darker then off state
 	Public Const COLOR_STATUS_OFF_BACKGROUND     As Int = COLOR_BACKGROUND_DEFAULT   	' same as default tile
 	Public Const COLOR_STATUS_ON_BORDER          As Int = 0xFF202020
 	Public Const COLOR_STATUS_OFF_BORDER         As Int = 0xFF888888
@@ -108,15 +108,16 @@ Private Sub Process_Globals
 	' ================================================================
 	Public Const COLOR_TEXT_PRIMARY    			As Int = 0xFFFFFFFF						' strong white, could also use F2F2F2 off-white
 	Public Const COLOR_TEXT_SECONDARY  			As Int = 0xFFDADADA
-	Public Const COLOR_TEXT_DISABLED   			As Int = 0xFF444444						' Dimmed text, if stronger then 0xFF7A7A7A
-	Public Const COLOR_TEXT_WARNING             As Int = 0xFF000000   					' black (max contrast)	COLOR_STATUS_WARNING
+	Public Const COLOR_TEXT_DISABLED   			As Int = 0xFF444444						' dimmed text, if stronger then 0xFF7A7A7A
+	Public Const COLOR_TEXT_WARNING             As Int = 0xFF000000   					' black (max contrast)
 	Public Const COLOR_TEXT_ALARM               As Int = 0xFFFFFFFF   					' white COLOR_STATUS_ALARM_HI
 	Public Const COLOR_TEXT_ERROR               As Int = 0xFFFFFFFF   					' white
+	Public Const COLOR_TEXT_INFO               	As Int = 0xFFA9A9A9   					' dark gray
 
 	' ================================================================
 	' TILE STATUS
 	' ================================================================
-	Public Const STATUS_NORMAL          		As String = "Normal"					' Changed to string from int 0-4
+	Public Const STATUS_NORMAL          		As String = "Normal"					' changed to string from int 0-4
 	Public Const STATUS_WARNING             	As String = "Warning"
 	Public Const STATUS_ALARM            		As String = "Alarm"
 	Public Const STATUS_DISABLED            	As String = "Disabled"
@@ -124,7 +125,7 @@ Private Sub Process_Globals
 	' ================================================================
 	' TILE COLORS PER STATE
 	' ================================================================
-	Public COLOR_TILE_NORMAL_BACKGROUND   		As Int = COLOR_BACKGROUND_DEFAULT	' Not as constant because can be changed (not recommended)
+	Public COLOR_TILE_NORMAL_BACKGROUND   		As Int = COLOR_BACKGROUND_DEFAULT		' Not a constant because can be changed (not recommended)
 	Public Const COLOR_TILE_NORMAL_TEXT         As Int = COLOR_TEXT_PRIMARY
 
 	Public Const COLOR_TILE_WARNING_BACKGROUND  As Int = COLOR_STATUS_WARNING

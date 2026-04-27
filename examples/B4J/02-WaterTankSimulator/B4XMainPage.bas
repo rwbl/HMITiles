@@ -7,7 +7,7 @@ Version=9.85
 ' ================================================================
 ' File:			WaterTankSimulator
 ' Brief:		An interactive water tank PID simulator demonstrating selective HMITiles.
-' Date:			2026-04-23
+' Date:			2026-04-27
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	WaterTankSimulator is a lightweight B4J demo application that simulates a controlled water tank process with input flow, tank level, and output flow.
 '				It showcases the practical use of HMITiles (SP/PV tiles, mini trends, and readouts).
@@ -44,7 +44,7 @@ Sub Class_Globals
 	' ================================================================
 	' APPLICATION METADATA
 	' ================================================================
-	Private VERSION As String	= "Water Tank Simulator v20260423"
+	Private VERSION As String	= "Water Tank Simulator v20260427"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2016 Robert W.B. Linn - MIT"$
 
 	' ================================================================
@@ -67,6 +67,7 @@ Sub Class_Globals
 	' Level controller (LRC) tiles
 	Private TileSPPVTankLevel As HMITileSPPV
 	Private TileTrendTankLevel As HMITileTrend
+	Private TileLevelIndicatorTank As HMITileLevelIndicator
 	
 	' Output (valve / flow) indication
 	Private TileReadoutOutput As HMITileReadout
@@ -251,11 +252,11 @@ Private Sub SimulatorStep
 	' UPDATE UI TILES
 	' ------------------------------------------------
 	InputFlowSP = TileSPPVInput.SP
-	TileSPPVInput.PV = NumberFormat(InputFlowPV,1,1)
+	TileSPPVInput.PV 		= NumberFormat(InputFlowPV,1,1)
 
-	TankLevelSP = TileSPPVTankLevel.SP
-	TileSPPVTankLevel.PV = NumberFormat(TankLevelPV,0,0)
-
+	TankLevelSP 			= TileSPPVTankLevel.SP
+	TileSPPVTankLevel.PV 	= NumberFormat(TankLevelPV,0,0)
+	TileLevelIndicatorTank.Value	= TileSPPVTankLevel.PV
 	TileReadoutOutput.Value = NumberFormat(OutputFlow, 1, 1)
 
 	' ------------------------------------------------
@@ -361,6 +362,7 @@ End Sub
 ' ================================================================
 ' EVENT VIEWER & TILE CALLBACKS
 ' ================================================================
+
 Private Sub TileEvents_ItemClick (Index As Int, Value As Object)
 	TileEvents.Insert($"[TileEvents_ItemClick] index=${Index}, value=${Value}"$, _
 		HMITileUtils.EVENT_LEVEL_INFO)

@@ -8,9 +8,11 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileLevel.bas
 ' Brief:		CustomView HMITile with a level bar 0-100%.
+' Date:			2026-04-27
+' Author:		Robert W.B. Linn (c) 2025-2026 MIT
+' Description:	Level indicator bar.
 '				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2026-04-24
-' Author:		Robert W.B. Linn (c) 2025 MIT
+'				NOT RECOMMENDED anymore > use instead HMITileLevelIndicator or HMITileSeekBar.
 ' Layout:
 '				+------------------+
 '				|       Title      |  	<< 25%
