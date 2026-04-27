@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **HMITiles*- are documented in this file.
+All notable changes to **HMITiles** - are documented in this file.
 
 The project follows semantic versioning where possible.
 
