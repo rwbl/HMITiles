@@ -95,11 +95,11 @@ All tiles share a **unified styling and state model**.
 
 ## Screenshots
 
-![Development](images/development_b4j.png "Development Program (B4J)") 
+![Development](images/development_b4j.png "Development Program - B4J") 
 
-![Vessel Process Simulator](images/vessel_process_simulator_b4j.png "Vessel Process Simulator (B4J)") 
+![Vessel Process Simulator](images/vessel_process_simulator_b4j.png "Vessel Process Simulator - B4J") 
 
-![Solar Info Panel](images/solar_info_panel_b4j.png "Solar Info Panel (B4J)") 
+![Solar Info Panel](images/solar_info_panel_b4j.png "Solar Info Panel - B4J") 
 
 ---
 
