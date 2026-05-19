@@ -45,8 +45,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object		'ignore
 
 	' Base Views
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' UI
@@ -73,17 +73,17 @@ Public Sub Initialize (Callback As Object, EventName As String)
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
-	mBase.LoadLayout("hmitilelist")
+	BasePane.LoadLayout("hmitilelist")
 
 	' Assign designer properties
 	mTitle			= Props.Get("Title")
@@ -96,12 +96,12 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	ApplyStyle
 
 	' Resize properly
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	Dim l,t,w,h As Float
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + 4dip
+	Dim pad As Int = 4dip
 
 	' Ensure b4xviews are initialized
 	If Not(LabelTitle.IsInitialized) Or Not(ClvList.IsInitialized) Then
@@ -157,11 +157,11 @@ Public Sub getShowSelected As Boolean
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 Public Sub setCompactMode(state As Boolean)
@@ -186,9 +186,9 @@ Private Sub ApplyStyle
 								 1dip, _ 
 								 HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								 0dip)
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

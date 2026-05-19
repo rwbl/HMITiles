@@ -17,8 +17,9 @@ Version=10.3
 ' Layout:
 '				+------------------+
 '				|       Label      |  < 25%
-'				|       Icon       |  < 50%
-'				|       Value      |  < 25% 
+'				|       Icon       |  < 20%
+'				|       Value      |  < 35% 
+'				|       Unit       |  < 15% 
 '				+------------------+
 ' ================================================================
 #End Region
@@ -39,8 +40,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object
 
 	' Base
-	Public mBase As B4XView
-	Private mLbl As B4XView	'ignore
+	Public BasePane As B4XView
+	Private BaseLabel As B4XView	'ignore
 	Public Tag As Object
 
 	' XUI
@@ -50,14 +51,15 @@ Private Sub Class_Globals
 	Private LabelTitle As B4XView
 	Private LabelIcon As B4XView
 	Private LabelValue As B4XView
+	Private LabelUnit As B4XView
 
-	' Properties Designer
+	' Designer Properties
 	Private mTitle As String
 	Private mValue As String
 	Private mUnit As String
 	Private mStatus As String
 	
-	' Properties (Class)
+	' Class Properties
 End Sub
 
 Public Sub Initialize(Callback As Object, EventName As String)
@@ -67,45 +69,43 @@ End Sub
 
 
 Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilesensor")
+	BasePane.LoadLayout("hmitilesensor")
 
 	' Store designer properties
 	mTitle				= Props.Get("Title")
 	LabelTitle.Text 	= mTitle
 	LabelIcon.Text  	= Props.Get("Icon")
-	' Check to remove 0x tn case icon starts with
+	' Check to remove 0x in case icon starts with
 	If LabelIcon.Text.ToLowerCase.Contains("0x") Then
 		LabelIcon.Text = LabelIcon.Text.ToLowerCase.Replace("0x","")
 	End If
-	mValue				= Props.Get("Value")
-	mUnit				= Props.Get("Unit")
-	setValue(mValue)
-	mStatus				= Props.Get("Status")
-
 	' Ensure the font is set to FA
 	setIcon(LabelIcon.Text)
-
-	ApplyStatusStyle(mStatus)
-	Base_Resize(mBase.Width, mBase.Height)
+	mValue				= Props.Get("Value")
+	LabelValue.Text 	= mValue
+	mUnit				= Props.Get("Unit")
+	LabelUnit.Text		= mUnit
+	mStatus				= Props.Get("Status")
+	ApplyStyle
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelValue.IsInitialized) Then Return
-
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
-	'								 d  l    t              w                h
-	LabelTitle.SetLayoutAnimated	(0, pad, pad,           Width - pad * 2, Height * 0.25)
-	LabelIcon.SetLayoutAnimated		(0, pad, Height * 0.25, Width - pad * 2, Height * 0.50)
-	LabelValue.SetLayoutAnimated	(0, pad, Height * 0.75, Width - pad * 2, Height * 0.25)
+	
+	'								 d  l    t              w       h
+	LabelTitle.SetLayoutAnimated	(0, 0, 0,           	Width, 	Height * 0.25)
+	LabelIcon.SetLayoutAnimated		(0, 0, Height * 0.25, 	Width, 	Height * 0.30)
+	LabelValue.SetLayoutAnimated	(0, 0, Height * 0.55, 	Width, 	Height * 0.35)
+	LabelUnit.SetLayoutAnimated  	(0, 0, Height * 0.80, 	Width,	Height * 0.15)
 End Sub
 
 ' ===================================================================
@@ -126,8 +126,8 @@ Public Sub setIcon(iconHex As String)
     ' expects "F043" or "f043" or real character
     Try
         If iconHex.Length > 0 And iconHex.Length <= 6 And iconHex.ToLowerCase.StartsWith("f") Then
-            LabelIcon.Text = Chr(Bit.ParseInt(iconHex, 16))
-        Else
+			LabelIcon.Text = Chr(Bit.ParseInt(iconHex, 16))
+		Else
             LabelIcon.Text = iconHex
         End If
     Catch
@@ -153,7 +153,7 @@ End Sub
 ' Value
 Public Sub setValue(value As String)
 	mValue = value
-	LabelValue.Text = mValue & mUnit
+	LabelValue.Text = mValue
 End Sub
 Public Sub getValue As String
 	Return mValue
@@ -161,7 +161,7 @@ End Sub
 
 Public Sub setUnit(unit As String)
 	mUnit = unit
-	LabelValue.Text =  mValue & mUnit
+	LabelUnit.Text =  mUnit
 End Sub
 Public Sub getUnit As String
 	Return mUnit
@@ -187,7 +187,7 @@ End Sub
 ' --- Core property ---
 Public Sub setStatus(value As String)
 	mStatus = value
-	ApplyStatusStyle(value)
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 
 Public Sub getStatus As String
@@ -195,44 +195,17 @@ Public Sub getStatus As String
 End Sub
 
 ' ================================================================
-' TILE STATUSSTYLE
+' TILESTYLE
 ' ================================================================
 
-#Region StatusStyle
-' ApplyStatustyle
-' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
-' Parameters:
-'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
-Private Sub ApplyStatusStyle(status As String)
-	mStatus = status
-
+#Region TileStyle
+Private Sub ApplyStyle
+	HMITileUtils.ApplyTileStyle(BasePane)
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
-	LabelIcon.TextSize = HMITileUtils.TEXT_SIZE_ICON
-	LabelIcon.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
+	HMITileUtils.ApplyFontAwesomeStyle(LabelIcon)
 	HMITileUtils.ApplyValueStyle(LabelValue)
-
-	Dim clr As Int = HMITileUtils.COLOR_TEXT_PRIMARY
-	Select status
-		Case HMITileUtils.STATUS_NORMAL
-			clr = HMITileUtils.COLOR_TEXT_PRIMARY
-			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-
-		Case HMITileUtils.STATUS_WARNING
-			clr = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
-
-		Case HMITileUtils.STATUS_ALARM
-			clr = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
-
-		Case HMITileUtils.STATUS_DISABLED
-			clr = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
-	End Select
-	LabelTitle.TextColor = clr
-	LabelValue.TextColor = clr
-	LabelIcon.TextColor = clr
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	HMITileUtils.ApplyUnitStyle(LabelUnit)
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 #End Region
 

@@ -30,8 +30,8 @@ Version=10.3
 Private Sub Class_Globals
 	Private xui 					As XUI
 
-	Public mBase 					As B4XView
-	Private mLbl 					As B4XView					'ignore
+	Public BasePane 				As B4XView
+	Private BaseLabel 				As B4XView					'ignore
 	Public Tag 						As Object
 
 	' Events
@@ -78,17 +78,17 @@ Private Sub Initialize(Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	' Load the customview layout(s) via CallSubDelayed.
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitiletimer")
+	BasePane.LoadLayout("hmitiletimer")
 
 	' Get the designer properties
 	mTitle			= Props.Get("Title")
@@ -107,26 +107,16 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	LabelStatus.Text = TIMER_STATE_START   ' means "press to start"
 	
 	' Resize to get the sizing right
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 	ApplyStyle
 End Sub
 
 Public Sub Base_Resize (Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Then Return
-
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
-	#if B4A
-	LabelTitle.SetLayoutAnimated (0, pad, pad,           Width - pad * 2, Height * 0.25)
-	LabelTimer.SetLayoutAnimated (0, pad, Height * 0.25, Width - pad * 2, Height * 0.55)
-	LabelStatus.SetLayoutAnimated  (0, pad, Height * 0.75, Width - pad * 2, Height * 0.2)	
-	#End If
-	
-	#if B4J
-	LabelTitle.SetLayoutAnimated (0, pad, pad,           Width - pad * 2, Height * 0.25)
-	LabelTimer.SetLayoutAnimated (0, pad, Height * 0.25, Width - pad * 2, Height * 0.60)
-	LabelStatus.SetLayoutAnimated  (0, pad, Height * 0.80, Width - pad * 2, Height * 0.15)	
-	#End If
+	'								 d  l  t                w      h
+	LabelTitle.SetLayoutAnimated	(0, 0, 0,           	Width, Height * 0.25)
+	LabelTimer.SetLayoutAnimated 	(0, 0, 0, 				Width, Height)
+	LabelStatus.SetLayoutAnimated  	(0, 0, Height * 0.80, 	Width, Height * 0.15)
 End Sub
 
 ' ================================================================
@@ -175,11 +165,11 @@ Public Sub Reset
 End Sub
 ' Get or set the timer enabled
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' Get or set the display format HHMMSS|HHMM|SS
@@ -209,11 +199,11 @@ End Sub
 Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelTimer)
-	HMITileUtils.ApplyTitleStyle(LabelStatus)
+	HMITileUtils.ApplyActionStyle(LabelStatus)
 
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

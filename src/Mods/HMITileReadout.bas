@@ -20,10 +20,10 @@ Version=10.3
 #End Region
 
 ' Designer Properties
-#DesignerProperty: Key: Title, 		DisplayName: Title, FieldType: String, DefaultValue: Sensor
-#DesignerProperty: Key: Value, 		DisplayName: Value, FieldType: String, DefaultValue: --
-#DesignerProperty: Key: Unit, 		DisplayName: Unit, FieldType: String, DefaultValue: Unit
-#DesignerProperty: Key: Status,		DisplayName: Status, FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Title, 		DisplayName: Title,		FieldType: String, DefaultValue: Sensor
+#DesignerProperty: Key: Value, 		DisplayName: Value, 	FieldType: String, DefaultValue: --
+#DesignerProperty: Key: Unit, 		DisplayName: Unit, 		FieldType: String, DefaultValue: Unit
+#DesignerProperty: Key: Status,		DisplayName: Status,	FieldType: String, List: Normal|Warning|Alarm, DefaultValue: Normal
 
 ' Events
 #Event: Click
@@ -34,8 +34,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object
 
 	' Base Views
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' UI
@@ -60,16 +60,16 @@ Public Sub Initialize (Callback As Object, EventName As String)
 End Sub
 
 Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilereadout")
+	BasePane.LoadLayout("hmitilereadout")
 
 	mTitle			= Props.Get("Title")
 	LabelTitle.Text = mTitle
@@ -77,21 +77,18 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	LabelValue.Text = mValue
 	mUnit			= Props.Get("Unit")
 	LabelUnit.Text 	= mUnit
-	mStatus		= Props.Get("Status")
+	mStatus			= Props.Get("Status")
 
-	ApplyStatusStyle(mStatus)
-
-	Base_Resize(mBase.Width, mBase.Height)
+	ApplyStyle
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Or Not(LabelValue.IsInitialized) Then Return
-
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-								 'd  l    t              w                h	
-	LabelTitle.SetLayoutAnimated (0, pad, pad,           Width - pad * 2, Height * 0.25)
-	LabelValue.SetLayoutAnimated (0, pad, Height * 0.25, Width - pad * 2, Height * 0.60)
-	LabelUnit.SetLayoutAnimated  (0, pad, Height * 0.80, Width - pad * 2, Height * 0.15)
+	'							  d  l    t             w      h	
+	LabelTitle.SetLayoutAnimated (0, 0, 0,           	Width, Height * 0.25)
+	LabelValue.SetLayoutAnimated (0, 0, Height * 0.25, 	Width, Height * 0.50)
+	LabelUnit.SetLayoutAnimated  (0, 0, Height * 0.80, 	Width, Height * 0.15)
 End Sub
 
 ' PUBLIC API
@@ -123,8 +120,8 @@ End Sub
 
 Public Sub setEnabled(enabled As Boolean)
 	mEnabled = enabled
-	mBase.Enabled = mEnabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mEnabled)
+	BasePane.Enabled = mEnabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(mEnabled)
 End Sub
 Public Sub getEnabled As Boolean
 	Return mEnabled
@@ -149,61 +146,31 @@ End Sub
 
 ' --- Core property ---
 Public Sub setStatus(value As String)
-	ApplyStatusStyle(value)
+	mStatus = value
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
-
 Public Sub getStatus As String
 	Return mStatus
 End Sub
 #End Region
 
+#Region TileStyle
 ' ================================================================
-' TILE STATUSSTYLE
+' TILESTYLE
 ' ================================================================
-
-#Region StatusStyle
-' ApplyStatustyle
-' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
-' Parameters:
-'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
-Private Sub ApplyStatusStyle(status As String)
-	mStatus = status
-
+Private Sub ApplyStyle
+	HMITileUtils.ApplyTileStyle(BasePane)
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelValue)
 	HMITileUtils.ApplyUnitStyle(LabelUnit)
-
-	Select status
-		Case HMITileUtils.STATUS_NORMAL
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-
-		Case HMITileUtils.STATUS_WARNING
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
-
-		Case HMITileUtils.STATUS_ALARM
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
-
-		Case HMITileUtils.STATUS_DISABLED
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			LabelUnit.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
-	End Select
-	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 #End Region
 
 #Region Events
+' ================================================================
+' EVENTS
+' ================================================================
 #if B4J
 Private Sub LabelValue_MouseClicked (EventData As MouseEvent)
 	LabelValue_Click

@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileClock.bas
 ' Brief:    	CustomView HMITile showing an analog clock drawn on a B4XCanvas.
-' Date:			2026-04-24
+' Date:			2026-05-16
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Hints:    	HMITile cannot be resized after form loaded.
 ' ================================================================
@@ -28,7 +28,7 @@ Private Sub Class_Globals
 	Private mEventName As String
 	Private mCallBack As Object
 
-	Public mBase As B4XView
+	Public BasePane As B4XView
 	Public Tag As Object
 
 	Private xui As XUI
@@ -52,15 +52,15 @@ Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitileclock")
+	BasePane.LoadLayout("hmitileclock")
 
 	' Store designer properties
 	mShowSeconds 	= Props.Get("ShowSeconds")
@@ -68,7 +68,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	CanvasClock.Initialize(PaneClock)
 	ApplyStatusStyle
 
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 
 	mClockTimer.Initialize("ClockTimer", 1000)   ' 1000 ms = 1 second
 	mClockTimer.Enabled = True
@@ -113,11 +113,11 @@ End Sub
 
 ' Get or set the clock enabled/disabled
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' Start the clock.
@@ -162,10 +162,10 @@ End Sub
 ' ApplyStatusStyle
 ' Apply status style to Normal.
 Private Sub ApplyStatusStyle
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
@@ -175,8 +175,11 @@ End Sub
 
 #Region DrawingMethods
 Private Sub DrawClockFace(cx As Float, cy As Float, r As Float)
+	' Use a quiet, dark border color for the outer ring instead of a bright text color
+	Dim FaceColor As Int = HMITileUtils.COLOR_BORDER_DARK ' e.g., 0xFF707070
+    
 	' Outter circle
-	CanvasClock.DrawCircle(cx, cy, r, HMITileUtils.COLOR_TEXT_SECONDARY, False, 3dip)
+	CanvasClock.DrawCircle(cx, cy, r, FaceColor, False, 3dip)
 
 	For i = 0 To 59
 		Dim angle As Double = (i / 60) * 360
@@ -191,7 +194,9 @@ Private Sub DrawClockFace(cx As Float, cy As Float, r As Float)
 		Dim y2 As Double  = cy + Sin(rad) * outerR
 
 		Dim stroke As Int = IIf(i Mod 5 = 0, 3dip, 1dip)
-		CanvasClock.DrawLine(x1, y1, x2, y2, HMITileUtils.COLOR_TEXT_SECONDARY, stroke)
+        
+		' Use FaceColor (Dark) for the ticks so they mirror your new gauge track style
+		CanvasClock.DrawLine(x1, y1, x2, y2, FaceColor, stroke)
 	Next
 End Sub
 

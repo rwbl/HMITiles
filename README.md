@@ -66,40 +66,40 @@ All tiles share a **unified styling and state model**.
 | **HMITileClock**              | Analog clock tile with customizable hands and appearance.                   |
 | **HMITileCustom**             | Create own custom tile with views.                                          |
 | **HMITileDigitalClock**       | Digital clock tile with flexible time and date formats.                     |
+| **HMITileDeviation**          | Bidirectional bar to indicate process value deviation from the set point.   |
 | **HMITileEventViewer**        | Scrollable event/log viewer for real-time messages.                         |
 | **HMITileGauge**              | Circular or linear gauge for visualizing numeric values.                    |
+| **HMITileGaugeSegments**      | Circular or linear gauge with segments for visualizing numeric values.      |
 | **HMITileGridHelper**         | Utility for aligning and arranging tiles in grid layouts.                   |
 | **HMITileImage**              | Displays images with scaling and positioning options.                       |
 | **HMITileImageIcon**          | Image-based icon tile with basic interaction support.                       |
 | **HMITileLabel**              | Text label tile with styling and alignment options.                         |
-| **HMITileLevel**              | Level indicator (e.g., tank/bar) showing percentage or value.               |
-| **HMITileLevelIndicator**     | generic visual level with a circle showing level percentage 0-100%.         |
+| **HMITileLabelTitle**         | Title and Text label tile with styling and alignment options.               |
+| **HMITileLevel**              | Level indicator showing percentage or value as a bar or circle.             |
 | **HMITileList**               | List display tile for dynamic or selectable items.                          |
 | **HMITileNavButton**          | Navigation button tile for switching views or pages.                        |
 | **HMITileReadout**            | Numeric or text readout tile for process or system values.                  |
-| **HMITileRGB**                | RGB color control or display tile (e.g., lighting control).                 |
-| **HMITileSeekBar**            | Slider control tile for interactive value adjustment.                       |
 | **HMITileSelect**             | Dropdown selection tile for choosing a single option.                       |
 | **HMITileSelectList**         | Extended selection list supporting multiple options.                        |
 | **HMITileSensor**             | Sensor tile for displaying live values with status indication.              |
-| **HMITileShape**              | Renders basic shapes (rectangles, circles, etc.) for layout and decoration. |
+| **HMITileSlider**            	| Slider control tile for interactive value adjustment.                       |
 | **HMITileSPPV**               | Setpoint vs. process value (SP/PV) visualization tile.                      |
+| **HMITileSymbols**   			| Shared helper for canvas symbols (Triangle, Diamond, Arrow).                |
 | **HMITileStatusIndicators**   | 3x3 responsive indicator tile.                        					  |
 | **HMITileTimer**              | Up or down counter using a seconds-based timer.                             |
 | **HMITileTrend**              | Trend/chart tile for plotting time-series data.                             |
 | **HMITileUtils**              | Shared helper and utility functions.                                        |
+| ----------------------------- | --------------------------------------------------------------------------- |
 
 ---
 
 ## Screenshots
 
-![Overview](images/overview_b4j.png "Overview Dashboard") 
+![Development](images/development_b4j.png "Development Program (B4J)") 
 
-![Water Tank Simulator](images/water_tank_simulator_b4j.png "Water Tank Simulator") 
+![Vessel Process Simulator](images/vessel_process_simulator_b4j.png "Vessel Process Simulator (B4J)") 
 
-![ESP32 BLE LED](images/esp32_ble_led.png "ESP32 BLE LED") 
-
-![HomeKit32](images/homekit32.png "HomeKit32") 
+![Solar Info Panel](images/solar_info_panel_b4j.png "Solar Info Panel (B4J)") 
 
 ---
 
@@ -113,26 +113,21 @@ All tiles share a **unified styling and state model**.
 
 ## Examples Included
 
-**GetStarted**  
-Easy-to-follow examples for every HMITile in the library.
+See folder **examples** containing easy-to-follow examples for every HMITile in the library.
 
-**B4J-Overview**  
-Overview of all available HMI tiles. A slider is used to change the active tile.
+In addition some more complete demo applications:
 
-**B4A-Overview**  
-Selected tiles demonstrated on Android.
+**Solar Info Panel**  
+Real-live data from the solar production system.
 
-**B4J-WaterTankSimulator**  
+**Vessel Process Simulator**  
 Simulated live process data using setpoints, indicators, and trend tiles.
 
 **B4J-ArduinoLED**  
-Control an Arduino onboard LED via serial communication (B4R firmware).
+Control an Arduino onboard LED via serial communication (USB) (B4R firmware).
 
 **B4A-ESP32BLELED**  
 Control an ESP32-connected LED via BLE (UART) (B4R firmware).
-
-**HomeKit32**  
-Real-world smart-home example controlling the [HomeKit32](http://github.com/rwbl/make-homekit23) system via BLE (UART) (B4R firmware).
 
 ---
 

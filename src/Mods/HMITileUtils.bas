@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileUtils.bas
 ' Brief:		Common constants and helper subs used by the customview HMITiles.
-' Date:			2026-04-24
+' Date:			2026-05-18
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Central styling module for HMITiles library.
 '     			- Base colors (neutral blue-green scale)
@@ -70,38 +70,52 @@ Private Sub Process_Globals
 	' ================================================================
 	Public Const TILE_DEFAULT_SIZE 				As Int = 120							' Recommended tile size: ~120×120 px for tiles with a title.
 																						' Smaller tiles are allowed only when:
-																						' They have NO title or contain a single numeric value only.
-	
+	Public Const TILE_PADDING 					As Int = 0								' Padding around views. Could also use 4dip
+	Public Const TILE_TITLE_HEIGHT_FACTOR 		As Float = 0.25
+	Public Const TILE_VALUE_HEIGHT_FACTOR 		As Float = 0.60
+
+	Public Const BORDER_WIDTH              		As Double = 1
+	Public Const BORDER_RADIUS             		As Double = 1
+	Public Const BORDER_RADIUS_LARGE            As Double = 12
+
 	' ================================================================
 	' BACKGROUND COLORS
 	' ================================================================
-	Public Const COLOR_BACKGROUND_DEFAULT  		As Int = 0xFF2B5267						' blueish
-	Public Const COLOR_BACKGROUND_PANEL        	As Int = 0xFFCCCCCC   					' panel slightly darker
-	Public Const COLOR_BACKGROUND_SCREEN       	As Int = 0xFFE6E6E6   					' very light neutral gray
-	Public Const COLOR_BORDER_DEFAULT      		As Int = 0xFF5A5A5A
-	Public Const COLOR_BORDER_DARK         		As Int = 0xFF707070
-	Public Const COLOR_BACKGROUND_HOVER   	 	As Int = 0xFFBBBBBB   					' just a bit lighter on hover
-	Public Const COLOR_BACKGROUND_DARK   	 	As Int = 0xFF202020   					' dark
-	Public Const COLOR_BACKGROUND_SELECTED   	As Int = 0xFFC8C8C8   					' medium-gray selected item
-	Public Const COLOR_BORDER_DEFAULT           As Int = 0xFFC0C0C0						' light neutral border
-	Public Const COLOR_BORDER_DARK           	As Int = 0xFF888888						' dark neutral border
-		
-	' ================================================================
-	' STATUS COLORS (ALARM ONLY)
-	' ================================================================
-	Public Const COLOR_STATUS_WARNING           As Int = 0xFFFFD24C
-	Public Const COLOR_STATUS_ALARM_LO          As Int = 0xFFFFA000
-	Public Const COLOR_STATUS_ALARM_HI          As Int = 0xFFD32F2F
-	Public Const COLOR_STATUS_FORBIDDEN         As Int = 0xFF7F0000
+	' Use a desaturated Slate/Charcoal Gray
+	Public Const COLOR_BACKGROUND_DEFAULT       As Int = 0xFF4A5560                     ' Muted slate gray (cool, non-intrusive)
+	Public Const COLOR_BACKGROUND_PANEL         As Int = 0xFFCCCCCC                     ' Panel slightly darker
+	Public Const COLOR_BACKGROUND_SCREEN        As Int = 0xFFE6E6E6                     ' Very light neutral gray
+	Public Const COLOR_BORDER_DEFAULT           As Int = 0xFFC0C0C0                     ' Light neutral border
+	Public Const COLOR_BORDER_DARK              As Int = 0xFF707070                     ' Dark neutral border
+	Public Const COLOR_BACKGROUND_HOVER         As Int = 0xFFBBBBBB                     ' Just a bit lighter on hover
+	Public Const COLOR_BACKGROUND_DARK          As Int = 0xFF202020                     ' Dark
+	Public Const COLOR_BACKGROUND_SELECTED      As Int = 0xFFC8C8C8                     ' Medium-gray selected item
 
 	' ================================================================
 	' TILE STATUS (NORMAL ON/OFF)
 	' ================================================================
-	Public Const COLOR_STATUS_ON_BACKGROUND      As Int = 0xFF103030					' 20% darker then off state
-	Public Const COLOR_STATUS_OFF_BACKGROUND     As Int = COLOR_BACKGROUND_DEFAULT   	' same as default tile
-	Public Const COLOR_STATUS_ON_BORDER          As Int = 0xFF202020
-	Public Const COLOR_STATUS_OFF_BORDER         As Int = 0xFF888888
-	Public Const COLOR_STATUS_TEXT               As Int = 0xFF202020   					' dark text for readability
+	' Normal operational states should be shades of gray, not pigmented colors
+	Public Const COLOR_STATUS_OFF_BACKGROUND    As Int = COLOR_BACKGROUND_DEFAULT       ' Neutral off-state (Muted Slate)
+	Public Const COLOR_STATUS_ON_BACKGROUND     As Int = 0xFF343D46                     ' Darker gray/charcoal to show active state
+	Public Const COLOR_STATUS_ON_BORDER         As Int = 0xFF202020
+	Public Const COLOR_STATUS_OFF_BORDER        As Int = 0xFF888888
+
+	' Ensure text color contrasts well with the new slate/charcoal backgrounds
+	Public Const COLOR_STATUS_TEXT              As Int = 0xFFFFFFFF                     ' White text for high contrast on dark tiles
+	Public Const COLOR_TEXT_MUTED               As Int = 0xFFD1D5DB                     ' Light gray text for minor details/units
+
+	' ================================================================
+	' STATUS COLORS (ALARM ONLY) - ISA-101 Compliant Muted Tones
+	' ================================================================
+	' Level 3 / Low Alarm / Warning: Muted Amber/Yellow (No glare)
+	Public Const COLOR_STATUS_WARNING           As Int = 0xFFE5A93C
+	Public Const COLOR_STATUS_ALARM_LO          As Int = 0xFFE5A93C
+	' Level 2 / High Alarm: Muted, deep orange-red
+	Public Const COLOR_STATUS_ALARM             As Int = 0xFFD35400
+	' Level 1 / Critical Alarm / High-Hi: Muted dark red (solid presence, no vibration)
+	Public Const COLOR_STATUS_ALARM_HI          As Int = 0xFFC0392B
+	' Interlocked / Blocked / Forbidden: Heavy dark burgundy
+	Public Const COLOR_STATUS_FORBIDDEN         As Int = 0xFF6B1D16
 	
 	' ================================================================
 	' TEXT COLORS
@@ -113,6 +127,12 @@ Private Sub Process_Globals
 	Public Const COLOR_TEXT_ALARM               As Int = 0xFFFFFFFF   					' white COLOR_STATUS_ALARM_HI
 	Public Const COLOR_TEXT_ERROR               As Int = 0xFFFFFFFF   					' white
 	Public Const COLOR_TEXT_INFO               	As Int = 0xFFA9A9A9   					' dark gray
+
+	' ================================================================
+	' INDICATOR COLORS
+	' ================================================================
+	Public Const COLOR_INDICATOR_TRACK 			As Int = 0xFF707070						' dark neutral track color
+	Public Const COLOR_INDICATOR_LEVEL 			As Int = 0xFFFFFFFF						' solid white
 
 	' ================================================================
 	' TILE STATUS
@@ -141,13 +161,6 @@ Private Sub Process_Globals
 	Public Const COLOR_TILE_ENABLED_TEXT         As Int = 0xFFFFFFFF
 
 	' ================================================================
-	' TILE BORDER
-	' ================================================================
-	Public Const BORDER_WIDTH              		As Double = 1
-	Public Const BORDER_RADIUS             		As Double = 1
-	Public Const BORDER_RADIUS_LARGE            As Double = 12
-
-	' ================================================================
 	' LAYOUT GRID GUIDELINES
 	' ================================================================
 	' 8-point baseline grid (8dip, 16dip, 24dip …)
@@ -156,9 +169,6 @@ Private Sub Process_Globals
 	Public Const GRID_SPACING              		As Double = 16
 	' 32dip margins outer screen edge
 	Public Const GRID_OUTER_SCREEN_EDGE			As Double = 32
-
-	' Default padding
-	Public Const PADDING 						As Int = 4dip
 
 	' ================================================================
 	' TEXT SIZES
@@ -314,9 +324,10 @@ Private Sub Process_Globals
 	' ================================================================
 	' TILE TREND
 	' ================================================================
-	Public Const COLOR_TREND_LINE     				As Int = 0xFF404040				' 0xFF707070
-	Public Const COLOR_TREND_BG       				As Int = 0xFFF5F5F5				' optional
+	Public Const COLOR_TREND_LINE     				As Int = 0xFFFFFFFF				' 0xFF404040				' 0xFF707070
+	Public Const COLOR_TREND_BACKGROUND      		As Int = COLOR_BACKGROUND_DEFAULT' optional
 	Public Const COLOR_TREND_BORDER   				As Int = 0xFFB0B0B0				' optional
+	Public Const COLOR_TREND_GRID_LINE      		As Int = 0xFF343D46				' 0xFFF5F5F5
 
 	' ================================================================
 	' TILE NAVBUTTON
@@ -340,6 +351,28 @@ Private Sub Process_Globals
 	Public Const TEXT_INDICATOR_DISABLED			As String = "Disabled"
 
 	' ================================================================
+	' TILE DEVIATION
+	' ================================================================
+	Public Const COLOR_DEVIATION_BAR				As Int = 0xFFD3D3D3				' lightgrey
+	Public Const COLOR_DEVIATION_DEADBAND			As Int = 0xFF555555				' dark-gray
+	Public Const COLOR_DEVIATION_NEUTRAL			As Int = 0xFFB0B0B0				' silver-gray
+	Public Const COLOR_DEVIATION_WARNING			As Int = 0xFFFFD700				' gold/yellow
+	Public Const COLOR_DEVIATION_ALARM				As Int = 0xFFFF0000				' red
+
+	' ================================================================
+	' TILE GAUGESEGMENTS
+	' ================================================================
+	' Color Definitions (Bright active colors)
+	Public Const COLOR_GAUGESEGMENTS_NORMAL_ACTIVE 	As Int = COLOR_SLIDER_ACTIVE
+	Public Const COLOR_GAUGESEGMENTS_WARNING_ACTIVE	As Int = 0xFFF59E0B   			' Industrial Amber
+	Public Const COLOR_GAUGESEGMENTS_ALARM_ACTIVE 	As Int = 0xFFEF4444   			' Industrial Red
+
+	' Muted Background Colors (Using Alpha/Transparency for the permanent background zones)
+	Public Const COLOR_GAUGESEGMENTS_NORMAL_MUTED 	As Int = COLOR_SLIDER_TRACK		' Standard track gray
+	Public Const COLOR_GAUGESEGMENTS_WARNING_MUTED 	As Int = 0x3CF59E0B     		' Muted transparent amber (Alpha 60 = 3C)
+	Public Const COLOR_GAUGESEGMENTS_ALARM_MUTED 	As Int = 0x3CEF4444     		' Muted transparent red (Alpha 60 = 3C)
+
+	' ================================================================
 	' FONTAWESOME ICONS
 	' ================================================================
 	Public ICON_ON 									As String = Chr(0xF205)
@@ -349,6 +382,13 @@ Private Sub Process_Globals
 	Public ICON_STOP								As String = Chr(0xF04D)
 	Public ICON_STOP_CIRCLE							As String = Chr(0xF28D)
 	Public ICON_WAIT								As String = Chr(0xF252)
+
+	' ================================================================
+	' REDUNDANT SHAPE ALARM INDICATORS
+	' ================================================================
+	Public Const SHAPE_INDICATOR_SIZE				As Double = 14dip
+	Public Const SHAPE_WARNING_INDICATOR			As String = "▲"
+	Public Const SHAPE_ALARM_INDICATOR				As String = "■"
 
 	' ================================================================
 	' HELPERS
@@ -363,27 +403,43 @@ End Sub
 ' ================================================================
 
 ' ApplyTileStyle
-' For all HMITiles the title style are consistent
+' For all HMITiles the tile style using the basepane is consistent
 ' Parameters:
-'	
-Public Sub ApplyTileStyle(tilepane As B4XView, status As String)
+'	basepane
+Public Sub ApplyTileStyle(basepane As B4XView)
+	basepane.SetColorAndBorder( _
+		COLOR_TILE_NORMAL_BACKGROUND, _
+		0, _
+		0, _
+		BORDER_RADIUS)
+End Sub
+
+' ApplyStatusStyle
+' For all HMITiles the tile status style is set using the title view.
+' The title text get a prefix if status warning or alarm.
+' Parameters:
+'	vw - Title view
+'	text - Title text (original)
+'	status - Tile status
+Public Sub ApplyStatusStyle(vw As B4XView, text As String, status As String)
 	Select status
 		Case STATUS_NORMAL
-			tilepane.Color = COLOR_TILE_NORMAL_BACKGROUND
-
+			vw.Color = COLOR_TILE_NORMAL_BACKGROUND
+			vw.TextColor = COLOR_TILE_NORMAL_TEXT
+			vw.Text = text
 		Case STATUS_WARNING
-			tilepane.Color = COLOR_TILE_WARNING_BACKGROUND
-
+			vw.Color = COLOR_TILE_WARNING_BACKGROUND
+			vw.TextColor = COLOR_TILE_WARNING_TEXT
+			vw.Text = $"${SHAPE_WARNING_INDICATOR} ${text}"$
 		Case STATUS_ALARM
-			tilepane.Color = COLOR_TILE_ALARM_BACKGROUND
-
-		Case STATUS_DISABLED
-			tilepane.Color = COLOR_TILE_DISABLED_BACKGROUND
+			vw.Color = COLOR_TILE_ALARM_BACKGROUND
+			vw.TextColor = COLOR_TILE_ALARM_TEXT
+			vw.Text = $"${SHAPE_ALARM_INDICATOR} ${text}"$
+		Case Else
+			vw.Color = COLOR_TILE_NORMAL_BACKGROUND
+			vw.TextColor = COLOR_TEXT_PRIMARY
+			vw.Text = text
 	End Select
-	tilepane.SetColorAndBorder(tilepane.Color, _
-								BORDER_WIDTH, _
-								COLOR_STATUS_ON_BORDER, _
-								BORDER_RADIUS)
 End Sub
 
 Public Sub ApplyTitleStyle(lbl As B4XView)
@@ -432,7 +488,7 @@ Public Sub ApplyLabelStyle(lbl As B4XView)
 		SetStyleBold(lbl, False)
 		#end if
 		#if B4A
-		lbl.Font = xui.CreateDefaultFont(TEXT_SIZE_STATE)
+		lbl.Font = xui.CreateDefaultFont(TEXT_SIZE_LABEL)
 		lbl.TextColor = COLOR_TEXT_PRIMARY
 		#End If
 	End If
@@ -449,6 +505,19 @@ Public Sub ApplyUnitStyle(lbl As B4XView)
 		lbl.Font = xui.CreateDefaultFont(TEXT_SIZE_SMALL)
 		lbl.TextColor = COLOR_TEXT_SECONDARY
 		#End If
+	End If
+End Sub
+
+Public Sub ApplyActionStyle(lbl As B4XView)
+    If lbl.IsInitialized Then
+		#if B4J
+		lbl.TextSize = TEXT_SIZE_SMALL
+		SetStyleBold(lbl, True)
+		#end if
+		#if B4A
+		lbl.Font = xui.CreateDefaultBoldFont(TEXT_SIZE_SMALL)
+		#End If
+		lbl.TextColor = COLOR_TEXT_PRIMARY
 	End If
 End Sub
 
@@ -559,11 +628,10 @@ Public Sub StatusToInt(status As String) As Int
 End Sub
 #End Region
 
-#Region Helper CustomListView
 ' ================================================================
 ' HELPER CUSTOMLISTVIEW
 ' ================================================================
-
+#Region Helper CustomListView
 ' Set CLV background transparent
 ' Example: SetCLVBackgroundTransparent(ClvCommands)
 #If Not(LINUX)
@@ -624,7 +692,7 @@ End Sub
 ' ================================================================
 #if B4J
 ' Implementation details & safety notes
-' - Canvas isolation: Grid uses its own B4XCanvas And gridPanel. HMITiles that also use B4XCanvas draw into their own panel Or mBase. Since gridPanel.SendToBack Is used, the grid Is always behind other views And doesn’t intercept touches.
+' - Canvas isolation: Grid uses its own B4XCanvas And gridPanel. HMITiles that also use B4XCanvas draw into their own panel Or BasePane. Since gridPanel.SendToBack Is used, the grid Is always behind other views And doesn’t intercept touches.
 ' - Performance: The drawing Is simple lines; even on large screens it Is cheap. Call Redraw only when settings change Or on resize.
 ' - Design vs runtime: You can leave the grid toggled off For runtime And use it only during development Or layout tuning.
 ' - Coordinate system: grid draws in device-independent dips (B4X uses dips), matching your HMITile sizes.
@@ -872,5 +940,11 @@ End Sub
 '	Unsigned Int 0-255
 Public Sub ByteToUnsigned(b As Byte) As Int
 	Return Bit.And(0xFF, b)
+End Sub
+
+' MapRange
+' Map the value from the 'From' range A and B to the 'To' range C and D.
+Public Sub MapRange(Value As Int, FromLow As Int, FromHigh As Int, ToLow As Int, ToHigh As Int) As Int
+	Return ToLow + (ToHigh - ToLow) * ((Value - FromLow) / (FromHigh - FromLow))
 End Sub
 #End Region

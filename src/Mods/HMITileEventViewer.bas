@@ -49,8 +49,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object		'ignore
 
 	' Base Views
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' UI
@@ -82,20 +82,20 @@ Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' First resize the base before loading the layout else customlistview not properly shown.
-	'Base_Resize(mBase.Width, mBase.Height)
+	'Base_Resize(BasePane.Width, BasePane.Height)
 
 	' Layout with label & clv
-	mBase.LoadLayout("hmitileeventviewer")
+	BasePane.LoadLayout("hmitileeventviewer")
 
 	' Properties Designer
 	mTitle			= Props.Get("Title")
@@ -113,20 +113,16 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	LabelTrash.Visible = mShowTrash
 
 	' Resize properly
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 
 	' Set clv transparant
 	ApplyStyle
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
+	If Not(LabelTitle.IsInitialized) Or Not(ClvEvents.IsInitialized) Then Return
 	Dim l,t,w,h As Float
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
-	' Ensure b4xviews are initialized
-	If Not(LabelTitle.IsInitialized) Or Not(ClvEvents.IsInitialized) Then
-		Return
-	End If
+	Dim pad As Int = HMITileUtils.TILE_PADDING
 
 	PaneEventViewer.SetLayoutAnimated(0, pad, pad, Width - pad * 2, Height - pad * 2)
 
@@ -170,11 +166,11 @@ Public Sub getTitle As String
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' MaxItems
@@ -243,9 +239,9 @@ Private Sub ApplyStyle
 								   1dip, _ 
 								   HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								   0dip)
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

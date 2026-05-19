@@ -37,12 +37,12 @@ Version=10.3
 '						lbls(i).SetTextAlignment("CENTER", "CENTER")
 '						lbls(i).TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
 '						lbls(i).Text = $"${titles(i)}"$
-'						left = HMITileUtils.PADDING
-'						top = (i * heightfactor) * TileCustom.mBase.Height
-'						width = TileCustom.mBase.Width - (HMITileUtils.PADDING * 2)
-'						height = TileCustom.mBase.Height * heightfactor
+'						left = HMITileUtils.TILE_PADDING
+'						top = (i * heightfactor) * TileCustom.BasePane.Height
+'						width = TileCustom.BasePane.Width - (HMITileUtils.TILE_PADDING * 2)
+'						height = TileCustom.BasePane.Height * heightfactor
 '						' Add label to the base
-'						TileCustom.mBase.AddView(lbls(i), left, top, width, height)
+'						TileCustom.BasePane.AddView(lbls(i), left, top, width, height)
 '					Next
 '				End Sub
 ' ================================================================
@@ -56,8 +56,8 @@ Version=10.3
 
 Private Sub Class_Globals
 	' Base
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' Events
@@ -80,21 +80,21 @@ End Sub
 
 'Base type must be Object
 Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	' Load the customview layout(s) via CallSubDelayed.
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilecustom")
+	BasePane.LoadLayout("hmitilecustom")
 
 	' Properties
 	mStatus = HMITileUtils.STATUS_NORMAL
 
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 	ApplyStatusStyle(mStatus)
 End Sub
 
@@ -107,11 +107,11 @@ End Sub
 ' ===================================================================
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
+	BasePane.Enabled = enabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(BasePane.Enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' --- Convenience helpers ---
@@ -152,19 +152,19 @@ Private Sub ApplyStatusStyle(status As String)
 	mStatus = status
 	Select status
 		Case HMITileUtils.STATUS_NORMAL
-			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 
 		Case HMITileUtils.STATUS_WARNING
-			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 
 		Case HMITileUtils.STATUS_ALARM
-			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 
 		Case HMITileUtils.STATUS_DISABLED
-			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

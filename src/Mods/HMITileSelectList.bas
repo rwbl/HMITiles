@@ -41,8 +41,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object		'ignore
 
 	' Base Views
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' UI
@@ -67,17 +67,17 @@ Public Sub Initialize (Callback As Object, EventName As String)
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
-	mBase.LoadLayout("hmitileselectlist")
+	BasePane.LoadLayout("hmitileselectlist")
 
 	' Assign designer properties
 	LabelTitle.Text = Props.Get("Title")
@@ -88,22 +88,21 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	ApplyStyle
 
 	' Resize properly
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	Dim l,t,w,h As Float
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
 	' Ensure b4xviews are initialized
 	If Not(LabelTitle.IsInitialized) Or Not(ClvSelect.IsInitialized) Then
 		Return
 	End If
 
-	PaneSelect.SetLayoutAnimated(0, pad, pad, Width - pad * 2, Height - pad * 2)
-	LabelTitle.SetLayoutAnimated(0, 0, 0, PaneSelect.Width, HMITileUtils.LIST_TITLE_HEIGHT)
+	PaneSelect.SetLayoutAnimated	(0, 0, 0, Width, 			Height)
+	LabelTitle.SetLayoutAnimated	(0, 0, 0, PaneSelect.Width,	HMITileUtils.LIST_TITLE_HEIGHT)
 
 	' Resize the base panel with CLV.GetBase.SetLayoutAnimated.
+	Dim pad As Int = 2dip
 	l = pad
 	t = pad
 	If mShowTitle Then
@@ -133,11 +132,11 @@ Public Sub getTitle As String
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 Public Sub setCompactMode(state As Boolean)
@@ -184,7 +183,7 @@ End Sub
 
 Public Sub setShowTitle(state As Boolean)
 	mShowTitle = state
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 Public Sub getShowTitle As Boolean
 	Return mShowTitle
@@ -204,9 +203,9 @@ Public Sub ApplyStyle
 								   1dip, _ 
 								   HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								   0dip)
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
@@ -286,16 +285,16 @@ Private Sub ClvSelectCreateItem(primaryitem As String) As Pane
 #If B4A
 Private Sub ClvSelectCreateItem(primaryitem As String) As Panel
 #End If
-	' Item height and padding
+	' Item height and 0ding
 	Dim rowheight As Int			= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_HEIGHT, HMITileUtils.EVENT_NORMAL_HEIGHT)
-	Dim rowpadding As Int			= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_PADDING, HMITileUtils.EVENT_NORMAL_PADDING)
+	Dim row0ding As Int			= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_PADDING, HMITileUtils.EVENT_NORMAL_PADDING)
 
 	' Font sizes
 	Dim primarytextsize As Float	= IIf(mCompactMode, HMITileUtils.EVENT_COMPACT_MESSAGE_TEXT_SIZE, HMITileUtils.EVENT_NORMAL_MESSAGE_TEXT_SIZE)
 
 	' Create panel to hold the item
 	Dim pnl As B4XView				= xui.CreatePanel("")
-	pnl.SetLayoutAnimated(0, rowpadding, rowpadding, ClvSelect.AsView.Width - (rowpadding * 2), rowheight)
+	pnl.SetLayoutAnimated(0, row0ding, row0ding, ClvSelect.AsView.Width - (row0ding * 2), rowheight)
 	Dim primaryitemheight As Int	= pnl.Height
 
 	' Set colors
@@ -317,7 +316,7 @@ Private Sub ClvSelectCreateItem(primaryitem As String) As Panel
 '	lblprimaryitem.TextColor		= HMITileUtils.LIST_COLOR_TEXT
 '	#End If
 
-	pnl.AddView(lblprimaryitem, rowpadding, 0, pnl.Width, primaryitemheight)
+	pnl.AddView(lblprimaryitem, row0ding, 0, pnl.Width, primaryitemheight)
 	Return pnl
 End Sub
 #End Region

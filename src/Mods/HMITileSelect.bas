@@ -37,8 +37,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object		'ignore
 
 	' Base Views
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 	Public Tag As Object
 
 	' UI
@@ -65,17 +65,17 @@ Public Sub Initialize (Callback As Object, EventName As String)
 End Sub
 
 Public Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Layout with label & clv
-	mBase.LoadLayout("hmitileselect")
+	BasePane.LoadLayout("hmitileselect")
 
 	' Assign designer properties
 	mTitle			= Props.Get("Title")
@@ -83,28 +83,22 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mShowTitle 		= Props.Get("ShowTitle")
 
 	' Resize properly
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 
 	' Set style to normal only
 	ApplyStyle
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
-	' Log($"[HMITileSelect] w=${Width},h=${Height}"$)
-
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
-	' Ensure b4xviews are initialized
 	If Not(LabelTitle.IsInitialized) Or Not(LabelUp.IsInitialized) Or Not(LabelDown.IsInitialized) Then
-		' Log($"[HMITileSelect.Base_Resize] Views not initialized"$)
 		Return
 	End If
 
-	PaneSelect.SetLayoutAnimated	(0, 0, 0, Width, Height)
-	LabelTitle.SetLayoutAnimated	(0, pad, pad, Width - pad * 2, Height * 0.25)
-	LabelSelected.SetLayoutAnimated	(0, pad, LabelTitle.Height, Width - pad * 2, Height * 0.50)
-	LabelDown.SetLayoutAnimated		(0, Width * 0.1, Height * 0.60, Width * 0.3, Height * 0.25)
-	LabelUp.SetLayoutAnimated		(0, Width * 0.6, Height * 0.60, Width * 0.3, Height * 0.25)
+	PaneSelect.SetLayoutAnimated	(0, 0, 				0, 					Width, 			Height)
+	LabelTitle.SetLayoutAnimated	(0, 0, 				0, 					Width, 			Height * 0.25)
+	LabelSelected.SetLayoutAnimated	(0, 0, 				LabelTitle.Height,	Width,			Height * 0.50)
+	LabelDown.SetLayoutAnimated		(0, Width * 0.1,	Height * 0.60, 		Width * 0.3,	Height * 0.25)
+	LabelUp.SetLayoutAnimated		(0, Width * 0.6, 	Height * 0.60, 		Width * 0.3, 	Height * 0.25)
 End Sub
 
 ' ================================================================
@@ -123,16 +117,16 @@ Public Sub getTitle As String
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 Public Sub setShowTitle(state As Boolean)
 	mShowTitle = state
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 Public Sub getShowTitle As Boolean
 	Return mShowTitle
@@ -227,9 +221,9 @@ Private Sub ApplyStyle
 								 0dip, _ 
 								 HMITileUtils.COLOR_STATUS_OFF_BORDER, _ 
 								 0dip)
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

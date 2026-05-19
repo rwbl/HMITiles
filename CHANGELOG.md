@@ -6,6 +6,29 @@ The project follows semantic versioning where possible.
 
 ---
 
+## [2.0.0] - 2026-05-19
+- NEW: Alarm Concept - Title changes color & indicator added depending state (normal, warning, alarm) and not the full tile anymore (clear visual hierarchy that instantly tells the status without overwhelming the screen)
+- NEW: HMITileDeviation - Bidirectional bar to indicate process value deviation from the set point
+- NEW: HMITileGauge - Properties Show Needle, Show Range Labels
+- NEW: HMITileGaugeSegments - Like HMITileGauge but with additional Warning/Alarm segments and shape indicator
+- NEW: HMITileLabelTitle - Tile with title label and centered label (with properties TextSize, TextColor)
+- NEW: HMITileUtils - Method MapRange
+- NEW: HMITileSlider - Slider control tile for interactive value adjustment
+- NEW: HMITileSymbols - Common symbol constants and helper subs for HMITileCustom
+- NEW: HMITileTrend - Applied graph smoothing (Chaikin Algorithm); Property GridColor; Event Click
+- NEW: HMITiles with Value & Unit - Added label Unit; Stacked labels Value (top) and Unit (bottom)
+- NEW: HMITilesExtensions - Library with HMITiles extension which go beyond the HMI design principles
+- NEW: HMITileLevel - Added level type Bar, Circle; Replaced bar & fill panes with b4xcanvas rectangles
+- UPD: HMITileSPPV - Seperator line between PV and SP; Warning/Alarm shape indicator below seperator line
+- UPD: HMITiles - Renamed mBase to BasePane (Public), mLbl to BaseLabel (Private)
+- UPD: Indicator Tiles - Consistent use of background track and active level colors
+- UPD: Examples - Folder structure using numeric index; Removed subfolders; Reworked all examples & some renamed
+- DEL: Examples - B4A & B4J Overview removed. Use B4A & B4J development app and program instead (folder src)
+- DEL: HMITileLevelIndicator - Included level type Circle in HMITileLevel
+- DEL: HMITileRGB - Moved to the new HMITilesExtensions library
+- DEL: HMITileShape - Moved to the new HMITilesExtensions library
+- DEL: HMITileSeekBar - Moved to the new HMITilesExtensions library
+
 ## [1.8.0] - 2026-04-27
 - NEW: HMITileCustom - Create custom tile by adding views to an empty tile
 - NEW: HMITileLevelIndicator - Generic visual level indicator (circle) 0-100%

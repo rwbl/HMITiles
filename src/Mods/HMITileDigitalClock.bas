@@ -24,8 +24,8 @@ Version=10.3
 Private Sub Class_Globals
 	Private xui As XUI
 
-	Public mBase As B4XView
-	Private mLbl As B4XView				'ignore
+	Public BasePane As B4XView
+	Private BaseLabel As B4XView				'ignore
 	Public Tag As Object
 
 	Private mEventName As String
@@ -50,17 +50,17 @@ Private Sub Initialize(Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	' Load the customview layout(s) via CallSubDelayed.
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilelabel")
+	BasePane.LoadLayout("hmitilelabel")
 
 	LabelText.Text = ""
 	
@@ -69,7 +69,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mBlinkColon		= Props.Get("BlinkColon")
 
 	' Resize to get the sizing right
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 	ApplyStatusStyle
 	
 	StartClock
@@ -77,7 +77,8 @@ End Sub
 
 Public Sub Base_Resize (Width As Double, Height As Double)
 	If Not(LabelText.IsInitialized) Then Return
-	LabelText.SetLayoutAnimated(0, 0, 0, Width, Height)
+	'							 d  l  t  w      h
+	LabelText.SetLayoutAnimated	(0, 0, 0, Width, Height)
 End Sub
 
 ' ================================================================
@@ -118,11 +119,11 @@ End Sub
 
 ' Get or set the clock enabled
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	HMITileUtils.SetAlpha(mBase.enabled)
+	BasePane.Enabled = enabled
+	HMITileUtils.SetAlpha(BasePane.enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 #End Region
 
@@ -136,9 +137,9 @@ End Sub
 Private Sub ApplyStatusStyle
 	HMITileUtils.ApplyValueStyle(LabelText)
 	
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
@@ -167,7 +168,7 @@ Private Sub UpdateClock
 		txt = NumberFormat2(h, 2, 0, 0, False) & colon & NumberFormat2(m, 2, 0, 0, False)
 	End If
 
-	' mLbl.Text = txt
+	' BaseLabel.Text = txt
 	LabelText.Text = txt
 End Sub
 #End Region

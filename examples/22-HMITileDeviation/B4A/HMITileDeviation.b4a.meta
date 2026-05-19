@@ -1,0 +1,12 @@
+﻿ModuleBookmarks0=
+ModuleBookmarks1=
+ModuleBookmarks2=
+ModuleBreakpoints0=
+ModuleBreakpoints1=
+ModuleBreakpoints2=
+ModuleClosedNodes0=1,2,6
+ModuleClosedNodes1=
+ModuleClosedNodes2=1
+NavigationStack=HMITileDeviation,StatusNormal,264,0,HMITileDeviation,getStatus,300,0,HMITileDeviation,ApplyStatusStyle,300,1,HMITileDeviation,ApplyStyle,300,0,HMITileDeviation,Class_Globals,71,6,HMITileDeviation,Base_Resize,123,0,HMITileDeviation,AfterLoadLayout,111,0,HMITileDeviation,GetDeviationColor,208,4,HMITileDeviation,Click,365,1,B4XMainPage,TileDeviation_Click,59,6,B4XMainPage,TileButton_Click,53,0
+SelectedBuild=0
+VisibleModules=1

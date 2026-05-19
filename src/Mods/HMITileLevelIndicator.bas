@@ -8,15 +8,16 @@ Version=10.3
 ' ================================================================
 ' File: 		HMITileLevelIndicatorIndicator.bas
 ' Brief:		CustomView HMITile generic visual level with a circle showing level percentage 0-100%.
-'				Style can be set to Normal, Warning, Alarm or Dimmed.
-' Date:			2026-04-26
+' Date:			2026-05-18
 ' Author:		Robert W.B. Linn (c) 2025 MIT
+' Description:	This tile works well for: level tanks, process vessels, analog indicators
+'				Style can be set to Normal, Warning, Alarm.
 ' Layout:
 '				+------------------+
-'				|       Title      |  	<< 25%
-'				|       Level      |	<< 50%
-'				|        CIRCLE       |  
-'				| 	  Value Unit   |	<< 25%
+'				|       Title      |  	< 25%
+'				|       Level      |	< 40%
+'				| 	    Value      |	< 35%
+'				| 	    Unit       |	< 15%
 '				+------------------+
 ' ================================================================
 #End Region
@@ -25,7 +26,7 @@ Version=10.3
 #DesignerProperty: Key: Title,		DisplayName: Title, 	FieldType: String,	DefaultValue: Level
 #DesignerProperty: Key: Value, 		DisplayName: Value, 	FieldType: Float, 	DefaultValue: 0
 #DesignerProperty: Key: Unit,  		DisplayName: Unit,  	FieldType: String, 	DefaultValue: 
-#DesignerProperty: Key: Status, 	DisplayName: Status,	FieldType: String, List: Normal|Warning|Alarm|Dimmed, DefaultValue: Normal
+#DesignerProperty: Key: Status, 	DisplayName: Status,	FieldType: String,	List: Normal|Warning|Alarm, DefaultValue: Normal
 
 ' Events
 #Event: Click (Value As Float)
@@ -34,8 +35,8 @@ Private Sub Class_Globals
 	Private mEventName As String
 	Private mCallBack As Object
 
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 
 	Private xui As XUI
 	Public Tag As Object
@@ -45,6 +46,7 @@ Private Sub Class_Globals
 	Private PaneLevelIndicator As B4XView
 	Private CvsLevelIndicator As B4XCanvas
 	Private LabelValue As B4XView
+	Private LabelUnit As B4XView
 
 	' Properties Designer
 	Private mTitle As String
@@ -57,9 +59,6 @@ Private Sub Class_Globals
 	Private mCx, mCy As Float
 	Private mRadius As Float
 	Private mBorderWidth As Int = 4dip
-	Private mBorderColor As Int
-	Private mBaseColor As Int
-	Private mLevelColor As Int
 End Sub
 
 Public Sub Initialize(Callback As Object, EventName As String)
@@ -68,15 +67,15 @@ Public Sub Initialize(Callback As Object, EventName As String)
 End Sub
 
 Private  Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilelevelindicator")
+	BasePane.LoadLayout("hmitilelevelindicator")
 	
 	' Properties Designer
 	mTitle			= Props.Get("Title")
@@ -84,40 +83,34 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mValue			= Props.Get("Value")
 	LabelValue.Text = mValue
 	mUnit			= Props.Get("Unit")
+	LabelUnit.Text 	= mUnit
 	mStatus			= Props.Get("Status")
 
 	' Properties Class
-	mBorderColor 	= HMITileUtils.COLOR_BORDER_DEFAULT
-	mBaseColor		= HMITileUtils.COLOR_SLIDER_TRACK
-	mLevelColor		= HMITileUtils.COLOR_SLIDER_ACTIVE
-	
-	ApplyStatusStyle(mStatus)
-	
-	Base_Resize(mBase.Width, mBase.Height)
+
+	ApplyStyle	
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelValue.IsInitialized) Then Return
 
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
+	'								 		 d  l  t              	w       h
+	LabelTitle.SetLayoutAnimated			(0, 0, 0, 				Width, 	Height * 0.25)
+	PaneLevelIndicator.SetLayoutAnimated	(0, 0, Height * 0.25, 	Width, 	Height * 0.40)
+	LabelValue.SetLayoutAnimated			(0, 0, Height * 0.55, 	Width, 	Height * 0.35)
+	LabelUnit.SetLayoutAnimated				(0, 0, Height * 0.80,	Width,	Height * 0.15)
 
-	LabelTitle.SetLayoutAnimated(0, pad, pad, Width - pad * 2, Height * 0.25)
-
-	PaneLevelIndicator.SetLayoutAnimated(0, pad, Height * 0.25, Width - pad * 2, Height * 0.5)
 	mCx 	= PaneLevelIndicator.Width / 2
-	mCy 	= PaneLevelIndicator.Height / 2
-	mRadius	= Min(mCx, mCy) * 0.8
+	mCy 	= PaneLevelIndicator.Height / 2.75 + 5dip
+	mRadius	= Min(mCx, mCy) * 0.9
 
 	' Rebind canvas to PaneLevelIndicator
 	CvsLevelIndicator.Initialize(PaneLevelIndicator)
-				
-	LabelValue.SetLayoutAnimated(0, pad, (Height*0.75) - pad, Width - pad * 2, Height * 0.25)
-	
-	setValue(mValue)
 End Sub
 
 ' ===================================================================
-' HELPER
+' DRAW
 ' ===================================================================
 
 ' ReDraw
@@ -133,10 +126,10 @@ Private Sub DrawLevelIndicator
 	CvsLevelIndicator.ClearRect(CvsLevelIndicator.TargetRect)
 
 	' Outer circle as border; not filled
-	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, mBorderColor, False, mBorderWidth)
+	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, HMITileUtils.COLOR_BORDER_DEFAULT, False, mBorderWidth)
 
 	' Inner circle as base; filled
-	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, mBaseColor, True, 0)
+	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, HMITileUtils.COLOR_INDICATOR_TRACK, True, 0)
 
 	' Level calculation 0-100
 	If mValue < 0 Then mValue = 0
@@ -154,9 +147,7 @@ Private Sub DrawLevelIndicator
   
    	' Clip the path and draw the fill circle
 	CvsLevelIndicator.ClipPath(p)
-	Dim levelcolor As Int = mLevelColor
-	If mValue == 0 Then levelcolor = mBaseColor
-	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, levelcolor, True, 0)
+	CvsLevelIndicator.DrawCircle(mCx, mCy, mRadius, HMITileUtils.COLOR_INDICATOR_LEVEL, True, 0)
 	CvsLevelIndicator.RemoveClip
 End Sub
 
@@ -176,7 +167,7 @@ Public Sub setValue(value As Float)
 	If LabelValue.IsInitialized Then
 		mValue = value
 		Redraw
-		LabelValue.Text = $"${NumberFormat(mValue, 1, mDigits)}${IIf(mUnit.Length > 0, $" ${mUnit}"$, "")}"$
+		LabelValue.Text = NumberFormat(mValue, 1, mDigits)
 	End If
 End Sub
 Public Sub getValue As Float
@@ -185,36 +176,18 @@ End Sub
 
 Public Sub setUnit(unit As String)
 	mUnit = unit
-	LabelValue.Text = $"${mValue}${IIf(mUnit.Length > 0, $" ${mUnit}"$, "")}"$
+	LabelUnit.Text = mUnit
 End Sub
 Public Sub getUnit As String
-	Return LabelValue.Text
-End Sub
-
-' Get or set the base color (circle background)
-Public Sub setBaseColor(value As Int)
-	mBaseColor = value
-	Redraw
-End Sub
-Public Sub getBaseColor As Int
-	Return mBaseColor
-End Sub
-
-' Get or set the level color (circle foreground)
-Public Sub setLevelColor(value As Int)
-	mLevelColor = value
-	Redraw
-End Sub
-Public Sub getLevelColor As Int
-	Return mLevelColor
+	Return mUnit
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
+	BasePane.Enabled = enabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(BasePane.Enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' --- Convenience helpers ---
@@ -237,7 +210,7 @@ End Sub
 ' --- Core property ---
 Public Sub setStatus(value As String)
 	mStatus = value
-	ApplyStatusStyle(value)
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 
 Public Sub getStatus As String
@@ -245,57 +218,16 @@ Public Sub getStatus As String
 End Sub
 
 ' ================================================================
-' TILE STATUSSTYLE
+' TILESTYLE
 ' ================================================================
 
-#Region StatusStyle
-' ApplyStatustyle
-' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
-' Parameters:
-'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
-Private Sub ApplyStatusStyle(status As String)
-	mStatus = status
-
+#Region TileStyle
+Private Sub ApplyStyle
+	HMITileUtils.ApplyTileStyle(BasePane)
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 	HMITileUtils.ApplyValueStyle(LabelValue)
-
-	Select status
-		Case HMITileUtils.STATUS_NORMAL
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-			
-		Case HMITileUtils.STATUS_WARNING
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
-
-		Case HMITileUtils.STATUS_ALARM
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
-
-		Case HMITileUtils.STATUS_DISABLED
-			LabelTitle.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			LabelValue.TextColor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND		
-	End Select
-
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
-
-'	' --- Bar ---
-'	PaneBar.SetColorAndBorder( _
-'        HMITileUtils.COLOR_SLIDER_TRACK, _
-'        0dip, _
-'        HMITileUtils.COLOR_SLIDER_TRACK, _
-'        0dip)
-'
-'	' --- Fill ---
-'	PaneFill.SetColorAndBorder( _
-'        HMITileUtils.COLOR_SLIDER_ACTIVE, _
-'        0dip, _
-'        HMITileUtils.COLOR_SLIDER_ACTIVE, _
-'        0dip)
+	HMITileUtils.ApplyUnitStyle(LabelUnit)
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 #End Region
 

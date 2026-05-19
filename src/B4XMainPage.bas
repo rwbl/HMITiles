@@ -5,9 +5,10 @@ Type=Class
 Version=9.85
 @EndOfDesignText@
 ' ================================================================
-' File:			HMITiles
-' Brief:		Development program for the HMITiles B4X library.
-' Description:	This library provides a coherent tile system, HMITiles.
+' File:			B4XMainPage
+' Project:		HMITiles
+' Brief:		Development program for the B4X HMITiles B4X.
+' Description:	This library provides a coherent tile system called HMITiles.
 ' Date:			See Class_Globals VERSION
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' DependsOn:	XUI Views, ByteConverter, JavaObject
@@ -20,7 +21,7 @@ Version=9.85
 #End Region
 
 Private Sub Class_Globals
-	Private VERSION As String	= "HMITiles Development v20260427"
+	Private VERSION As String	= "HMITiles Development v20260519"
 	Private ABOUT As String 	= $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 	
 	' UI
@@ -30,34 +31,41 @@ Private Sub Class_Globals
 	
 	' UI HMITiles
 	Private TileLabelFontAwesome As HMITileLabel
-	Private TileNavButtonPage2 As HMITileNavButton
+	Private TileLabelTitle As HMITileLabelTitle
+	Private TileLabelTitleAlarm As HMITileLabelTitle
+	Private TileNavButtonSecondPage As HMITileNavButton
 	Private TileButtonOnOff As HMITileButton
 	Private TileButtonToggle As HMITileButton
 	Private TileEventViewer As HMITileEventViewer
 	Private TileButtonAlarm As HMITileButton
-	Private TileLevel As HMITileLevel
-	Private TileSeekBar As HMITileSeekBar
-	Private TileSeekBarIndicator As HMITileSeekBar
-	Private TileSeekBarIndicator2 As HMITileSeekBar
+	Private TileLevelBar As HMITileLevel
+	Private TileLevelCircle As HMITileLevel
 	Private TileList As HMITileList
 	Private TileReadOut As HMITileReadout
 	Private TileSPPV1 As HMITileSPPV
 	Private TileSPPV2 As HMITileSPPV
+	Private TileDeviation As HMITileDeviation
 	Private TileSelect As HMITileSelect
 	Private TileSelectList As HMITileSelectList
 	Private TileTrend As HMITileTrend
 	Private TileGauge As HMITileGauge
-	Private TileLevelIndicator As HMITileLevelIndicator
+	Private TileGaugeNeedle As HMITileGauge
+	Private TileGaugeSegments As HMITileGaugeSegments
 	Private TileDigitalClock As HMITileDigitalClock
 	Private TileSensor As HMITileSensor
 	Private TileButtonFA As HMITileButton
 	Private TileButtonFA2 As HMITileButton
 	Private TileStatusIndicators As HMITileStatusIndicators
 	Private TileTimer As HMITileTimer
-	Private TileCustom As HMITileCustom
-	
+	Private TileCustomLabels As HMITileCustom
+	Private TileCustomShape As HMITileCustom
+	Private TileSliderHor As HMITileSlider
+	Private TileSliderIndicator1 As HMITileSlider
+	Private TileSliderIndicator2 As HMITileSlider
+	Private TileSliderVer As HMITileSlider
+		
 	' Pages
-	Private Page2 As B4XPage2
+	Private SecondPage As B4XSecondPage
 End Sub
 
 Public Sub Initialize
@@ -71,9 +79,9 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 
 	' Add pages
 	' Sub-Pages
-	Page2.Initialize
+	SecondPage.Initialize
 	' Page ID, Page Object (defined in class_globals)
-	B4XPages.AddPage("Page2", Page2)
+	B4XPages.AddPage("SecondPage", SecondPage)
 
 	' UI  additional settings
 	Root.Color = HMITileUtils.COLOR_BACKGROUND_SCREEN
@@ -103,6 +111,12 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	TileLabelFontAwesome.SetFontAwesome(True)
 	TileLabelFontAwesome.Text = Chr(0xF256)
 
+	' LabelTitle
+'	TileLabelTitle.Title = "LabelTitle"
+'	TileLabelTitle.Text = "Alarm State"
+'	TileLabelTitle.StatusAlarm
+	TileLabelTitleAlarm.TextSize = 32
+	
 	' Digital Clock
 	TileDigitalClock.ShowSeconds = True
 	
@@ -135,31 +149,37 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' Readout
 	TileReadOut.Value = 67
 	
+	' Gauge
+	TileGauge.Value = 67
+	TileGauge.Min = 0
+	TileGauge.Max = 100
+	TileGaugeNeedle.Value = 90
+	TileGaugeNeedle.Min = 0
+	TileGaugeNeedle.Max = 180
+	TileGaugeSegments.Value = 67
+	
 	' Level Indicators
-	TileGauge.Value = 40
-	TileLevel.Value = 25
-	TileLevelIndicator.Value = 67
-	' TileLevelIndicator.LevelColor = xui.color_blue
+	TileLevelBar.Value = 25
+	TileLevelCircle.Value = 67
 
-	' SeekBars 
-	TileSeekBarIndicator.Vertical = True
-	TileSeekBarIndicator.Value = 25
-	TileSeekBarIndicator.ShowTicks = False
-	' TileSeekBarIndicator.Enabled = False
-	TileSeekBarIndicator.ThumbRadius = 0
-	TileSeekBarIndicator.ActiveBarWidth		= TileSeekBarIndicator.mBase.Width * 0.2
-	TileSeekBarIndicator.InActiveBarWidth	= TileSeekBarIndicator.mBase.Width * 0.2
+	' Slider
+	TileSliderIndicator1.Vertical = True
+	TileSliderIndicator1.Value = 25
+	TileSliderIndicator1.ShowTicks = False
+	TileSliderIndicator1.ThumbRadius = 0
+	TileSliderIndicator1.ActiveBarWidth = TileSliderIndicator1.BasePane.Width * 0.2
+	TileSliderIndicator1.InActiveBarWidth = TileSliderIndicator1.BasePane.Width * 0.2
 	
 	' List
 	TileListAddItems
 	TileList.SelectedItemIndex = 2
 	
 	' SPPV
-	TileSPPV1.DeviationLimit = 10
-	TileSPPV1.SP = 25
-	TileSPPV1.PV = 20
-	TileSPPV1.StepSize = 5
+	TileSPPV1.Title = "FlowRate"
 	TileSPPV1.ShowDeviation = True
+	TileSPPV1.DeviationWarning = 30	'Value SP 50 +/- 
+	TileSPPV1.DeviationAlarm = 40
+	TileSPPV1.StepSize = 5
 	TileSPPV1.EditMode = True
 
 	' Trend
@@ -183,15 +203,25 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	' Timer
 	TileTimer.TimerTextSize = 22
 	
-	' Custom Tile
-	TileCustomCreate
+	' Custom Tiles
+	TileCustomCreateLabels
+	TileCustomCreateShape
+End Sub
+
+' ================================================================
+' TileLabelTitle
+' ================================================================
+
+Private Sub TileLabelTitle_Click
+	
 End Sub
 
 ' ================================================================
 ' NAVBUTTONS
 ' ================================================================
-Private Sub TileNavButtonPage2_Click
-	B4XPages.ShowPageAndRemovePreviousPages("page2")
+
+Private Sub TileNavButtonSecondPage_Click
+	B4XPages.ShowPageAndRemovePreviousPages("SecondPage")
 End Sub
 
 ' ================================================================
@@ -202,8 +232,8 @@ Private Sub TileButtonOnOff_Click
 	TileButtonOnOff.Value = Not(TileButtonOnOff.Value)
 	TileEventViewer.Insert($"[TileButtonOnOff] value=${TileButtonOnOff.Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
 	TileEventViewer.Insert($"[TileButtonOnOff] ${TileEventViewer.StatusSummary}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	TileEventViewer.Insert($"[TileButtonOnOff] slidermax=${TileSeekBarIndicator.MaxValue}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	TileSeekBar.ShowValue = Not(TileSeekBar.ShowValue)
+	TileEventViewer.Insert($"[TileButtonOnOff] slidermax=${TileSliderIndicator1.MaxValue}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	' TileSliderIndicator1.ShowValue = Not(TileSliderIndicator1.ShowValue)
 End Sub
 
 ' Button with fontawesome looks like a toggle switch.
@@ -232,58 +262,66 @@ Private Sub TileButtonFA_Click
 End Sub
 
 ' ================================================================
-' RGB
-' ================================================================
-
-Private Sub TileRGBHorizontal_ValueChanged (m As Map)
-	Dim tile As HMITileRGB = Sender
-	TileEventViewer.Insert($"[TileRGBHorizontal_ValueChanged] tile=${tile.Title}, value=${m}"$, HMITileUtils.EVENT_LEVEL_INFO)
-End Sub
-
-' ================================================================
 ' SLIDER
 ' ================================================================
 
 ' Handle slider value changed.
 ' Set the value and style (Normal, Warning, Alarm) for selected tiles.
-Private Sub TileSeekBar_ValueChanged (value As Int)
+Private Sub TileSliderHor_ValueChanged (Value As Int)
 	Dim level As Int
-	TileReadOut.Value = value
-	TileLevel.Value = value
-	TileGauge.Value = value
-	TileLevelIndicator.Value = value
-	TileSensor.Value = value
-	TileSeekBarIndicator.Value = value
-	TileSeekBarIndicator2.Value = value
-	TileTrend.Add(value)
-
-	If value > 90 Then
+	TileReadOut.Value = Value
+	TileLevelBar.Value = Value
+	TileLevelCircle.Value = Value
+	TileGauge.Value = Value
+	TileGaugeNeedle.Value = HMITileUtils.MapRange(Value, 0, 100, 0, 180)
+	TileGaugeSegments.Value = Value
+	TileSensor.Value = Value
+	TileSliderIndicator1.Value = Value
+	TileSliderIndicator2.Value = Value
+	TileTrend.Add(Value)
+	TileSPPV1.PV = Value
+	TileSPPV2.PV = Round(Value / 10)
+	
+	If Value > 90 Then
 		TileReadOut.StatusAlarm
-		TileLevel.StatusAlarm
-		TileLevelIndicator.StatusAlarm
+		TileLevelBar.StatusAlarm
+		TileLevelCircle.StatusAlarm
 		TileGauge.StatusAlarm
 		TileSensor.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
-	Else if value > 70 Then
+	Else if Value > 70 Then
 		TileReadOut.StatusWarning
-		TileLevel.StatusWarning
-		TileLevelIndicator.StatusWarning
+		TileLevelBar.StatusWarning
+		TileLevelCircle.StatusWarning
 		TileGauge.StatusWarning
 		TileSensor.StatusWarning
 		level = HMITileUtils.EVENT_LEVEL_WARNING
-	Else if value == 0 Then
-		TileLevel.StatusAlarm
+	Else if Value == 0 Then
+		TileLevelBar.StatusAlarm
+		TileLevelCircle.StatusAlarm
 		level = HMITileUtils.EVENT_LEVEL_ALARM
 	Else
 		TileReadOut.StatusNormal
-		TileLevel.StatusNormal
-		TileLevelIndicator.StatusNormal
+		TileLevelBar.StatusNormal
+		TileLevelCircle.StatusNormal
 		TileGauge.StatusNormal
 		TileSensor.StatusNormal
 		level = HMITileUtils.EVENT_LEVEL_INFO
 	End If
 	
-	TileEventViewer.Insert($"[TileSeekBar_ValueChanged] value=${value}"$, level)
+	TileEventViewer.Insert($"[TileSeekBar_ValueChanged] value=${Value}"$, level)
+End Sub
+
+Private Sub TileSliderVer_ValueChanged (Value As Int)
+	
+End Sub
+
+Private Sub TileSliderIndicator2_ValueChanged (Value As Int)
+	
+End Sub
+
+Private Sub TileSliderIndicator1_ValueChanged (Value As Int)
+	
 End Sub
 
 ' ================================================================
@@ -322,21 +360,34 @@ End Sub
 
 Private Sub TileTrendAddData
 	Dim data As List
-	data.Initialize2(Array As Int(20, 20, 30, 15, 75))
+	data.Initialize2(Array As Int(20, 20, 30, 15))
 	TileTrend.UpdateChart(data)
 End Sub
 
+Private Sub TileTrend_Click
+	TileEventViewer.Insert($"[TileTrend_Click] datapoints=${TileTrend.DataPoints}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
 ' ================================================================
-' SETPOINT
+' SPPV
 ' ================================================================
+
+Private Sub TileSPPV1_ValueChanged(Value As Float)
+	TileEventViewer.Insert($"[TileSPPV1_ValueChanged] value=${Value}, setpoint=${TileSPPV1.SP}, deviation=${TileSPPV1.Deviation}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	' Set alarm depending deviaton
+	If Abs(TileSPPV1.Deviation) > 30 Then
+		TileSPPV1.StatusAlarm
+	Else If Abs(TileSPPV1.Deviation) > 20 Then
+		TileSPPV1.StatusWarning
+	Else
+		TileSPPV1.StatusNormal
+	End If
+	TileDeviation.Value = TileDeviation.CalculateDeviation(TileSPPV1.SP, TileSPPV1.PV)	' , TileSPPV1.max - TileSPPV1.Min
+End Sub
 
 Private Sub TileSPPV1_SetPointChanged(Value As Float)
 	TileEventViewer.Insert($"[TileSPPV1_SetPointChanged] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
-End Sub
-
-Private Sub TileSPPV2_SetPointChanged(Value As Float)
-	TileEventViewer.Insert($"[TileSPPV2_SetPointChanged] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
-	TileSPPV2.PV = Rnd(TileSPPV2.Min, TileSPPV2.Max * 1.1)
+	TileDeviation.Value = TileDeviation.CalculateDeviation(TileSPPV1.SP, TileSPPV1.PV)
 End Sub
 
 Private Sub TileSPPV2_ValueChanged(Value As Float)
@@ -351,12 +402,17 @@ Private Sub TileSPPV2_ValueChanged(Value As Float)
 	End If
 End Sub
 
+Private Sub TileSPPV2_SetPointChanged(Value As Float)
+	TileEventViewer.Insert($"[TileSPPV2_SetPointChanged] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+	TileSPPV2.PV = Rnd(TileSPPV2.Min, TileSPPV2.Max * 1.1)
+End Sub
+
 ' ================================================================
 ' SELECT
 ' ================================================================
 
 Private Sub TileSelectListAddAll
-	TileSelectList.AddAll(Array As String("Item1", "Item 2", "Item 3"))
+	TileSelectList.AddAll(Array As String("Item1", "Item 2", "Item 3", "Item 4"))
 End Sub
 
 Private Sub TileSelectList_ItemClick (Index As Int, Value As Object)
@@ -413,11 +469,23 @@ Private Sub TileReadOut_Click
 End Sub
 
 ' ================================================================
-' LEVELINDICATOR
+' LEVEL
 ' ================================================================
 
-Private Sub TileLevelIndicator_Click (Value As Float)
-	TileEventViewer.Insert($"[TileLevelIndicator] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+Private Sub TileLevelBar_Click (Value As Float)
+	TileEventViewer.Insert($"[TileLevelBar] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+Private Sub TileLevelCircle_Click (Value As Float)
+	TileEventViewer.Insert($"[TileLevelCircle] value=${Value}"$, HMITileUtils.EVENT_LEVEL_INFO)
+End Sub
+
+' ================================================================
+' TileCustom
+' ================================================================
+
+Private Sub TileDeviation_Click (Value As Float, Status As String)
+	TileEventViewer.Insert($"[TileDeviation] value=${Value} status=${Status}"$, HMITileUtils.EVENT_LEVEL_INFO)
 End Sub
 
 ' ================================================================
@@ -426,12 +494,12 @@ End Sub
 
 ' Create customized tile starting with empty pane.
 ' Added are 4 labels (B4XViews) top-down.
-Private Sub TileCustomCreate
+Private Sub TileCustomCreateLabels
 	Dim left As Double 
 	Dim top As Double
 	Dim width As Double
 	Dim height As Double
-	Dim heightfactor As Double = 0.25
+	Dim heightfactor As Double = HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
 
 	' Create 4 labels
 	Dim lbls(4) As B4XView
@@ -442,11 +510,58 @@ Private Sub TileCustomCreate
 		lbls(i).SetTextAlignment("CENTER", "CENTER")
 		lbls(i).TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
 		lbls(i).Text = $"${titles(i)}"$
-		left = HMITileUtils.PADDING
-		top = (i * heightfactor) * TileCustom.mBase.Height
-		width = TileCustom.mBase.Width - (HMITileUtils.PADDING * 2)
-		height = TileCustom.mBase.Height * heightfactor
+		left = HMITileUtils.TILE_PADDING
+		top = (i * heightfactor) * TileCustomLabels.BasePane.Height
+		width = TileCustomLabels.BasePane.Width - (HMITileUtils.TILE_PADDING * 2)
+		height = TileCustomLabels.BasePane.Height * heightfactor
 		' Add label to the base
-		TileCustom.mBase.AddView(lbls(i), left, top, width, height)
+		TileCustomLabels.BasePane.AddView(lbls(i), left, top, width, height)
 	Next
+End Sub
+
+' Create customized tile starting with empty pane.
+' Add are a title and a triangle shape
+Private Sub TileCustomCreateShape
+	Dim left As Double
+	Dim top As Double
+	Dim width As Double
+	Dim height As Double
+	Dim heightfactor As Double = HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
+
+	Dim titlelabel As B4XView
+	Dim footerlabel As B4XView
+	Dim cvs As B4XCanvas
+	
+	' Title
+	titlelabel = XUIViewsUtils.CreateLabel
+	titlelabel.Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_LABEL)
+	titlelabel.SetTextAlignment("CENTER", "CENTER")
+	titlelabel.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
+	titlelabel.Text = $"Custom Tile"$
+	left 	= HMITileUtils.TILE_PADDING
+	top 	= 0
+	width 	= TileCustomShape.BasePane.Width - (HMITileUtils.TILE_PADDING * 2)
+	height 	= TileCustomShape.BasePane.Height * heightfactor
+	' Add label to the base
+	TileCustomShape.BasePane.AddView(titlelabel, left, top, width, height)
+
+	' Shape
+	cvs.Initialize(TileCustomShape.BasePane)
+	Dim cx As Float 	= TileCustomShape.BasePane.Width / 2
+	Dim cy As Float 	= TileCustomShape.BasePane.Height / 2
+	Dim size As Float 	= 40
+	HMITileSymbols.Triangle(cvs, cx, cy, size, HMITileUtils.COLOR_STATUS_ALARM, True, 0, HMITileSymbols.DIR_NORTH)
+
+	' footer
+	footerlabel = XUIViewsUtils.CreateLabel
+	footerlabel.Font = xui.CreateDefaultFont(HMITileUtils.TEXT_SIZE_LABEL)
+	footerlabel.SetTextAlignment("CENTER", "CENTER")
+	footerlabel.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
+	footerlabel.Text = $"Triangle North"$
+	left 	= HMITileUtils.TILE_PADDING
+	top 	= TileCustomShape.BasePane.Height * (1 - heightfactor)
+	width 	= TileCustomShape.BasePane.Width - (HMITileUtils.TILE_PADDING * 2)
+	height	= TileCustomShape.BasePane.Height * heightfactor
+	' Add label to the base
+	TileCustomShape.BasePane.AddView(footerlabel, left, top, width, height)
 End Sub

@@ -32,8 +32,8 @@ Private Sub Class_Globals
 	Private mEventName As String	'ignore
 	Private mCallBack As Object		'ignore
 
-	Public mBase As B4XView
-	Public mLbl As B4XView
+	Public BasePane As B4XView
+	Public BaseLabel As B4XView
 
 	Private xui As XUI
 	#if B4J
@@ -59,15 +59,15 @@ Public Sub Initialize(Callback As Object, EventName As String)
 End Sub
 
 Public Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitileimageicon")
+	BasePane.LoadLayout("hmitileimageicon")
 	mImageName 	= Props.Get("ImageName")
 	mResizeMode	= Props.Get("ResizeMode")
 	mRounded 	= Props.Get("Rounded")
@@ -77,17 +77,18 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	setRounded(mRounded)
 
 	ApplyStatusStyle(mStatus)
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(B4XImageViewHMITile.IsInitialized) Then Return
 
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + 4dip
+	Dim pad As Int = 4dip
 	Dim imageHeight As Float = Height - pad * 2
 
 	' Image area
-	B4XImageViewHMITile.mBase.SetLayoutAnimated(0, _
+	B4XImageViewHMITile.mBase.SetLayoutAnimated( _ 
+		0, _
         pad, _
         pad, _
         Width - pad*2, _
@@ -114,10 +115,11 @@ Public Sub setImage(image As String)
 	#End If
 	If File.Exists(folder, mImageName) Then
 		Try
-			B4XImageViewHMITile.Bitmap = xui.LoadBitmapResize(folder, image, _
-            B4XImageViewHMITile.mBase.Width, _
-            B4XImageViewHMITile.mBase.Height, _
-            True)
+			B4XImageViewHMITile.Bitmap = xui.LoadBitmapResize( _
+				folder, image, _
+            	B4XImageViewHMITile.mBase.Width, _
+            	B4XImageViewHMITile.mBase.Height, _
+            	True)
 			B4XImageViewHMITile.CornersRadius = HMITileUtils.BORDER_RADIUS
 			B4XImageViewHMITile.ResizeMode = mResizeMode
 			B4XImageViewHMITile.RoundedImage = mRounded
@@ -133,11 +135,11 @@ Public Sub getImage As String
 End Sub
 
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
+	BasePane.Enabled = enabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(BasePane.Enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' Set the tile status to normal.
@@ -201,18 +203,18 @@ Private Sub ApplyStatusStyle(status As String)
 
 	Select status
 		Case HMITileUtils.STATUS_NORMAL
-			mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 		Case HMITileUtils.STATUS_WARNING
-			mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
 		Case HMITileUtils.STATUS_ALARM
-			mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
 		Case HMITileUtils.STATUS_DISABLED
-			mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
+			BasePane.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
 	End Select
 
 	' Make image view background match HMITile
-	B4XImageViewHMITile.mBackgroundColor = mBase.Color
+	B4XImageViewHMITile.mBackgroundColor = BasePane.Color
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region

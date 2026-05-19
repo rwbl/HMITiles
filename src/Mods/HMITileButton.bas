@@ -9,7 +9,7 @@ Version=10.3
 ' File:     	HMITileButton.bas
 ' Brief:    	CustomView HMITile that behaves like a button (clickable).
 '           	Supports Normal, Warning, Error, Dimmed styles.
-' Date:			2026-01-23
+' Date:			2026-01-29
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+------------------+
@@ -99,7 +99,6 @@ Version=10.3
 #End Region
 
 ' Designer Properties
-
 #DesignerProperty: Key: Title,  	DisplayName: Title,  FieldType: String, DefaultValue: Title
 ' Functional state
 #DesignerProperty: Key: Value,  	DisplayName: Value,  FieldType: Boolean, DefaultValue: False
@@ -113,8 +112,8 @@ Version=10.3
 
 Private Sub Class_Globals
 	' Base
-	Public mBase As B4XView
-	Private mLbl As B4XView			'ignore
+	Public BasePane As B4XView
+	Private BaseLabel As B4XView			'ignore
 	Public Tag As Object
 
 	' Events
@@ -143,15 +142,15 @@ Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilebutton")
+	BasePane.LoadLayout("hmitilebutton")
 	
 	' Properties Designer 
 	mTitle			= Props.Get("Title")
@@ -161,24 +160,43 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mOnText 		= Props.Get("OnText")
 	mOffText 		= Props.Get("OffText")
 
-	ApplyStatusStyle(mStatus)
+	ApplyStyle
 
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 
 	setValue(mValue)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Or Not(LabelValue.IsInitialized) Then Return
-
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
+	Dim l, t, w, h As Float
 	
 	If LabelTitle.Text.Length > 0 Then
-		LabelTitle.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0.25)
-		LabelValue.SetLayoutAnimated(0, pad,  Height * 0.25, Width - pad * 2, Height * 0.60)
+		' Title
+		l = 0
+		t = 0
+		w = Width
+		h = Height * HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
+		LabelTitle.SetLayoutAnimated(0, l, t, w, h)
+		' Value
+		l = 0
+		t = Height * HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
+		w = Width
+		h = Height * HMITileUtils.TILE_VALUE_HEIGHT_FACTOR
+		LabelValue.SetLayoutAnimated(0, l, t, w, h)
 	Else
-		LabelTitle.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0)
-		LabelValue.SetLayoutAnimated(0, pad,  0,        	 Width - pad * 2, Height)
+		' Title
+		l = 0
+		t = 0
+		w = Width
+		h = 0
+		LabelTitle.SetLayoutAnimated(0, l, t, w, h)
+		' Value
+		l = 0
+		t = 0
+		w = Width
+		h = Height
+		LabelValue.SetLayoutAnimated(0, l, t, w, h)
 	End If
 End Sub
 
@@ -200,7 +218,7 @@ End Sub
 Public Sub setValue(value As Boolean)
 	mValue = value
 	LabelValue.Text = IIf(mValue, mOnText, mOffText)
-	HMITileUtils.ApplyValueStyleOnOff(mBase, LabelValue, mValue)
+	HMITileUtils.ApplyValueStyleOnOff(BasePane, LabelValue, mValue)
 End Sub
 Public Sub getValue As Boolean
 	Return mValue
@@ -236,11 +254,11 @@ End Sub
 
 ' Get or set the tile enabled/disabled..
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
+	BasePane.Enabled = enabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(BasePane.Enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' --- Convenience helpers ---
@@ -262,8 +280,8 @@ End Sub
 
 ' --- Core property ---
 Public Sub setStatus(value As String)
-    mStatus = value
-    ApplyStatusStyle(value)
+	mStatus = value
+	HMITileUtils.ApplyStatusStyle(LabelTitle, mTitle, mStatus)
 End Sub
 
 Public Sub getStatus As String
@@ -272,42 +290,14 @@ End Sub
 #End Region
 
 ' ================================================================
-' TILE STATUSSTYLE
+' TILESTYLE
 ' ================================================================
 
-#Region StatusStyle
-' ApplyStatustyle
-' Set one of the 4 visual status Normal, Warning, Alarm, Disabled
-' Parameters:
-'	status String - Use HMITileUtils constants STATUS_NORMAL_TEXT ... WARNING, ALARM, DISABLED
-Private Sub ApplyStatusStyle(status As String)
-    mStatus = status
-
-    HMITileUtils.ApplyTitleStyle(LabelTitle)
+#Region TileStyle
+Private Sub ApplyStyle
+	HMITileUtils.ApplyTileStyle(BasePane)
+	HMITileUtils.ApplyTitleStyle(LabelTitle)
     HMITileUtils.ApplyValueStyle(LabelValue)
-
-    Dim textcolor As Int
-	Select status
-        Case HMITileUtils.STATUS_NORMAL
-            textcolor = HMITileUtils.COLOR_TILE_NORMAL_TEXT
-            mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-
-        Case HMITileUtils.STATUS_WARNING
-            textcolor = HMITileUtils.COLOR_TILE_WARNING_TEXT
-            mBase.Color = HMITileUtils.COLOR_TILE_WARNING_BACKGROUND
-
-        Case HMITileUtils.STATUS_ALARM
-            textcolor = HMITileUtils.COLOR_TILE_ALARM_TEXT
-            mBase.Color = HMITileUtils.COLOR_TILE_ALARM_BACKGROUND
-
-        Case HMITileUtils.STATUS_DISABLED
-            textcolor = HMITileUtils.COLOR_TILE_DISABLED_TEXT
-            mBase.Color = HMITileUtils.COLOR_TILE_DISABLED_BACKGROUND
-    End Select
-
-    LabelTitle.TextColor = textcolor
-    LabelValue.TextColor = textcolor
-    mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
@@ -317,24 +307,28 @@ End Sub
 
 #Region Events
 #if B4J
-Private Sub LabelValue_MouseClicked(EventData As MouseEvent)
-	LabelValue_Click
+Private Sub LabelTitle_MouseClicked(EventData As MouseEvent)
+	TileClick
 End Sub
 
-Private Sub LabelTitle_MouseClicked (EventData As MouseEvent)
-	LabelValue_Click
+Private Sub LabelValue_MouseClicked (EventData As MouseEvent)
+	TileClick
 End Sub
 #End If
 
-' B4X - use click only
+' B4X
+
 Private Sub LabelValue_Click
-	'mValue = Not(mValue)
-	If SubExists(mCallBack, mEventName & "_Click") Then
-		CallSubDelayed(mCallBack, mEventName & "_Click")
-	End If
+	TileClick
 End Sub
 
 Private Sub LabelTitle_Click
-	LabelValue_Click	
+	TileClick
+End Sub
+
+Private Sub TileClick
+	If SubExists(mCallBack, mEventName & "_Click") Then
+		CallSubDelayed(mCallBack, mEventName & "_Click")
+	End If
 End Sub
 #End Region

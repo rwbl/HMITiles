@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:			HMITileTrend.bas
 ' Brief:    	CustomView HMITile with a title & mini trend chart (sparkline).
-' Date:			2026-04-23
+' Date:			2026-05-19
 ' Author:		Robert W.B. Linn (c) 2025 MIT
 ' Description:	HMITileTrend displays a mini trend line.
 '				Mini trends are used to answer:
@@ -45,15 +45,16 @@ Version=10.3
 #End Region
 
 ' Designer Properties
-#DesignerProperty: Key: Title, 			DisplayName: Title, FieldType: String, DefaultValue: Trend
-#DesignerProperty: Key: Unit, 			DisplayName: Unit, FieldType: String, DefaultValue: Unit
-#DesignerProperty: Key: ShowBorder,		DisplayName: Show Border, FieldType: Boolean, DefaultValue: True, Description: Show the chart with border.
-#DesignerProperty: Key: AutoScale,		DisplayName: Auto Scale, FieldType: Boolean, DefaultValue: True, Description: Wheter to set the scale to frozen or autoscale.
-#DesignerProperty: Key: ScaleMin,		DisplayName: Scale Min, FieldType: Float, DefaultValue: 0, Description: Min scale for non auto scale mode.
-#DesignerProperty: Key: ScaleMax,		DisplayName: Scale Max, FieldType: Float, DefaultValue: 100, Description: Max scale for non auto scale mode.
+#DesignerProperty: Key: Title, 			DisplayName: Title, 		FieldType: String,	DefaultValue: Trend
+#DesignerProperty: Key: Unit, 			DisplayName: Unit, 			FieldType: String, 	DefaultValue: Unit
+#DesignerProperty: Key: ShowBorder,		DisplayName: Show Border,	FieldType: Boolean, DefaultValue: True, Description: Show the chart with border.
+#DesignerProperty: Key: AutoScale,		DisplayName: Auto Scale,	FieldType: Boolean, DefaultValue: True, Description: Wheter to set the scale to frozen or autoscale.
+#DesignerProperty: Key: ScaleMin,		DisplayName: Scale Min,		FieldType: Float, 	DefaultValue: 0, 	Description: Min scale for non auto scale mode.
+#DesignerProperty: Key: ScaleMax,		DisplayName: Scale Max,		FieldType: Float, 	DefaultValue: 100, 	Description: Max scale for non auto scale mode.
+#DesignerProperty: Key: DataPoints,		DisplayName: Datapoints,	FieldType: Int, 	DefaultValue: 0,	Description: Max number of data points (0=no limit).
 
 ' Events
-' #Event: Click
+#Event: Click
 
 Private Sub Class_Globals
 	
@@ -62,8 +63,8 @@ Private Sub Class_Globals
 	Private mCallBack As Object			'ignore
 
 	' Base Views
-	Public mBase As B4XView
-	Private mLbl As B4XView				'ignore
+	Public BasePane As B4XView
+	Private BaseLabel As B4XView		'ignore
 	Public Tag As Object
 
 	' UI
@@ -78,6 +79,7 @@ Private Sub Class_Globals
 	Private mAutoScale As Boolean
 	Private mScaleMin As Float
 	Private mScaleMax As Float
+	Private mDataPoints As Int
 
 	' Designer Class
 	Private mStatus As String
@@ -86,6 +88,9 @@ Private Sub Class_Globals
 	Private mChartCanvas As B4XCanvas
 	Private mIsChartCanvasInitialized As Boolean = False
 	Private mChartRect As B4XRect
+	Private mGridLineColor As Int = HMITileUtils.COLOR_TREND_GRID_LINE
+
+	Type PointData (X As Float, Y As Float)
 	Private mData As List
 End Sub
 
@@ -96,41 +101,42 @@ Public Sub Initialize (Callback As Object, EventName As String)
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitiletrend")
+	BasePane.LoadLayout("hmitiletrend")
 
 	mTitle			= Props.Get("Title")
+	LabelTitle.Text = mTitle
 	mUnit			= Props.Get("Unit")
+	' LabelUnit.Text 	= mUnit
 	mShowBorder		= Props.GetDefault("ShowBorder", True)
 	mAutoScale		= Props.GetDefault("AutoScale", True)
 	mScaleMin		= Props.GetDefault("ScaleMin", 0)
 	mScaleMax		= Props.GetDefault("ScaleMax", 100)
-	LabelTitle.Text = mTitle
+	mDataPoints		= Props.GetDefault("DataPoints", 0)
 
 	ApplyStatusStyle(HMITileUtils.STATUS_NORMAL)
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Then Return
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
 	'                            d  l  t            w      h
-	LabelTitle.SetLayoutAnimated(0, 0, pad,         Width, Height * 0.25)
+	LabelTitle.SetLayoutAnimated(0, 0, 0,         Width, Height * 0.25)
 
+	Dim pad As Int = 4
 	PaneChart.SetLayoutAnimated (0, _
-								 HMITileUtils.PADDING, _ 
-								 (Height * 0.25) + HMITileUtils.PADDING, _
-								 Width - (HMITileUtils.PADDING * 2), _
-								 (Height * 0.70) - (HMITileUtils.PADDING * 2))
+								 pad, _ 
+								 (Height * 0.25) + pad, _
+								 Width - (pad * 2), _
+								 (Height * 0.70) - (pad * 2))
 
 	' Chart
 	' Init the canvas holding the chart usig the pane chart - after panechart layout set
@@ -139,6 +145,8 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 		mIsChartCanvasInitialized = True
 	End If
 	mChartRect.Initialize(0, 0, PaneChart.Width, PaneChart.Height)
+	PaneChart.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	DrawChart
 End Sub
 
 ' ================================================================
@@ -150,35 +158,39 @@ End Sub
 ' Notes:
 ' The chart rectangle is set in Base_Resize, like left=4.0, top=34.0, right=116.0, bottom=116.0
 Private Sub DrawChart
-	If Not(PaneChart.IsInitialized) Then
-		Log("[HMITileTrend.DrawChart] Chart not ready yet.")
-		Return
+	Dim padV As Float		= 4dip
+	Dim padH As Float		= 2dip
+	Dim usableH As Float	= PaneChart.Height - (padV * 2)
+	Dim usableW As Float	= PaneChart.Width - (padH * 2)
+
+	' Validation & Setup
+	If Not(PaneChart.IsInitialized) Or PaneChart.Width <= 0 Or PaneChart.Height <= 0 Then Return
+	If mData.IsInitialized = False Or mData.Size < 2 Then Return
+
+	' DO NOT USE THIS IN B4A
+	#if B4J
+	PaneChart.Color = xui.Color_Transparent
+	#End If
+
+	' Clear Canvas & Background
+	mChartCanvas.ClearRect(mChartRect)
+	
+	' Chart background 
+	' mChartCanvas.DrawRect(mChartRect, HMITileUtils.COLOR_TREND_BACKGROUND, True, 0dip)
+
+	If mShowBorder Then
+		mChartCanvas.DrawRect(mChartRect, HMITileUtils.COLOR_BORDER_DARK, False, 1dip)
 	End If
 	
-	' Ensure the chart width&height are set
-	If PaneChart.Width <= 0 Or PaneChart.Height <= 0 Then
-		Log("[HMITileTrend.DrawChart] Chart not ready yet.")
-		Return
-	End If
+	Dim gridLevels() As Float = Array As Float(0.33, 0.66)
+	
+	For Each glevel In gridLevels
+		Dim gridY As Float = padV + (usableH * (1 - glevel))
+		mChartCanvas.DrawLine(padH, gridY, PaneChart.Width - padH, gridY, mGridLineColor, 1dip)
+	Next
 
-	' Check data
-	If mData.IsInitialized = False Or mData.Size < 2 Then
-		Log($"[HMITileTrend.DrawChart] No chart data."$)
-		Return
-	End If
-
-	' Clear the chart
-	mChartCanvas.ClearRect(mChartRect)
-	mChartCanvas.DrawRect(mChartRect, HMITileUtils.COLOR_BACKGROUND_SCREEN, True, 0dip)
-
-	' --- Optional border
-	If mShowBorder Then
-		mChartCanvas.DrawRect(mChartRect, HMITileUtils.COLOR_TREND_BORDER, False, 1dip)
-	End If
-
-	Dim vMin As Float
-	Dim vMax As Float
-
+	' Scale Calculation
+	Dim vMin, vMax As Float
 	If Not(mAutoScale) Then
 		vMin = mScaleMin
 		vMax = mScaleMax
@@ -186,49 +198,78 @@ Private Sub DrawChart
 		vMin = mData.Get(0)
 		vMax = vMin
 		For Each v As Float In mData
-			If v < vMin Then vMin = v
-			If v > vMax Then vMax = v
+			vMin = Min(vMin, v)
+			vMax = Max(vMax, v)
 		Next
-		If vMax = vMin Then vMax = vMin + 1
 	End If
-	' Log($"[HMITileTrend.DrawChart] autoscale=${mAutoScale}, min=${vMin}, max=${vMax}"$)
+    
+	' Prevent divide-by-zero
+	If vMax = vMin Then vMax = vMin + 1
 
-	' Prevent flatline divide-by-zero
-	If vMax = vMin Then
-		vMax = vMin + 1
-	End If
-
-	' --- Geometry
+	' Geometry & Padding
+	' padV: Prevents clipping at top/bottom. padH: Prevents clipping at sides.
 	Dim count As Int = mData.Size
-	' Clamp the last point to avoid drawing outside the chart
-	Dim stepX As Float = (PaneChart.Width - 1) / (count - 1)
 
-	Dim prevX As Float
-	Dim prevY As Float
-
-	' --- Draw polyline
+	' Generate Raw Points
+	Dim RawPoints As List
+	RawPoints.Initialize
 	For i = 0 To count - 1
 		Dim value As Float = mData.Get(i)
-		
-		Dim x As Float = i * stepX
 		Dim norm As Float = (value - vMin) / (vMax - vMin)
-		If norm < 0 Then norm = 0
-		If norm > 1 Then norm = 1
-
-		Dim pad As Float = 1dip
-		Dim usableH As Float = PaneChart.Height - pad * 2
-		Dim y As Float = pad + usableH - (norm * usableH)
-		
-		If i > 0 Then
-			mChartCanvas.DrawLine(prevX, prevY, x, y, HMITileUtils.COLOR_TREND_LINE, 2dip)
-			' Log($"[HMITileTrend.DrawChart] i=${i}, value=${value}, prevX=${prevX}, prevY=${prevY}, x=${x}, y=${y}"$)
-		End If
-
-		prevX = x
-		prevY = y
+		norm = Max(0, Min(1, norm))
+        
+		Dim p As PointData
+		' X is distributed across usable width
+		p.X = padH + (i * (usableW / (count - 1)))
+		' Y is inverted (B4X 0 is top) and kept within usable height
+		p.Y = padV + usableH - (norm * usableH)
+		RawPoints.Add(p)
 	Next
+
+	' Apply Smoothing (Chaikin Algorithm)
+	' Two iterations provide a very high-quality "organic" curve
+	Dim FinalPoints As List = SmoothPoints(RawPoints)
+	FinalPoints = SmoothPoints(FinalPoints)
+
+	' Final Draw
+	For i = 1 To FinalPoints.Size - 1
+		Dim pStart As PointData = FinalPoints.Get(i - 1)
+		Dim pEnd As PointData = FinalPoints.Get(i)
+		mChartCanvas.DrawLine(pStart.X, pStart.Y, pEnd.X, pEnd.Y, HMITileUtils.COLOR_TREND_LINE, 2dip)
+	Next
+
 	mChartCanvas.Invalidate
 End Sub
+
+' Helper: Smooths out the "Z" sharp corners
+Private Sub SmoothPoints(Points As List) As List
+	Dim Smoothed As List
+	Smoothed.Initialize
+	If Points.Size < 3 Then Return Points
+    
+	Smoothed.Add(Points.Get(0))
+	For i = 0 To Points.Size - 2
+		Dim p0 As PointData = Points.Get(i)
+		Dim p1 As PointData = Points.Get(i + 1)
+        
+		Dim q, r As PointData
+		' Point Q at 25% of segment
+		q.X = p0.X * 0.75 + p1.X * 0.25
+		q.Y = p0.Y * 0.75 + p1.Y * 0.25
+		' Point R at 75% of segment
+		r.X = p0.X * 0.25 + p1.X * 0.75
+		r.Y = p0.Y * 0.25 + p1.Y * 0.75
+        
+		Smoothed.Add(q)
+		Smoothed.Add(r)
+	Next
+	Smoothed.Add(Points.Get(Points.Size - 1))
+	Return Smoothed
+End Sub
+
+' ===================================================================
+' Public API
+' ===================================================================
 
 ' UpdateChart
 ' Update the chart with data points array.
@@ -277,6 +318,13 @@ End Sub
 '	v Float
 Public Sub Add(v As Float)
 	mData.Add(v)
+	' Check limit
+	If mDataPoints > 0 Then
+		' If size exceeds limit then remove first data point
+		If mData.Size > mDataPoints Then
+			mData.RemoveAt(0)
+		End If
+	End If
 	DrawChart
 End Sub
 
@@ -287,6 +335,17 @@ End Sub
 Public Sub AddAll(v() As Float)
 	mData.AddAll(v)
 	DrawChart
+End Sub
+
+' Remove
+' Remove data point.
+' Parameters:
+'	index 
+Public Sub Remove(index As Int)
+	If index >= 0 And index <= mData.Size - 1 Then
+		mData.RemoveAt(index)
+		DrawChart		
+	End If
 End Sub
 
 ' Size
@@ -305,15 +364,15 @@ Public Sub DataPoints As List
 	Return mData
 End Sub
 
-' ===================================================================
-' Public API
-' ===================================================================
-
 Public Sub setTitle(text As String)
 	LabelTitle.Text = text
 End Sub
 Public Sub getTitle As String
 	Return LabelTitle.Text
+End Sub
+
+Public Sub SetTitleColorInfo
+	LabelTitle.TextColor = HMITileUtils.COLOR_TEXT_INFO
 End Sub
 
 Public Sub setUnit(text As String)
@@ -323,7 +382,15 @@ Public Sub getUnit As String
 	Return mUnit
 End Sub
 
-' --- Convenience helpers ---
+Public Sub setGridLineColor(value As Int)
+	mGridLineColor = value
+	DrawChart
+End Sub
+Public Sub getGridLineColor As Int
+	Return mGridLineColor
+End Sub
+
+' Convenience helpers
 Public Sub StatusNormal(text As String)
 	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
@@ -340,14 +407,14 @@ Public Sub StatusDisabled(text As String)
 	setStatus(HMITileUtils.STATUS_DISABLED)
 End Sub
 
-' --- Core property ---
+' Core property
 Public Sub setStatus(value As String)
 	ApplyStatusStyle(value)
 End Sub
-
 Public Sub getStatus As String
 	Return mStatus
 End Sub
+
 
 ' ================================================================
 ' TILE STATUSSTYLE
@@ -365,8 +432,8 @@ Private Sub ApplyStatusStyle(status As String)
 	' Trend
 	PaneChart.Color = HMITileUtils.COLOR_BACKGROUND_SCREEN
 
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 
@@ -374,5 +441,20 @@ End Sub
 ' EVENTS
 ' ================================================================
 #Region Events
-	' No events 
+#if B4J
+Private Sub PaneChart_MouseClicked (EventData As MouseEvent)
+	TileClick
+End Sub
+#End If
+
+' B4A
+Private Sub PaneChart_Click
+	TileClick
+End Sub
+
+Private Sub TileClick
+	If SubExists(mCallBack, mEventName & "_Click") Then
+		CallSubDelayed(mCallBack, mEventName & "_Click")
+	End If
+End Sub
 #End Region

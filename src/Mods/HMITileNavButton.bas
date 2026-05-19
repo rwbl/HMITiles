@@ -8,7 +8,7 @@ Version=10.3
 ' ================================================================
 ' File:     	HMITileNavButton.bas
 ' Brief:    	CustomView HMITile that behaves like a navigation button (clickable).
-' Date:			2026-01-14
+' Date:			2026-05-17
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	Page-Select Tile (navigation tile) should:
 '				-Be instantly recognizable
@@ -34,8 +34,8 @@ Version=10.3
 
 Private Sub Class_Globals
 	' Base
-	Public mBase As B4XView
-	Private mLbl As B4XView							'ignore
+	Public BasePane As B4XView
+	Private BaseLabel As B4XView					'ignore
 	Public Tag As Object
 
 	' Events
@@ -58,15 +58,15 @@ Private Sub Initialize (Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView (Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilenavbutton")
+	BasePane.LoadLayout("hmitilenavbutton")
 
 	' Get properties
 	LabelIcon.Text  = Props.Get("Icon")
@@ -78,17 +78,16 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	LabelText.Text	= Props.Get("Text")
 	mSelectType 	= Props.Get("SelectType")
 
-	ApplyStyle(HMITileUtils.STATUS_NORMAL)
-	Base_Resize(mBase.Width, mBase.Height)
+	ApplyStyle
+	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelIcon.IsInitialized) Or Not(LabelText.IsInitialized) Then Return
 
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-	
-	LabelIcon.SetLayoutAnimated(0, pad,  pad,           Width - pad * 2, Height * 0.70)
-	LabelText.SetLayoutAnimated(0, pad,  Height * 0.70, Width - pad * 2, Height * 0.30)
+	' 							 d  l   t              	w      h
+	LabelIcon.SetLayoutAnimated	(0, 0,  0, 				Width, Height)
+	LabelText.SetLayoutAnimated	(0, 0,  Height * 0.80, 	Width, Height * 0.15)
 End Sub
 
 ' ================================================================
@@ -151,11 +150,11 @@ End Sub
 
 ' Get or set the tile enabled/disabled..
 Public Sub setEnabled(enabled As Boolean)
-	mBase.Enabled = enabled
-	mBase.Alpha = HMITileUtils.SetAlpha(mBase.Enabled)
+	BasePane.Enabled = enabled
+	BasePane.Alpha = HMITileUtils.SetAlpha(BasePane.Enabled)
 End Sub
 Public Sub getEnabled As Boolean
-	Return mBase.Enabled
+	Return BasePane.Enabled
 End Sub
 
 ' ================================================================
@@ -166,13 +165,13 @@ End Sub
 ' Apply default stype Normal
 ' Parameters:
 '	tilestate String - HMITileUtils.TYPESTYLE_NORMAL
-Public Sub ApplyStyle(tilestate As String)
+Private Sub ApplyStyle
 	' Do not use HMITileUtils.ApplyIconStyle(LabelIcon)
 	LabelIcon.TextSize = HMITileUtils.TEXT_SIZE_ICON
 	LabelIcon.TextColor = HMITileUtils.COLOR_TEXT_PRIMARY
 	HMITileUtils.ApplyUnitStyle(LabelText)
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

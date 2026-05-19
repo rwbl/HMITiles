@@ -33,8 +33,8 @@ Version=10.3
 Private Sub Class_Globals
 	Private xui 					As XUI
 
-	Public mBase 					As B4XView
-	Private mLbl 					As B4XView					'ignore
+	Public BasePane 					As B4XView
+	Private BaseLabel 					As B4XView					'ignore
 	Public Tag 						As Object
 
 	' Events
@@ -76,17 +76,17 @@ Private Sub Initialize(Callback As Object, EventName As String)	'ignore
 End Sub
 
 Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'ignore
-	mBase = Base
-	mLbl = Lbl
-	Tag = mBase.Tag
-	mBase.Tag = Me
+	BasePane = Base
+	BaseLabel = Lbl
+	Tag = BasePane.Tag
+	BasePane.Tag = Me
 
 	' Load the customview layout(s) via CallSubDelayed.
 	CallSubDelayed2(Me, "AfterLoadLayout", Props)
 End Sub
 
 Private Sub AfterLoadLayout(Props As Map)	'ignore
-	mBase.LoadLayout("hmitilestatusindicators")
+	BasePane.LoadLayout("hmitilestatusindicators")
 
 	' Get & set designer properties
 	mTitle			= Props.Get("Title")
@@ -98,7 +98,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	CreateStatusIndicators
 	
 	' Resize to get the sizing right
-	Base_Resize(mBase.Width, mBase.Height)
+	Base_Resize(BasePane.Width, BasePane.Height)
 
 	' Apply style to UI views	
 	ApplyStyle
@@ -107,20 +107,15 @@ End Sub
 Private Sub Base_Resize (Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Then Return
 
-	' 1. If too small, force the parent container to grow
+	' If too small, force the parent container to grow
 	If Width < HMITileUtils.TILE_DEFAULT_SIZE Or Height < HMITileUtils.TILE_DEFAULT_SIZE Then
 		Dim NewW As Double = Max(Width, HMITileUtils.TILE_DEFAULT_SIZE)
 		Dim NewH As Double = Max(Height, HMITileUtils.TILE_DEFAULT_SIZE)
-		mBase.SetLayoutAnimated(0, mBase.Left, mBase.Top, NewW, NewH)
+		BasePane.SetLayoutAnimated(0, BasePane.Left, BasePane.Top, NewW, NewH)
 		Return ' Exit and let the sub re-fire with the new dimensions
 	End If
 
-	' 2. Proceed with layout using the safe dimensions
-	Dim pad As Int = HMITileUtils.BORDER_WIDTH + HMITileUtils.PADDING
-
-	' Note: Using Width - (pad * 2) here is why it looked "wrong"
-	' before—it was wider than the physical screen.
-	LabelTitle.SetLayoutAnimated (0, pad, pad, Width - pad * 2, Height * 0.25)
+	LabelTitle.SetLayoutAnimated (0, 0, 0, Width, Height * 0.25)
     
 	Dim it As Double = LabelTitle.Top + LabelTitle.Height
 	' Use Floor to get safe integer-like steps
@@ -150,7 +145,7 @@ Private Sub CreateStatusIndicators
 	For i = 0 To STATUS_INDICATORS_SIZE - 1 
 		Dim lbl As Label
 		lbl.Initialize("LabelStatusIndicator")
-		mBase.AddView(lbl, 0dip, 0dip, 30dip, 30dip)
+		BasePane.AddView(lbl, 0dip, 0dip, 30dip, 30dip)
 		LabelStatusIndicators(i) = lbl
 		Dim data As IndicatorData
 		data.Initialize
@@ -314,10 +309,10 @@ End Sub
 Private Sub ApplyStyle
 	HMITileUtils.ApplyTitleStyle(LabelTitle)
 
-	mBase.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
+	BasePane.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	
 	' Border styling - All non-buttons clean, borderless tile with border-radius.
-	mBase.SetColorAndBorder(mBase.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
+	BasePane.SetColorAndBorder(BasePane.Color, 0, 0, HMITileUtils.BORDER_RADIUS)
 End Sub
 #End Region
 

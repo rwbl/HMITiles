@@ -1,15 +1,31 @@
 # Examples
 
-**HMITiles** examples.
+Example projects for the **HMITiles** library.
 
 ---
 
-B4A - Android Apps
+Welcome to the HMITiles examples collection.
 
-B4J - Desktop Applications
+This folder contains standalone and easy-to-follow examples for every tile and feature included in the library.
 
-B4X - B4A & B4J Applications
+## Contents
+### Tile Examples
+- Each numbered subfolder contains a self-contained demo for a specific HMITile component.
+- Reference Implementations
+- Use the examples as a reference for properties, styling, status handling, layouts, and data integration.
+### Application Demos
+- More complete demo applications start at index 50-....
 
-GetStarted - This folder provides isolated, easy-to-follow examples for every HMITile in the library.
+## Folder Structure
+Examples are organized in numbered folders:
 
-Libs - Additional libraries for examples using B4R (ESP32 Firmware)
+01-HMITile...
+02-HMITile...
+...
+99-...
+
+This numbering keeps the examples grouped and easy to navigate.
+
+Simply open a project folder to see a tile in action and reuse the implementation patterns in your own applications.
+
+---
