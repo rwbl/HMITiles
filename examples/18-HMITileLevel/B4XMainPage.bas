@@ -20,7 +20,8 @@ Sub Class_Globals
 	Private LabelLegend As B4XView
 	Private TileLabel As HMITileLabel
 	Private TileButton As HMITileButton
-	Private TileLevel As HMITileLevel
+	Private TileLevelBar As HMITileLevel
+	Private TileLevelCircle As HMITileLevel
 End Sub
 
 Public Sub Initialize
@@ -48,8 +49,10 @@ End Sub
 ' ================================================================
 
 Private Sub TileLevelSetProperties
-	TileLevel.Value = 68
-	TileLabel.Text = $"Level${CRLF}${TileLevel.Value}"$
+	TileLevelBar.Value = 68
+	TileLabel.Text = $"Level${CRLF}${TileLevelBar.Value}"$
+	TileLevelCircle.Value = 68
+	SetLabel
 End Sub
 
 ' ===================================================
@@ -58,21 +61,23 @@ End Sub
 
 Private Sub TileButton_Click
 	Dim v As Float = Rnd(0, 101)
-	TileLevel.Value = v
-	If v > 90 Then
-		TileLevel.StatusAlarm
-	Else if v > 80 Then
-		TileLevel.StatusWarning
+	TileLevelBar.Value = v
+	If v > 80 Then
+		TileLevelBar.StatusAlarm
+	Else if v > 70 Then
+		TileLevelBar.StatusWarning
 	Else 
-		TileLevel.StatusNormal
+		TileLevelBar.StatusNormal
 	End If
 	SetLabel
+	Dim v As Float = Rnd(0, 101)
+	TileLevelCircle.Value = v
 End Sub
 
-Private Sub TileLevel_Click (Value As Float)
+Private Sub TileLevelBar_Click (Value As Float)
 	SetLabel
 End Sub
 
 Private Sub SetLabel
-	TileLabel.Text = $"Level${CRLF}${TileLevel.Value}${CRLF}${TileLevel.Status}"$
+	TileLabel.Text = $"Levels${CRLF}Bar:${NumberFormat(TileLevelBar.Value,0,0)} ${TileLevelBar.Status}${CRLF}Circle:${NumberFormat(TileLevelCircle.Value,0,0)}"$
 End Sub
