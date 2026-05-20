@@ -22,7 +22,7 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=BLEExample.zip
 
 Sub Class_Globals
-	Private VERSION As String = "BLEScanner v20260520+"
+	Private VERSION As String = "BLEScanner v20260520"
 	Private INFO 	As String = "HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"
 
 	' UI
