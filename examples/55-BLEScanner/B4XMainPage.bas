@@ -8,7 +8,7 @@ Version=9.85
 ' File:			BLEScanner
 ' Project:		HMITiles
 ' Brief:		Example using the BLE Scanner.
-' Date:			2026-05-19
+' Date:			2026-05-20
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' Description:	Scan (AllowDuplicates set to false) for BLE devices and list their name and id (MAC address).
 ' Based on:		B4A forumm example www.b4x.com/android/forum/threads/b4x-ble-2-bluetooth-low-energy.59937/ (thanks for sharing)
@@ -22,7 +22,7 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=BLEExample.zip
 
 Sub Class_Globals
-	Private VERSION As String = "BLEScanner v20260519"
+	Private VERSION As String = "BLEScanner v20260520+"
 	Private INFO 	As String = "HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"
 
 	' UI
@@ -100,7 +100,7 @@ Sub Manager_DeviceFound (Name As String, Id As String, AdvertisingData As Map, R
 	sb.Initialize
 	For Each key As Int In AdvertisingData.Keys
 		Dim data() As Byte = AdvertisingData.Get(key)
-		sb.Append($"AD Type=${key},${bc.HexFromBytes(data)}${CRLF}"$)
+		sb.Append($"ADV Type=${key};ADV Data=${bc.HexFromBytes(data)}${CRLF}"$)
 		' Log("AD Type=" & key & " Data=" & bc.HexFromBytes(data))
 	Next
 	TileEventViewer.Insert($"Device found: ${Name} ${Id} data=${sb.ToString}"$, HMITileUtils.EVENT_LEVEL_INFO)
@@ -108,7 +108,7 @@ End Sub
 
 Private Sub StartScan
 	If manager.State <> manager.STATE_POWERED_ON Then
-		TileEventViewer.Insert("BLE is not powered on.", HMITileUtils.EVENT_LEVEL_WARNING)
+		TileEventViewer.Insert("BLE not powered on.", HMITileUtils.EVENT_LEVEL_WARNING)
 	Else
 		' Start scanning
 		manager.Scan2(Null, AllowDuplicates)
