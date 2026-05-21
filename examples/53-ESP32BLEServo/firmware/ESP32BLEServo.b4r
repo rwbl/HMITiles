@@ -11,28 +11,29 @@ Version=4
 @EndOfDesignText@
 #Region Project Header
 '==============================================
-' Project:		rESP32Servo
+' Project:		HMITiles
+' File:			ESP32BLEServo.b4r
 ' Brief:		Example to set the angle of a geekservo via BLE.
-' Date: 		2026-04-13
+' Date: 		2026-05-21
 ' Author:      	Robert W.B. Linn (c) 2026 MIT
 ' Description:	The angle of the geekservo is open (90) or close (135).
-'				The BLE server processes a 5-byte command received from the connected client via BLE.
-'				This is the 5-byte protocol from the author's HubController project.
+'				The BLE server processes a 5-byte frame received from the connected client via BLE.
+'				The frame used is the 5-byte PentaProtocol developed by the author and used in several projects.
 '				Byte 1 = Header 	- fix 0x19
 '				Byte 2 = Address	- example 0x12
 '				Byte 3 = Command	- example 0x05
-'				Byte 4 = Value		- example 0x00 or 0x01 or a value between 0x5A (DEC 90) and 0x87 (DEC 135)
+'				Byte 4 = Value		- example 0x00 or 0x01 or a value between 0x5A (DEC 90) [open] and 0x87 (DEC 135) [close]
 '				Byte 5 = Footer 	- fix 0x58
-'				Servo Pos Close: [OnWrite][I] RX:5 1912058758
-'				Servo Pos Open: [OnWrite][I] RX:5 1912055A58
-' BLE:			Device name = BLEGeekServo
+'				Servo Pos Close:	[OnWrite][I] RX:5 1912058758
+'				Servo Pos Open:		[OnWrite][I] RX:5 1912055A58
+' BLE:			Device name = ESP32BLEServo
 '				MAC address = "80:F3:DA:4C:36:7A"
 '        		Service UUID = 12345678-1234-1234-1234-1234567890ab
 '				Char UUID = abcd1234-5678-1234-5678-1234567890ab
 ' Gimmick:		If servo angle at close pos, the onboard blue LED is turned ON.
 ' DependsOn:	rESP32Servo, rNimBLEServer, rConvert
 '				Arduino Installed: ESP32@3.3.8, ESP32Servo@3.1.3, NimBLE-Arduino@2.5.0
-' Hardware:		ESP32
+' Hardware:		ESP32 Wrover Kit
 ' Wiring:		GPIO 2 - Onboard LED
 '				GPIO 4 - Servo Signal Pin, Servo VCC 5V
 '==============================================
@@ -46,16 +47,16 @@ Version=4
 'Ctrl+Click to open the C code folder: ide://run?File=%WINDIR%\System32\explorer.exe&Args=%PROJECT%\Objects\Src
 
 Sub Process_Globals
-	Private VERSION 						As String = "BLE GeekServo v2026-04-13"
+	Private VERSION 						As String = "ESP32BLEServo v20260521"
 	
 	' Communication
     Public Serial1 							As Serial
-	Private BleServer 						As NimBLEServer
+	Private BLEServer 						As NimBLEServer
 	
 	' Servo
 	Private GeekServo 						As ESP32Servo
 	Private GeekServoPin 					As Pin
-	Private GeekServoPinNr 					As Byte = 4
+	Private GeekServoPinNr 					As Byte = 4			' GPIO4
 	Private ServoAngle 						As UInt
 	Private ANGLE_BASE_POS					As UInt = 90
 	Private ANGLE_OPEN						As UInt = 90
@@ -65,7 +66,7 @@ Sub Process_Globals
 	Private OnboardLED 						As Pin
 	Private ONBOARDLED_PINNR 				As Byte = 2
 
-	' BLE HubBin Frame 5-Bytes HDR ADR CMD VAL FTR
+	' BLE PentaProtocol Frame 5-Bytes HDR ADR CMD VAL FTR
 	' Header and footer
 	Public FRAME_LENGTH 					As Byte	= 5
 	Public FRAME_HEADER 					As Byte = 0x19
@@ -99,8 +100,8 @@ Sub AppStart
 	Log("[Main.AppStart][I] Init servo angle=", ServoAngle)
 
 	' Init the BLE server
-    BleServer.Initialize( _
-        "BLEGeekServo", _
+    BLEServer.Initialize( _
+        "ESP32BLEServo", _
         "12345678-1234-1234-1234-1234567890ab", _
         "abcd1234-5678-1234-5678-1234567890ab", _
         "OnConnected", _
@@ -108,7 +109,7 @@ Sub AppStart
         "OnWrite", _
         True)
 	' Starte BLE server waiting for clients
-	BleServer.Start
+	BLEServer.Start
 	Log("[AppStart][I] Start BLE Server, waiting clients...")
 	Log("[AppStart][I] Done")
 End Sub

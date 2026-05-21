@@ -5,19 +5,19 @@ Type=Class
 Version=9.85
 @EndOfDesignText@
 ' ================================================================
-' File:			BLEGeekServo
+' File:			ESP32BLEServo
 ' Project: 		HMITiles
-' Brief:		Example B4XPages application for the rESP32Servo library.
-' Date:			2026-05-19
+' Brief:		Example application to control servo position connected to an ESP32.
+' Date:			2026-05-21
 ' Author:		Robert W.B. Linn (c) 2026 MIT
 ' Description:	Set a GeekServo position to open (90°) or close (135°) via BLE.
-' Depends on:	Bleak, HMITiles, ByteConverter
+' Depends on:	PyBridge, Bleak, HMITiles, ByteConverter
 ' ================================================================
 
 #CustomBuildAction: after packager, %WINDIR%\System32\robocopy.exe, Python temp\build\bin\python /E /XD __pycache__ Doc pip setuptools tests
 
 Sub Class_Globals
-	Private Const VERSION 			As String = "BLEGeekServo v20260519"
+	Private Const VERSION 			As String = "ESP32BLEServo v20260521"
 	Private ABOUT 					As String = $"HMITiles (c) 2025-2026 Robert W.B. Linn - MIT"$
 
 	' UI
@@ -36,7 +36,7 @@ Sub Class_Globals
 	' Device
 	' BLE device (ESP32)
 	Public BLE_MAC 				As String = "80:F3:DA:4C:36:7A"						
-	Public BLE_DEVICE_NAME 		As String = "BLEGeekServo"							' Case sensitive, MUST MATCH name defined in B4R
+	Public BLE_DEVICE_NAME 		As String = "ESP32BLEServo"							' Case sensitive, MUST MATCH name defined in B4R
 
 	' BLE Service & Characteristics
 	Public SERVICE_UUID 		As String = "12345678-1234-1234-1234-1234567890ab"	' UART
@@ -44,7 +44,7 @@ Sub Class_Globals
 	Public CHAR_UUID_RX 		As String = "abcd1234-5678-1234-5678-1234567890ab"	' Receive Flags read,notify,write
 
 	' BLE
-	' Frame
+	' Frame using the authors PentaProtocol with 5 bytes HDR ADR CMD VAL FTR
 	Private FRAME_HEADER 		As Byte = 0x19
 	Private FRAME_FOOTER 		As Byte = 0x58
 	Private DEVICE_ADDRESS 		As Byte = 0x12
