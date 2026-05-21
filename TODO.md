@@ -13,7 +13,7 @@
 - NEW: Tiles label set or get textsize: TitleTextSize, ValueTextSize, UnitTextSize or set tile-specific: TimerTextSize,GaugeValueTextSize,AlarmTextSize,TitleTextSize.
 - FIX: HMITileSelectList - Compact mode customlistview item height same as default mode.
 #### Status
-Tested HMITiles Overview example on Linux Ubuntu and Raspberry Pi. Need to document.
+Tested HMITiles on Linux Ubuntu and Raspberry Pi. Need to document.
 
 ### NEW: Keyestudio Smart Farm Kit
 Develop new project `FarmKit32` to control the Keyestudio Smart Farm Kit [KS0567](docs.keyestudio.com/projects/KS0567/en/latest/wiki/index.html). 
