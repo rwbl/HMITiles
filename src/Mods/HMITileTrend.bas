@@ -122,6 +122,7 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	mScaleMax		= Props.GetDefault("ScaleMax", 100)
 	mDataPoints		= Props.GetDefault("DataPoints", 0)
 
+	PaneChart.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	ApplyStatusStyle(HMITileUtils.STATUS_NORMAL)
 	Base_Resize(BasePane.Width, BasePane.Height)
 End Sub
@@ -145,7 +146,6 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 		mIsChartCanvasInitialized = True
 	End If
 	mChartRect.Initialize(0, 0, PaneChart.Width, PaneChart.Height)
-	PaneChart.Color = HMITileUtils.COLOR_TILE_NORMAL_BACKGROUND
 	DrawChart
 End Sub
 

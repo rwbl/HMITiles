@@ -113,6 +113,7 @@ End Sub
 
 Public Sub Base_Resize (Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Then Return
+
 	'								 d  l  t                w      h
 	LabelTitle.SetLayoutAnimated	(0, 0, 0,           	Width, Height * 0.25)
 	LabelTimer.SetLayoutAnimated 	(0, 0, 0, 				Width, Height)

@@ -168,36 +168,11 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
-	If Not(LabelTitle.IsInitialized) Or Not(LabelValue.IsInitialized) Then Return
-	Dim l, t, w, h As Float
-	
-	If LabelTitle.Text.Length > 0 Then
-		' Title
-		l = 0
-		t = 0
-		w = Width
-		h = Height * HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
-		LabelTitle.SetLayoutAnimated(0, l, t, w, h)
-		' Value
-		l = 0
-		t = Height * HMITileUtils.TILE_TITLE_HEIGHT_FACTOR
-		w = Width
-		h = Height * HMITileUtils.TILE_VALUE_HEIGHT_FACTOR
-		LabelValue.SetLayoutAnimated(0, l, t, w, h)
-	Else
-		' Title
-		l = 0
-		t = 0
-		w = Width
-		h = 0
-		LabelTitle.SetLayoutAnimated(0, l, t, w, h)
-		' Value
-		l = 0
-		t = 0
-		w = Width
-		h = Height
-		LabelValue.SetLayoutAnimated(0, l, t, w, h)
-	End If
+	If Not(LabelTitle.IsInitialized) Then Return
+
+	'                            d  l  t  w      h
+	LabelTitle.SetLayoutAnimated(0, 0, 0, Width, Height * 0.25)
+	LabelValue.SetLayoutAnimated(0, 0, 0, Width, Height)
 End Sub
 
 ' ================================================================

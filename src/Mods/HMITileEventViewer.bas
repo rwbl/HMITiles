@@ -9,7 +9,7 @@ Version=10.3
 ' File:     HMITileEventViewer.bas
 ' Brief:    HMITile with a title, customlistview and trash icon (clear all event messages).
 '			The customlistview contains an event list with each line being an event (Or "event message")
-' Date:		2026-04-21
+' Date:		2026-05-22
 ' Author:	Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '			+------------------+
@@ -100,8 +100,8 @@ Private Sub AfterLoadLayout(Props As Map)	'ignore
 	' Properties Designer
 	mTitle			= Props.Get("Title")
 	LabelTitle.Text = mTitle
-	mTimeStamp		= Props.Get("TimeStamp")
-	mMaxEvents		= Props.Get("MaxItems")
+	mTimeStamp		= Props.GetDefault("TimeStamp", True)
+	mMaxEvents		= Props.GetDefault("MaxEvents", 50)
 	mShowTitle		= Props.GetDefault("ShowTitle", True)
 	mShowTrash		= Props.GetDefault("ShowTrash", True)
 	mCompactMode	= Props.GetDefault("CompactMode", False)

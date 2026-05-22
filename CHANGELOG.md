@@ -6,8 +6,10 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [2.x.x] - 2026-mm-dd
-- 
+## [2.0.1] - 2026-05-22
+- NEW: Example 57-GeneratorSimulator - Demo simulates a standard European 220V/230V @ 50Hz 4-pole industrial diesel generator
+- FIX: HMITileSlider - Handling value < min range or > max range; Tickmarks fixed length instead barheight/width 
+- FIX: HMITileEventViewer - Property MaxItems wrongly initialized as MaxItems (caused eventviewer crash)
 
 ## [2.0.0] - 2026-05-19
 - NEW: Alarm Concept - Title changes color & indicator added depending state (normal, warning, alarm) and not the full tile anymore (clear visual hierarchy that instantly tells the status without overwhelming the screen)

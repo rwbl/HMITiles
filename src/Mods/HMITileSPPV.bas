@@ -165,8 +165,8 @@ Private Sub Base_Resize(Width As Double, Height As Double)
 	LabelDeviation.SetLayoutAnimated	(0, 0,                      Height * 0.80, 	Width,        	Height * 0.15)
 
 	' Draw seperator below PV
-	Dim h As Double = Height * 0.55
-	mCanvasSeperator.DrawLine(0, h, Width, h, xui.Color_White, 2)
+	Dim h As Double = Height * 0.6
+	mCanvasSeperator.DrawLine(0, h, Width, h, xui.Color_White, 1dip)
 End Sub
 
 ' UpdateSPPV

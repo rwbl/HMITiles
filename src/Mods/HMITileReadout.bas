@@ -8,7 +8,7 @@ Version=10.3
 ' File:     	HMITileReadout.bas
 ' Brief:    	CustomView HMITile with a title, value, unit readout.
 '           	Supports Normal, Warning, Alarm, Dimmed styles.
-' Date:			2026-04-23
+' Date:			2026-05-22
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Layout:
 '				+------------------+
@@ -85,14 +85,16 @@ End Sub
 
 Private Sub Base_Resize(Width As Double, Height As Double)
 	If Not(LabelTitle.IsInitialized) Or Not(LabelValue.IsInitialized) Then Return
+
 	'							  d  l    t             w      h	
 	LabelTitle.SetLayoutAnimated (0, 0, 0,           	Width, Height * 0.25)
-	LabelValue.SetLayoutAnimated (0, 0, Height * 0.25, 	Width, Height * 0.50)
+	LabelValue.SetLayoutAnimated (0, 0, 0, 				Width, Height)
 	LabelUnit.SetLayoutAnimated  (0, 0, Height * 0.80, 	Width, Height * 0.15)
 End Sub
 
 ' PUBLIC API
 
+' Get or set the title as string
 Public Sub setTitle(text As String)
 	mTitle = text
 	LabelTitle.Text = mTitle
@@ -101,7 +103,7 @@ Public Sub getTitle As String
 	Return mTitle
 End Sub
 
-' Value as string
+' Get or set the value as string
 Public Sub setValue(value As String)
 	mValue = value
 	LabelValue.Text = mValue
@@ -110,6 +112,7 @@ Public Sub getValue As String
 	Return mValue
 End Sub
 
+' Get or set the unit as string
 Public Sub setUnit(text As String)
 	mUnit = text
 	LabelUnit.Text = mUnit
@@ -118,6 +121,7 @@ Public Sub getUnit As String
 	Return mUnit
 End Sub
 
+' Get or set the tile enabled
 Public Sub setEnabled(enabled As Boolean)
 	mEnabled = enabled
 	BasePane.Enabled = mEnabled
@@ -127,7 +131,6 @@ Public Sub getEnabled As Boolean
 	Return mEnabled
 End Sub
 
-' --- Convenience helpers ---
 Public Sub StatusNormal
 	setStatus(HMITileUtils.STATUS_NORMAL)
 End Sub
@@ -152,6 +155,17 @@ End Sub
 Public Sub getStatus As String
 	Return mStatus
 End Sub
+
+' Set or get value label text size
+' Use for example to reduce size if the value is used as text indicator
+Public Sub setValueTextSize(value As Float)
+	LabelValue.TextSize = value
+End Sub
+Public Sub getValueTextSize As Float
+	Return LabelValue.TextSize
+End Sub
+
+
 #End Region
 
 #Region TileStyle

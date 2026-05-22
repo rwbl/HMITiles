@@ -7,7 +7,7 @@ Version=10.3
 ' ================================================================
 ' File:			HMITileSlider
 ' Brief:		Custom slider with optional tickmarks (horizontal/vertical).
-' Date:			2026-05-17
+' Date:			2026-05-22
 ' Author:		Robert W.B. Linn (c) 2025-2026 MIT
 ' Description:	This slider is primarily designed for horizontal orientation.
 '				Important: 
@@ -132,10 +132,9 @@ Private Sub DesignerCreateView(Base As Object, Lbl As Label, Props As Map)	'igno
 	#End If
 	mTickFontSize		= HMITileUtils.TEXT_SIZE_SMALL
 	mInterval 			= Max(1, Props.GetDefault("Interval", 1))
-
 	mMinValue 			= Props.Get("Min")
 	mMaxValue 			= Props.Get("Max")
-	mValue 				= Max(mMinValue, Min(mMaxValue, Props.Get("Value")))
+	mValue 				= Props.Get("Value")
 
 	mVertical			= Props.Get("Vertical")
 
@@ -196,155 +195,251 @@ Public Sub Base_Resize(Width As Double, Height As Double)
 End Sub
 
 ' ================================================================
+' Returns normalized slider value between 0.0 and 1.0
+' ================================================================
+Private Sub GetNormalizedValue As Float
+	Dim range As Float = mMaxValue - mMinValue
+	If range = 0 Then Return 0
+	
+	Dim df As Float = (mValue - mMinValue) / range
+	' Clamp below minimum = 0; above maximum = 1
+	Return Max(0, Min(1, df))
+End Sub
+
+' ================================================================
 ' Redraws slider and tickmarks
 ' ================================================================
 Public Sub DrawSliders
-	Dim x1,y1,x2,y2 As Float
 
-	' Clear the canvs rect
+	' Dim x1,y1,x2,y2 As Float
+	Dim tickmarklength As Float = 4dip
+	
+	Dim cx As Float = BasePane.Width / 2
+	Dim cy As Float = BasePane.Height / 2
+
+	' Clear canvas
 	CanvasSeekBar.ClearRect(CanvasSeekBar.TargetRect)
 
-	' ----------------------------------------------------------------
-	' Horizontal
-	' ----------------------------------------------------------------
-	If Not(mVertical) Then 
-		mSize = BasePane.Width - 2 * mThumbRadiusPressed
+	' Normalize current value
+	Dim df As Float = GetNormalizedValue
 
-		' Check if size > 0
+	' ============================================================
+	' Horizontal Slider
+	' ============================================================
+	If Not(mVertical) Then
+
+		mSize = BasePane.Width - (2 * mThumbRadiusPressed)
+
 		If mSize <= 0 Then Return
-		Dim y As Int = (BasePane.Height / 2)
-		Dim w As Int = mThumbRadiusPressed + (mValue - mMinValue) / (mMaxValue - mMinValue) * mSize
 
-		' Draw active level
-		x1 = mThumbRadiusPressed
-		y1 = y 
-		x2 = w
-		y2 = y
-		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorLevel, mActiveBarWidth)
-
-		' Draw full background track
-		x1 = w
-		y1 = y
-		x2 = BasePane.Width - mThumbRadiusPressed
-		y2 = y
-		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorTrack, mInActiveBarWidth)
+		' --------------------------------------------------------
+		' Slider geometry
+		' --------------------------------------------------------
+		Dim barLeft As Float = mThumbRadiusPressed
+		Dim barRight As Float = BasePane.Width - mThumbRadiusPressed
 		
-		' Draw thumb
-		If mShowThumb Then
-			CanvasSeekBar.DrawCircle(w, y, mThumbRadius, mThumbColor, True, 0)
-			If Pressed Then CanvasSeekBar.DrawCircle(w, y, mThumbRadiusPressed, mThumbColor, True, 0)
+		Dim barTop As Float = cy - (mInActiveBarWidth / 2)
+		Dim barBottom As Float = cy + (mInActiveBarWidth / 2)
+
+		Dim thumbX As Float = barLeft + (mSize * df)
+
+		' --------------------------------------------------------
+		' Draw inactive track
+		' --------------------------------------------------------
+		CanvasSeekBar.DrawLine( _
+			barLeft, cy, _
+			barRight, cy, _
+			mColorTrack, _
+			mInActiveBarWidth)
+
+		' --------------------------------------------------------
+		' Draw active track
+		' --------------------------------------------------------
+		If thumbX > barLeft Then
+			CanvasSeekBar.DrawLine( _
+				barLeft, cy, _
+				thumbX, cy, _
+				mColorLevel, _
+				mActiveBarWidth)
 		End If
+
+		' --------------------------------------------------------
+		' Draw thumb
+		' --------------------------------------------------------
+		If mShowThumb Then
 		
-		' Draw tickmarks if enabled
+			CanvasSeekBar.DrawCircle( _
+				thumbX, cy, _
+				mThumbRadius, _
+				mThumbColor, _
+				True, 0)
+
+			If Pressed Then
+				CanvasSeekBar.DrawCircle( _
+					thumbX, cy, _
+					mThumbRadiusPressed, _
+					mThumbColor, _
+					True, 0)
+			End If
+		End If
+
+		' --------------------------------------------------------
+		' Draw tickmarks
+		' --------------------------------------------------------
 		If mShowTicks And mTickCount > 1 Then
+
+			Dim fnt As B4XFont
+			
+			#if B4A
+			fnt = xui.CreateDefaultFont(mTickFontSize + 4dip)
+			#Else
+			fnt = xui.CreateDefaultFont(mTickFontSize)
+			#End If
+
+			Dim tickY1 As Float = barBottom
+			Dim tickY2 As Float = tickY1 + tickmarklength
+
+			#if B4A
+			tickY2 = tickY2 + 6dip
+			#End If
+
 			For i = 0 To mTickCount - 1
-				Dim xTick As Float = mThumbRadiusPressed + i * mSize / (mTickCount - 1)
-				
+
+				Dim xTick As Float = barLeft + (i * mSize / (mTickCount - 1))
+
 				' Tick line
-				x1 = xTick
-				y1 = (BasePane.Height / 2) + (mActiveBarWidth / 2)
-				x2 = xTick
-				y2 = y1 + mActiveBarWidth
-				#if B4A
-				y2 = y2 + 6dip
-				#End If
+				CanvasSeekBar.DrawLine( _
+					xTick, tickY1, _
+					xTick, tickY2, _
+					mTickValueColor, _
+					1dip)
 
-				If i = 0 Or i = mTickCount - 1 Then
-					y1 = y1 - (mActiveBarWidth / 2)
-				End If
-				CanvasSeekBar.DrawLine(x1, y1, x2, y2, mTickValueColor, 1dip)
-				
-				' Tick label below tick
-				#if B4A
-				Dim fnt As B4XFont = xui.CreateDefaultFont(mTickFontSize + 4dip)
-				#End If
-				#if B4J
-				Dim fnt As B4XFont = xui.CreateDefaultFont(mTickFontSize)
-				#End If
-				Dim tickVal As Int = mMinValue + i * (mMaxValue - mMinValue) / (mTickCount - 1)
-				x1 = xTick
-				y1 = y2	+ mThumbRadius * 2
+				' Tick value
+				Dim tickVal As Int = _
+					mMinValue + _
+					(i * (mMaxValue - mMinValue) / (mTickCount - 1))
 
-				' Just to show how to left align the last value but not looking good				
-				'If i == mTickCount - 1 Then
-				'	x1 = x1 - (fnt.size * tickVal.As(String).Length) / 2
-				'End If
-				CanvasSeekBar.DrawText(tickVal, x1, y1, fnt, mTickValueColor, "CENTER")
+				CanvasSeekBar.DrawText( _
+					tickVal, _
+					xTick, _
+					tickY2 + (mThumbRadius * 2), _
+					fnt, _
+					mTickValueColor, _
+					"CENTER")
+
 			Next
 		End If
 	End If
-	
-	' ----------------------------------------------------------------
-	' Vertical
-	' ----------------------------------------------------------------
+
+	' ============================================================
+	' Vertical Slider
+	' ============================================================
 	If mVertical Then
-		Dim x As Int	= BasePane.Width / 2
-		Dim dy As Float
-		Dim yoffset As Double
-		
+
+		Dim yoffset As Float
+
 		yoffset = LabelTitle.Top + LabelTitle.Height
+
 		If mShowValue Then
 			yoffset = yoffset + LabelValue.Height
 		End If
+
 		#if B4A
 		yoffset = yoffset + 5dip
 		#End If
 
 		mBarTop = yoffset
-		
-		mBarBottom = LabelUnit.top - 2dip	' BasePane.Height * 0.85
+		mBarBottom = LabelUnit.Top - 2dip
+
 		mSize = mBarBottom - mBarTop
-		' Check if size > 0
+
 		If mSize <= 0 Then Return
 
-		x1 = x
-		y1 = mBarTop
-		x2 = x1
-		y2 = mBarBottom
-		dy = y2 - y1
+		' --------------------------------------------------------
+		' Slider geometry
+		' --------------------------------------------------------
+		Dim barTop As Float = mBarTop
+		Dim barBottom As Float = mBarBottom
 
-		' Draw bottom/back track
-		CanvasSeekBar.DrawLine(x1, y1, x2, y2, mColorTrack, mInActiveBarWidth)
-		' Log($"BACK top=${mBarTop} x1=${x1} y1=${y1} x2=${x2} y2=${y2} dy=${dy} dytick=${(y2-y1)/mTickCount}"$)
+		Dim barLeft As Float = cx - (mInActiveBarWidth / 2)
+		Dim barRight As Float = cx + (mInActiveBarWidth / 2)
 
-		'CanvasSeekBar.DrawLine(x, mThumbRadiusPressed, x, s1, mColorBarFill, mInActiveBarWidth)
+		Dim thumbY As Float = _
+			barBottom - ((barBottom - barTop) * df)
 
-		' Draw top/front track
-		Dim df As Float	= mValue / (mMaxValue - mMinValue)
-		x1 = x 
-		y1 = y2 - ((y2 - y1) * df)
-		x2 = x1
-		y2 = y2
-		CanvasSeekBar.DrawLine(x1,y1,x2,y2, mColorLevel, mActiveBarWidth)
-		' Log($"FRONT top=${mBarTop} x1=${x1} y1=${y1} x2=${x2} y2=${y2} "$)
-		' CanvasSeekBar.DrawLine(x, s1, x, BasePane.Height - mThumbRadiusPressed, mColorBar, mActiveBarWidth)
+		Dim dy As Float = barBottom - barTop
 
-		' Draw thumb
-		If mShowThumb Then
-			CanvasSeekBar.DrawCircle(x, y1, mThumbRadius, mThumbColor, True, 0)		' mColorBar
-			If Pressed Then CanvasSeekBar.DrawCircle(x, y1, mThumbRadiusPressed, mThumbColor, True, 0)
+		' --------------------------------------------------------
+		' Draw inactive track
+		' --------------------------------------------------------
+		CanvasSeekBar.DrawLine( _
+			cx, barTop, _
+			cx, barBottom, _
+			mColorTrack, _
+			mInActiveBarWidth)
+
+		' --------------------------------------------------------
+		' Draw active track
+		' --------------------------------------------------------
+		If thumbY < barBottom Then
+			CanvasSeekBar.DrawLine( _
+				cx, thumbY, _
+				cx, barBottom, _
+				mColorLevel, _
+				mActiveBarWidth)
 		End If
-		
-		' Draw tickmarks if enabled
-		Dim yTick As Float
-		Dim x2Tick As Float
-		Dim dyTick As Float = (dy / (mTickCount - 1))
 
-		' Expect at least 2 tickcounts for top and bottom
-		If mShowTicks And mTickCount > 2 Then
+		' --------------------------------------------------------
+		' Draw thumb
+		' --------------------------------------------------------
+		If mShowThumb Then
+
+			CanvasSeekBar.DrawCircle( _
+				cx, thumbY, _
+				mThumbRadius, _
+				mThumbColor, _
+				True, 0)
+
+			If Pressed Then
+				CanvasSeekBar.DrawCircle( _
+					cx, thumbY, _
+					mThumbRadiusPressed, _
+					mThumbColor, _
+					True, 0)
+			End If
+		End If
+
+		' --------------------------------------------------------
+		' Draw tickmarks
+		' --------------------------------------------------------
+		If mShowTicks And mTickCount > 1 Then
+
+			Dim dyTick As Float = dy / (mTickCount - 1)
+			Dim fnt As B4XFont = xui.CreateDefaultFont(mTickFontSize)
+
 			For i = 0 To mTickCount - 1
-				yTick = mBarTop + (i * dyTick)
-			
+
+				Dim yTick As Float = barTop + (i * dyTick)
+
 				' Tick line
-				x2Tick = x - (mInActiveBarWidth / 2)
-				If i = 0 Or i = mTickCount - 1 Then x2Tick = x + (mInActiveBarWidth / 2)
-				CanvasSeekBar.DrawLine(x - (mInActiveBarWidth/2) - 4dip, yTick, x2Tick, yTick, mTickValueColor, 1dip)
+				CanvasSeekBar.DrawLine( _
+					barLeft - 4dip, yTick, _
+					barLeft, yTick, _
+					mTickValueColor, _
+					1dip)
 
-				' Tick label left of tick
-				Dim tickVal As Int = mMaxValue - i * (mMaxValue - mMinValue) / (mTickCount - 1)
-				CanvasSeekBar.DrawText(tickVal, x - (mInActiveBarWidth/2) - 8dip, yTick + 4dip, xui.CreateDefaultFont(mTickFontSize), mTickValueColor, "RIGHT")
+				' Tick value
+				Dim tickVal As Int = _
+					mMaxValue - _
+					(i * (mMaxValue - mMinValue) / (mTickCount - 1))
 
-				' Log($"${i}=${yTick} ${tickVal}"$)
+				CanvasSeekBar.DrawText( _
+					tickVal, _
+					barLeft - 8dip, _
+					yTick + 4dip, _
+					fnt, _
+					mTickValueColor, _
+					"RIGHT")
 
 			Next
 		End If
@@ -352,7 +447,8 @@ Public Sub DrawSliders
 
 	CanvasSeekBar.Invalidate
 
-	LabelValue.Text	= mValue
+	LabelValue.Text = mValue
+
 End Sub
 
 ' ================================================================
@@ -496,7 +592,7 @@ End Sub
 ' Parameters:
 '	v Int - Bar value. Must be in min / max range.
 Public Sub setValue(v As Int)
-	mValue = Max(mMinValue, Min(mMaxValue, v))
+	mValue = v
 	DrawSliders
 End Sub
 Public Sub getValue As Int
