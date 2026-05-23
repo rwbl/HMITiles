@@ -6,10 +6,11 @@ The project follows semantic versioning where possible.
 
 ---
 
-## [2.0.1] - 2026-05-22
+## [2.0.1] - 2026-05-23
 - NEW: Example 57-GeneratorSimulator - Demo simulates a standard European 220V/230V @ 50Hz 4-pole industrial diesel generator
 - NEW: Example 58-ColdStorageSimulator - Demo simulates an environmental control chamber / industrial refrigerator loop
 - NEW: Example 59-ConveyorSortingSimulator - Demo simulates a factory material-handling conveyor belt line driven by a VFD motor
+- NEW: Example 60-LighthouseSimulator - Automation example modeling a coastal marine lighthouse station console
 - FIX: HMITileSlider - Handling value < min range or > max range; Tickmarks fixed length instead barheight/width 
 - FIX: HMITileEventViewer - Property MaxEvents wrongly initialized as MaxItems (caused eventviewer crash)
 

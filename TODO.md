@@ -14,16 +14,3 @@
 - FIX: HMITileSelectList - Compact mode customlistview item height same as default mode.
 #### Status
 Tested HMITiles on Linux Ubuntu and Raspberry Pi. Need to document.
-
-### NEW: Keyestudio Smart Farm Kit
-Develop new project `FarmKit32` to control the Keyestudio Smart Farm Kit [KS0567](docs.keyestudio.com/projects/KS0567/en/latest/wiki/index.html). 
-Similar to the HomeKit32 project.
-#### Status
-Not started.
-
-### NEW: HubController RailYard GUI
-Develop GUI for the [HubController – ESP32 Command Hub](www.b4x.com/android/forum/threads/hubcontroller-–-esp32-command-hub.170663/) example application `RailYard`.
-#### Status
-In progress.
-
-
